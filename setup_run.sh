@@ -1,20 +1,26 @@
 #!/bin/bash
 
-RUNTYPE=DATA
-[[ $# -gt 1 ]] && RUNTYPE=$1
+WORKLOAD_NAME=DATA
+[[ "$#" -ne 0 ]] && WORKLOAD_NAME=$1
 
 CWD=$(pwd)
-RUNDIR=../rundir/$(date +"$RUNTYPE-%Y%m%d-%H%M")
+RUNDIR=../rundir/$WORKLOAD_NAME/$(date +"%Y%m%d-%H%M%S")
 RAWDIR=$RUNDIR/data/raw
 FINALDIR=$RUNDIR/data/final
 SCRIPTDIR=$RUNDIR/scripts
 IMGDIR=$RUNDIR/img
 HTMLDIR=$RUNDIR/html
-mkdir -p $RAWDIR
-mkdir -p $FINALDIR
-mkdir -p $SCRIPTDIR
-mkdir -p $IMGDIR
-rm -f ../rundir/$RUNTYPE-latest
-ln -sf $RUNDIR ../rundir/$RUNTYPE-latest
+
+for DIR in data/raw data/final scripts img html
+do
+  mkdir -p $RUNDIR/$DIR
+done
+
 cp $0 $SCRIPTDIR   # copy this script to the script directory
+
+cd $RUNDIR/..
+rm -f latest
+ln -sf $(basename $RUNDIR) latest
+
 echo $RUNDIR
+
