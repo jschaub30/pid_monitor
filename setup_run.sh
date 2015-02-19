@@ -11,10 +11,12 @@ SCRIPTDIR=$RUNDIR/scripts
 IMGDIR=$RUNDIR/img
 HTMLDIR=$RUNDIR/html
 
-for DIR in data/raw data/final scripts img html
+for DIR in data/raw data/final scripts img 
 do
   mkdir -p $RUNDIR/$DIR
 done
+
+cp -R html $RUNDIR/html
 
 cp $0 $SCRIPTDIR   # copy this script to the script directory
 
