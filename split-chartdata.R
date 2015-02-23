@@ -15,8 +15,8 @@
 #   2,7,3
 #   3,NA,9
 # Usage:   
-#  ./split_chartdata.R [TIDY_CSV] [SPLIT_VAR] [TIME_VAR] [MEAS_VAR]
-# Example: ./split_chartdata.R pwatch.csv pid elapsed_time_sec, cpu_pct
+#  ./split-chartdata.R [TIDY_CSV] [SPLIT_VAR] [TIME_VAR] [MEAS_VAR]
+# Example: ./split-chartdata.R pwatch.csv pid elapsed_time_sec cpu_pct
 
 args <- commandArgs(TRUE)
 

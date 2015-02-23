@@ -1,17 +1,15 @@
 # pid_monitor
-Linux tools for monitoring processes written in bash, python and javascript
+Linux tool that launched a workload, records process and system data (like CPU and Memory usage), and automatically generates an html page with interactive javascript charts.
 
- - /rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
- - /rundir/[WORKLOAD-NAME]/[DATETIME]/data/final # Parsed CSV data
- - /rundir/[WORKLOAD-NAME]/[DATETIME]/script     # Measurement and analysis scripts
- - /rundir/[WORKLOAD-NAME]/[DATETIME]/img        # Any image files from analyzing data
- - /rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
+Written in bash, python, R and javascript.  Uses the D3js and C3js javascript libraries.
 
-Example program around "sleep" command
+Start by editing the "run-workload.sh" script
+$ ./run-workload.sh   # calls the "watch-process.py script
 
-./run_sleep.sh   # runs "sleep 2" and creates run directory in ../rundir/SLEEP/[TIMESTAMP]/latest
-./tidy_all_sleep.sh  # Calls ./tidy_sleep.py against all runs to parse raw data into ../rundir/SLEEP/[TIMESTAMP]/latest/data/final/summary.csv
+This will create the follwing directories:
+ - ../rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
+ - ../rundir/[WORKLOAD-NAME]/[DATETIME]/data/final # Parsed CSV data in "tidy" data format
+ - ../rundir/[WORKLOAD-NAME]/[DATETIME]/script     # Measurement and analysis scripts
+ - ../rundir/[WORKLOAD-NAME]/[DATETIME]/img        # Any image files from analyzing data
+ - ../rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
 
-A summary CSV file of all the runs will be located at ../rundir/SLEEP/all.csv
-
-The output is stored with "tidy data" principles in mind.

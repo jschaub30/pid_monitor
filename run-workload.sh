@@ -24,7 +24,7 @@ STAT_STDOUT=$RUNDIR/data/raw/log.pwatch.stdout
 SPARK_CONFIG_FN=$RUNDIR/data/raw/log.config.spark.txt   # Unique to this workload
 
 # STEP 2: DEFINE COMMANDS FOR WORKLOAD AND ALL MONITORS
-STAT_CMD="./watch_process.sh $PROCESS_NAME_TO_WATCH" # could use dstat here too
+STAT_CMD="./watch-process.sh $PROCESS_NAME_TO_WATCH" # could use dstat here too
 
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
 CONFIG=$CONFIG,timestamp,$TIMESTAMP
@@ -52,11 +52,13 @@ kill -9 $STAT_PID
 sleep 1
 
 #STEP 7: ANALYZE DATA
-./tidy_pwatch.py $STAT_STDOUT $PROCESS_NAME_TO_GREP | tee $RUNDIR/data/final/pwatch.csv
+./tidy-pwatch.py $STAT_STDOUT $PROCESS_NAME_TO_GREP | tee $RUNDIR/data/final/pwatch.csv
 
 #STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
 CWD=$(pwd)
-cp split_chartdata.py $RUNDIR/html
-cd -R html $RUNDIR/html
-./split_chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct  # Parse CPU data
-./split_chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec mem_pct  # Parse memory data
+cp -R html $RUNDIR/html
+cp split-chartdata.R $RUNDIR/html/.
+cd $RUNDIR/
+./split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct  # Parse CPU data
+./split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec mem_pct  # Parse memory data
+cd $CWD
