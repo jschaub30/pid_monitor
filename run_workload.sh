@@ -57,5 +57,6 @@ sleep 1
 #STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
 CWD=$(pwd)
 cp split_chartdata.py $RUNDIR/html
-cd $RUNDIR/html
-./split_chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct mem_pct
+cd -R html $RUNDIR/html
+./split_chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct  # Parse CPU data
+./split_chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec mem_pct  # Parse memory data

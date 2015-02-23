@@ -1,42 +1,30 @@
-function create_all_charts(arr) {
+cpu_chart = function(id, csv_fn){
+  //csv_filename = obj.filename;
 
-    for(i = 0; i < arr.length; i++) {
-        cpu_mem_chart(arr[i])
-    }      
-}
-
-cpu_mem_chart = function(obj){
-  var id = obj.id,
-      csv_filename = obj.filename;
-  
   // Add h3 title
   $('<h3></h3>', {
-    text: "Process " + id,
+    text: id,
   }).appendTo('body');
-  
+
   // Add chart div
   div = $('<div></div>',{
     class: "chart",
     id: "id_" + id
   }).appendTo('body');
-  
+
   //Create c3js chart
   var chart = c3.generate({
     bindto: "#id_" + id,
     data: {
-      url: csv_filename,
-      x: 'elapsed_time_sec',
-      names: {
-        mem_pct: 'Memory',
-        cpu_pct: 'CPU'
-      },
+      url: csv_fn,
+      x: 'x',
     },
     type: 'line'
     ,
     axis: {
       y: {
-        min: 0,
-        max: 100,
+        // min: 0,
+        // max: 100,
         label: 'Usage [ % ]',
       },
       x: {
@@ -45,9 +33,11 @@ cpu_mem_chart = function(obj){
         label: 'Elapsed time [ sec ]',
       }
     }
-  }); 
+  });
 }
 
-create_all_charts(chartdata);
+cpu_chart('CPU', 'cpu_pct.csv');
+
+cpu_chart('Memory', 'mem_pct.csv');
 
 
