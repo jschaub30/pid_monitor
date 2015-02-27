@@ -4,7 +4,7 @@ WORKLOAD_NAME=DATA
 [[ "$#" -ne 0 ]] && WORKLOAD_NAME=$1
 
 CWD=$(pwd)
-RUNDIR=../rundir/$WORKLOAD_NAME/$(date +"%Y%m%d-%H%M%S")
+RUNDIR=$CWD/../rundir/$WORKLOAD_NAME/$(date +"%Y%m%d-%H%M%S")
 RAWDIR=$RUNDIR/data/raw
 FINALDIR=$RUNDIR/data/final
 SCRIPTDIR=$RUNDIR/scripts

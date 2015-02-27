@@ -28,8 +28,8 @@ cpu_chart = function(id, csv_fn){
         label: 'Usage [ % ]',
       },
       x: {
-        min: 0,
-        max: 60,
+        // min: 0,
+        // max: 60,
         label: 'Elapsed time [ sec ]',
       }
     }
