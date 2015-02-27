@@ -1,13 +1,12 @@
 #!/bin/bash
 
-WORKLOAD_NAME=SPARK
-PROCESS_NAME_TO_WATCH="python"
-PROCESS_NAME_TO_GREP="pyspark.daemon"
-WORKLOAD_CMD="spark-submit --properties-file config.conf extlink.py externallinks_en.csv"
-#WORKLOAD_CMD="python fake_workload1.py & python fake_workload2.py"
+set -x
+[ -z $WORKLOAD_NAME ]  && WORKLOAD_NAME=dd
+[ -z $PROCESS_NAME_TO_WATCH ]  && PROCESS_NAME_TO_WATCH="dd"
+[ -z $PROCESS_NAME_TO_GREP ]  && PROCESS_NAME_TO_GREP="dd"
+[ -z $WORKLOAD_CMD ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=128k count=8192"
 
-
-RUNDIR=$(./setup_run.sh $WORKLOAD_NAME)
+RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 echo $RUNDIR
 cp $0 $RUNDIR/scripts
 cp *py $RUNDIR/scripts
@@ -17,11 +16,9 @@ cp *R $RUNDIR/scripts
 TIMESTAMP=$(date +"%Y-%m-%d_%H:%M:%S")
 TIME_FN=$RUNDIR/data/raw/log.time.txt
 CONFIG_FN=$RUNDIR/data/raw/log.config.txt
-WORKLOAD_STDOUT=$RUNDIR/data/raw/log.spark.stdout
-WORKLOAD_STDERR=$RUNDIR/data/raw/log.spark.stderr
+WORKLOAD_STDOUT=$RUNDIR/data/raw/log.workload.stdout
+WORKLOAD_STDERR=$RUNDIR/data/raw/log.workload.stderr
 STAT_STDOUT=$RUNDIR/data/raw/log.pwatch.stdout
-
-SPARK_CONFIG_FN=$RUNDIR/data/raw/log.config.spark.txt   # Unique to this workload
 
 # STEP 2: DEFINE COMMANDS FOR WORKLOAD AND ALL MONITORS
 STAT_CMD="./watch-process.sh $PROCESS_NAME_TO_WATCH" # could use dstat here too
@@ -35,7 +32,6 @@ CONFIG=$CONFIG,stat_command,$STAT_CMD
 CONFIG=$CONFIG,workload_command,$WORKLOAD_CMD
 CONFIG=$CONFIG,  # Add trailiing comma
 echo $CONFIG > $CONFIG_FN
-cp config.conf $SPARK_CONFIG_FN  # unique to this workload
 
 # STEP 4: START PROCESS MONITOR
 $STAT_CMD > $STAT_STDOUT &
@@ -47,18 +43,17 @@ STAT_PID=$!
 
 #STEP 6: KILL STAT MONITOR
 sleep 5
-kill -9 $STAT_PID
-
+kill -9 $STAT_PID 2> /dev/null 1>/dev/null
 sleep 1
 
 #STEP 7: ANALYZE DATA
-./tidy-pwatch.py $STAT_STDOUT $PROCESS_NAME_TO_GREP | tee $RUNDIR/data/final/pwatch.csv
+./tidy-pwatch.py $STAT_STDOUT $PROCESS_NAME_TO_GREP > $RUNDIR/data/final/pwatch.csv
 
 #STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
 CWD=$(pwd)
-cp -R html $RUNDIR/html
-cp split-chartdata.R $RUNDIR/html/.
-cd $RUNDIR/
+cp -R html $RUNDIR/.
+cd $RUNDIR/html
 ./split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct  # Parse CPU data
 ./split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec mem_pct  # Parse memory data
 cd $CWD
+
