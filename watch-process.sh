@@ -1,5 +1,8 @@
 #!/bin/bash
 COUNTER=0
+DELAY=$2
+
+[[ $# -lt "2" ]] && DELAY=1
 while [ 1 ]; do
 	echo '==--=='
 	date
@@ -8,7 +11,7 @@ while [ 1 ]; do
 	ps -C $1 -o pid,%cpu,%mem,cmd 
 	#echo 'top 10'
 	#top -b -n 1 | head -n 17 | tail -n 11
-	sleep 1 
+	sleep $DELAY
 	#echo '--==--'
 	#echo
 done

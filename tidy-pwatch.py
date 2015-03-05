@@ -50,9 +50,41 @@ def main(argList):
     m = Measurement()
     print(m.header())
 
-    fields = parse_run_log(m, run_fn, workload_cmd)
+    fields = parse_pwatch(m, run_fn, workload_cmd)
 
-def parse_run_log(m, fn, workload_cmd):
+def parse_time(m, fn):
+    '''
+    This parses the output of "/usr/bin/time --verbose"
+    Parsing these fields:  exit_status, user_time_sec, elapsed_time_sec, cpu_percent
+    '''
+    with open (fn, 'r') as f:
+        blob = f.read()
+    time_fields = ['Exit status', 'User time (seconds)', 'System time (seconds)']
+    val = blob.split('Exit status: ')[1].split('\n')[0].strip()
+    if val == '0':
+        m.success = True
+    else:
+        m.success = False
+    meas_types = ['exit_status']
+    meas_vals = [val]
+    val = blob.split('User time (seconds): ')[1].split('\n')[0].strip()
+    meas_types.append('user_time_sec')
+    meas_vals.append(val)
+    val = blob.split('Elapsed (wall clock) time (h:mm:ss or m:ss): ')[1].split('\n')[0].strip()
+    if len(val.split(':'))==2:   # m:ss
+        val = str(int(val.split(':')[0])*60 + float(val.split(':')[1].strip()))
+    elif len(val.split(':'))==3:   # h:m:ss
+        val = str(int(val.split(':')[0])*3600 + int(val.split(':')[1])*60 + float(val.split(':')[2].strip()))
+    meas_types.append('elapsed_time_sec')
+    meas_vals.append(val)
+    val = blob.split('Percent of CPU this job got: ')[1].split('\n')[0].strip('%')
+    meas_types.append('cpu_percent')
+    meas_vals.append(val)
+    return [meas_types, meas_vals]
+
+    return m
+
+def parse_pwatch(m, fn, workload_cmd):
     '''
     Custom parser for pwatch program
     '''
