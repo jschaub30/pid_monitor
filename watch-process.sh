@@ -8,7 +8,7 @@ while [ 1 ]; do
 	date
 	#echo 'process cmd'
 #	pgrep $1
-	ps -C $1 -o pid,%cpu,%mem,cmd 
+	ps -C $1 -o pid,%cpu,%mem,cmd,user
 	#echo 'top 10'
 	#top -b -n 1 | head -n 17 | tail -n 11
 	sleep $DELAY
