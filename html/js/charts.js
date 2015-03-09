@@ -1,6 +1,5 @@
 cpu_chart = function(id, csv_fn){
-  //csv_filename = obj.filename;
-
+  id = id.replace(/ /g, '_');  // Replace all spaces
   // Add h3 title
   $('<h3></h3>', {
     text: id,
@@ -19,8 +18,18 @@ cpu_chart = function(id, csv_fn){
       url: csv_fn,
       x: 'x',
     },
-    type: 'line'
-    ,
+    type: 'line',
+    grid: {
+      x: {
+        show: true
+      },
+      y: {
+        show: true
+      }
+    },
+    point: {
+      r: 5
+    },
     axis: {
       y: {
         // min: 0,

@@ -71,7 +71,7 @@ echo Now tidying raw data into CSV files
 echo Creating html charts
 cp -R html $RUNDIR/.
 cd $RUNDIR/html
-./split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct  # Parse CPU data
-./split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec mem_pct  # Parse memory data
+../scripts/split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec cpu_pct  # Parse CPU data
+../scripts/split-chartdata.R ../data/final/pwatch.csv pid elapsed_time_sec mem_pct  # Parse memory data
 cd $CWD
 

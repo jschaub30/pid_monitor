@@ -90,7 +90,7 @@ def parse_pwatch(m, fn, workload_cmd):
     '''
     with open (fn, 'r') as f:
         for line in f:
-            if 'CST 201' in line:
+            if 'T 201' in line:
                 # Time format is "Mon Feb 16 11:38:53 CST 2015"
                 if 'ts0' in locals():
                     ts = datetime.strptime(' '.join(line.split(' ')[1:]).strip(), "%b %d %H:%M:%S %Z %Y")
