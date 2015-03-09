@@ -24,6 +24,7 @@ input_csv <- args[1]       # Input filename
 split_var <- args[2]       # Split on this column name
 time_var  <- args[3]       # Timebase
 data_var  <- args[4]       # Print these column names to output files
+run_id <- args[5]       # Print these column names to output files
 
 write(sprintf("Reading input file=%s", input_csv), stderr())
 write(sprintf("Splitting on column name=%s", split_var), stderr())
@@ -36,9 +37,9 @@ pieces <- split(d, d[split_var])
 
 x <- unique(d[, time_var])
 dnew <- data.frame(x=x)
-
+id_list = c()
 for (i in seq_along(pieces)){
-  id <- names(pieces)[i]
+  id_list[i] <- sprintf('%s=%s', split_var, names(pieces)[i])
   d1 <- pieces[[i]]
   x2 <- d1[ , time_var]
   d2 <- d1[ , data_var]
@@ -50,8 +51,9 @@ for (i in seq_along(pieces)){
   y[pos] <- d2
   dnew <- cbind(dnew, y)
 }
-names(dnew) <- c('x', names(pieces))
-out_fn <- paste(data_var,'csv', sep='.')
+#names(dnew) <- c('x', names(pieces))
+names(dnew) <- c('x', id_list)
+out_fn <- paste(run_id, data_var, 'csv', sep='.')
 write(sprintf("Writing to: %s", out_fn), stderr())
 write.csv(dnew, out_fn, row.names=FALSE)
 
