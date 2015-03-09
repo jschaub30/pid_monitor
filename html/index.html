@@ -29,51 +29,33 @@
   <a class="padding-L1" href="http://arlab093.austin.ibm.com/">Jeremy's site</a>
   <a class="padding-L1" href="http://arlab093.austin.ibm.com/blog">Jeremy's blog</a>
   <a class="padding-L1" href="http://arlab093.austin.ibm.com/schaubj/chart">All data charts</a>
-  <span class="date">TODAY'S DATE</span>
+  <span class="date">DATE</span>
 </header>
-	<h1 class="title">WORKLOAD NAME</h1>
+	<h1 class="title">WORKLOAD</h1>
   
   <h3 id="cpu_title">CPU</h3>
   <div id="id_cpu"></div>
   <h3 id="mem_title">Memory</h3>
   <div id="id_mem"></div>
-  
+
+	<script src='js/charts.js' type='text/javascript'> </script>
   <script type="text/javascript">
-    var id_list = ["COUNT=8192", "COUNT=16384"]
-    
-    for (i in id_list){
-      create_button(i, id_list)
-    }
-    var cpu_csv_fn = id_list[0] + '.cpu_pct.csv';
-    var mem_csv_fn = id_list[0] + '.mem_pct.csv';
-    
-    function create_button(i, id_list){
-      var id = id_list[i];
-      var button_id = button + String(i);
-      var button = $('<button></button>', {
-        id:button_id,
-        text:id
-      }).insertBefore('#cpu_title');
-      
-      $("#" + button_id).on('click', function(){
-        setTimeout(function () {
-          cpu_chart.unload();
-          mem_chart.unload();
-        }, 500);
-        setTimeout(function () {
-          cpu_chart.load({
-              url: id + '.cpu_pct.csv'
-          });
-          mem_chart.load({
-              url: id + '.mem_pct.csv'
-          });
-        }, 1000);
-      })
-      
-    }
+
+    $.ajax({
+      type: "GET",
+      url: "IDs.txt",
+      dataType: "script",
+      success: function(data) {
+        var id_list = $.trim(data).split('\n');
+        build_charts(id_list);
+      },
+      error: function (request, status, error) {
+
+        console.log(error);
+      }
+    });
     
   </script>
-	<script src='js/charts.js' type='text/javascript'> </script>
 </body>
 </html>
 
