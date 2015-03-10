@@ -3,8 +3,8 @@
 # To run a custom workload, define the following 4 variables and run this script
 
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd && echo "dd workload"
-[ -z "$PROCESS_NAME_TO_WATCH" ]  && PROCESS_NAME_TO_WATCH="dd"
-[ -z "$PROCESS_NAME_TO_GREP" ]  && PROCESS_NAME_TO_GREP="dd"
+#[ -z "$PROCESSES_TO_WATCH" ]  && PROCESSES_TO_WATCH=(dd)
+[ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=128k count=16384"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
@@ -24,7 +24,7 @@ echo Running this workload:
 echo \"$WORKLOAD_CMD\"
 
 echo Putting results in $RUNDIR
-cp $0 $RUNDIR/scripts
+cp *sh $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 cp *R $RUNDIR/scripts
 
@@ -38,7 +38,9 @@ STAT_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
 DSTAT_CSV=$RUNDIR/data/final/dstat.csv
 
 # STEP 2: DEFINE COMMANDS FOR ALL SYSTEM MONITORS
-STAT_CMD="./watch-process.sh $PROCESS_NAME_TO_WATCH $DELAY_SEC" 
+STAT_CMD="./watch-process.sh $DELAY_SEC" 
+$STAT_CMD > $STAT_STDOUT &
+STAT_PID=$!
 DSTAT_CMD="dstat -v --output $DSTAT_CSV $DELAY_SEC"
 
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
@@ -52,11 +54,6 @@ CONFIG=$CONFIG,workload_command,$WORKLOAD_CMD
 CONFIG=$CONFIG,workload_dir,$WORKLOAD_DIR
 CONFIG=$CONFIG,  # Add trailiing comma
 echo $CONFIG > $CONFIG_FN
-
-# STEP 4: START SYSTEM MONITORS
-$STAT_CMD > $STAT_STDOUT &
-
-STAT_PID=$!
 
 CWD=$(pwd)
 echo Working directory: $WORKLOAD_DIR
@@ -74,12 +71,12 @@ sleep 1
 
 #STEP 7: ANALYZE DATA
 echo Now tidying raw data into CSV files
-./tidy-pwatch.py $STAT_STDOUT $PROCESS_NAME_TO_GREP $RUN_ID > $RUNDIR/data/final/$RUN_ID.pwatch.csv
+./tidy-pwatch.py $STAT_STDOUT $PROCESS_TO_GREP $RUN_ID > $RUNDIR/data/final/$RUN_ID.pwatch.csv
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
 
 # Combine CSV files from all runs into summaries
-./summarize-csv.sh .time.csv > $RUNDIR/data/final/summary.time.csv
-./summarize-csv.sh .pwatch.csv > $RUNDIR/data/final/summary.pwatch.csv
+./summarize-csv.sh $RUNDIR/data/final .time.csv > $RUNDIR/data/final/summary.time.csv
+./summarize-csv.sh $RUNDIR/data/final .pwatch.csv > $RUNDIR/data/final/summary.pwatch.csv
 
 #STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
 echo Creating html charts

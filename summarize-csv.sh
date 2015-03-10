@@ -1,8 +1,9 @@
 #!/bin/bash
 
-[[ $# -lt 1 ]] && echo "Must input filename suffix (eg .time.csv)" && exit 1
+[[ $# -lt 2 ]] && echo "Usage: $0 [FN_PATH] [FN_SUFFIX] (eg $0 ../rundir/dd/latest/data/final .time.csv)" && exit 1
 
-SUFFIX=$1
+cd $1
+SUFFIX=$2
 
 H=1 # Header flag
 for F in $(ls -tr *$SUFFIX)

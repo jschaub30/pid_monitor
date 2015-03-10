@@ -1,17 +1,15 @@
 #!/bin/bash
-COUNTER=0
-DELAY=$2
+DELAY=$1
 
-[[ $# -lt "2" ]] && DELAY=1
+[[ $# -lt "1" ]] && DELAY=1
+
 while [ 1 ]; do
 	echo '==--=='
 	date
-	#echo 'process cmd'
-#	pgrep $1
-	ps -C $1 -o pid,%cpu,%mem,cmd,user
+	ps r -o pid,%cpu,%mem,cmd,user
+	sleep $DELAY
 	#echo 'top 10'
 	#top -b -n 1 | head -n 17 | tail -n 11
-	sleep $DELAY
 	#echo '--==--'
 	#echo
 done
