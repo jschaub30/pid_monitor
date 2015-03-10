@@ -13,10 +13,10 @@
 
 if [ -z "$SWEEP_FLAG" ]
 then
-    echo workload:\"$WORKLOAD_NAME\" >> $RUNDIR/html/config.txt
-    echo date:\"$(date)\" >> $RUNDIR/html/config.txt
+    echo \{\"workload\":\"$WORKLOAD_NAME\", >> $RUNDIR/html/config.json
+    echo \"date\":\"$(date)\", >> $RUNDIR/html/config.json
 fi
-echo run_id:\"$RUN_ID\" >> $RUNDIR/html/config.txt
+echo \"$RUN_ID\", >> $RUNDIR/html/config.json
 
 DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
 
@@ -86,3 +86,8 @@ cd $RUNDIR/html
 ../scripts/split-chartdata.R ../data/final/$RUN_ID.pwatch.csv pid elapsed_time_sec mem_pct  $RUN_ID # Parse memory data
 cd $CWD
 
+if [ -z "$SWEEP_FLAG" ]
+then
+    echo \]\} >> $RUNDIR/html/config.json
+    ./tidy-json.py $RUNDIR/html/config.json > $RUNDIR/html/config.clean.json
+fi
