@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # To run a custom workload, define the following 4 variables and run this script
+
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd && echo "dd workload"
 [ -z "$PROCESS_NAME_TO_WATCH" ]  && PROCESS_NAME_TO_WATCH="dd"
 [ -z "$PROCESS_NAME_TO_GREP" ]  && PROCESS_NAME_TO_GREP="dd"
@@ -8,7 +9,14 @@
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
 [ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
-[ -z "$RUN_ID" ]  && RUN_ID=1
+[ -z "$RUN_ID" ]  && RUN_ID="RUN1"
+
+if [ -z "$SWEEP_FLAG" ]
+then
+    echo "workload=$WORKLOAD_NAME" >> $RUNDIR/html/config.txt
+    echo "date=$(date)" >> $RUNDIR/html/config.txt
+fi
+echo "run_id=$RUN_ID" >> $RUNDIR/html/config.txt
 
 DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
 
