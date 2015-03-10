@@ -2,24 +2,20 @@
 
 $.ajax({
   type: "GET",
-  url: "config.txt",
-  dataType: "text",
+  url: "config.json",
+  dataType: "json",
   success: function(data) {
+    console.log(data);
     var config_list = $.trim(data).split('\n');
     
-    $('#id_workload').text(config_list[0].split(':')[1]);
-    $('#id_date').text(config_list[1].split(':')[1]);
-    var id_list;
-    for (i in config_list.slice(2)){
-      id_list[i] = config_list.slice(2).split(':')[1];
-    }
-    build_charts(config_list.slice(2));
+    $('#id_workload').text(data["workload"]);
+    $('#id_date').text(data["date"]);
+    build_charts(data["id_list"]);
   },
   error: function (request, status, error) {
     console.log(error);
   }
 });
-
 
 function build_charts(id_list) {
   var cpu_csv_fn  = id_list[0] + '.cpu_pct.csv',
