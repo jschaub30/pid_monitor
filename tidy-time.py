@@ -68,6 +68,7 @@ def parse_time(m, fn):
     if m.exit_status != '0':
         sys.stderr.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         sys.stderr.write("WARNING! non-zero exit status = " + m.exit_status + "\n")
+        sys.stderr.write("See file " + fn + "\n")
         sys.stderr.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
     m.user_time_sec = blob.split('User time (seconds): ')[1].split('\n')[0].strip()
     m.system_time_sec = blob.split('System time (seconds): ')[1].split('\n')[0].strip()

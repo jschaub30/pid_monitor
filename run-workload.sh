@@ -13,10 +13,10 @@
 
 if [ -z "$SWEEP_FLAG" ]
 then
-    echo "workload=$WORKLOAD_NAME" >> $RUNDIR/html/config.txt
-    echo "date=$(date)" >> $RUNDIR/html/config.txt
+    echo workload:\"$WORKLOAD_NAME\" >> $RUNDIR/html/config.txt
+    echo date:\"$(date)\" >> $RUNDIR/html/config.txt
 fi
-echo "run_id=$RUN_ID" >> $RUNDIR/html/config.txt
+echo run_id:\"$RUN_ID\" >> $RUNDIR/html/config.txt
 
 DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
 
@@ -76,6 +76,10 @@ sleep 1
 echo Now tidying raw data into CSV files
 ./tidy-pwatch.py $STAT_STDOUT $PROCESS_NAME_TO_GREP $RUN_ID > $RUNDIR/data/final/$RUN_ID.pwatch.csv
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
+
+# Combine CSV files from all runs into summaries
+./summarize-csv.sh .time.csv > $RUNDIR/data/final/summary.time.csv
+./summarize-csv.sh .pwatch.csv > $RUNDIR/data/final/summary.pwatch.csv
 
 #STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
 echo Creating html charts
