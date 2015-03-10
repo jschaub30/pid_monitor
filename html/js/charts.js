@@ -1,3 +1,26 @@
+// First read configuration from a file, then call build_charts
+
+$.ajax({
+  type: "GET",
+  url: "config.txt",
+  dataType: "text",
+  success: function(data) {
+    var config_list = $.trim(data).split('\n');
+    
+    $('#id_workload').text(config_list[0].split(':')[1]);
+    $('#id_date').text(config_list[1].split(':')[1]);
+    var id_list;
+    for (i in config_list.slice(2)){
+      id_list[i] = config_list.slice(2).split(':')[1];
+    }
+    build_charts(config_list.slice(2));
+  },
+  error: function (request, status, error) {
+    console.log(error);
+  }
+});
+
+
 function build_charts(id_list) {
   var cpu_csv_fn  = id_list[0] + '.cpu_pct.csv',
   mem_csv_fn  = id_list[0] + '.mem_pct.csv';
@@ -72,14 +95,22 @@ function build_charts(id_list) {
   }
 
   function create_button(i, id_list){
-    var id        = id_list[i];
-    var button_id = button + String(i);
-    var button    = $('<button></button>', {
-      id:button_id,
-      text:id
-    }).insertBefore('#cpu_title');
-  
+    var id        = id_list[i],
+        button_id = "button" + String(i),
+        button    = $('<button></button>', {
+                      id:button_id,
+                      width:"180px",
+                      height:"40px",
+                      text:id
+                    }).insertBefore('#cpu_title').addClass('button');
+    
+    if (i==0){
+      button.addClass('active')
+    }
     $("#" + button_id).on('click', function(){
+      $this = $(this);
+      $this.addClass('active');
+      $this.siblings('button').removeClass('active');
       setTimeout(function () {
         cpu_chart.unload();
         mem_chart.unload();
@@ -95,3 +126,6 @@ function build_charts(id_list) {
     })
   }
 }
+
+
+

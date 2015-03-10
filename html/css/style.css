@@ -21,10 +21,6 @@ body {
     font-family: "Helvetica";
 }
 
-
-
-
-
 html {
     min-width: 1040px;
 }
@@ -155,4 +151,14 @@ iframe {
 
 .full-time {
     text-color: #0000FF;
+}
+
+.active {
+  background-color: #0066ff;
+  color: #FFFFFF;
+  margin: 1em;
+}
+
+.button {
+  margin: 1em;
 }
