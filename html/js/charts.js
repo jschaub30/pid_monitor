@@ -2,7 +2,7 @@
 
 $.ajax({
   type: "GET",
-  url: "config.json",
+  url: "config.clean.json",
   dataType: "json",
   success: function(data) {
     console.log(data);
@@ -10,16 +10,16 @@ $.ajax({
     
     $('#id_workload').text(data["workload"]);
     $('#id_date').text(data["date"]);
-    build_charts(data["id_list"]);
+    build_charts(data["run_ids"]);
   },
   error: function (request, status, error) {
     console.log(error);
   }
 });
 
-function build_charts(id_list) {
-  var cpu_csv_fn  = id_list[0] + '.cpu_pct.csv',
-  mem_csv_fn  = id_list[0] + '.mem_pct.csv';
+function build_charts(run_ids) {
+  var cpu_csv_fn  = run_ids[0] + '.cpu_pct.csv',
+  mem_csv_fn  = run_ids[0] + '.mem_pct.csv';
   
   //Create c3js chart
   var cpu_chart = c3.generate({
@@ -86,12 +86,12 @@ function build_charts(id_list) {
     }
   });
 
-  for (i in id_list){
-    create_button(i, id_list)
+  for (i in run_ids){
+    create_button(i, run_ids)
   }
 
-  function create_button(i, id_list){
-    var id        = id_list[i],
+  function create_button(i, run_ids){
+    var id        = run_ids[i],
         button_id = "button" + String(i),
         button    = $('<button></button>', {
                       id:button_id,
