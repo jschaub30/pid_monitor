@@ -75,6 +75,7 @@ echo Now tidying raw data into CSV files
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
 
 # Combine CSV files from all runs into summaries
+rm $RUNDIR/data/final/summary.time.csv $RUNDIR/data/final/summary.pwatch.csv
 ./summarize-csv.sh $RUNDIR/data/final .time.csv > $RUNDIR/data/final/summary.time.csv
 ./summarize-csv.sh $RUNDIR/data/final .pwatch.csv > $RUNDIR/data/final/summary.pwatch.csv
 
