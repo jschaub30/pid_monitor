@@ -95,8 +95,6 @@ function build_charts(run_ids) {
         button_id = "button" + String(i),
         button    = $('<button></button>', {
                       id:button_id,
-                      width:"180px",
-                      height:"40px",
                       text:id
                     }).insertBefore('#cpu_title').addClass('button');
     

@@ -160,5 +160,7 @@ iframe {
 }
 
 .button {
-  margin: 1em;
+  margin: 10px;
+  width: 155px;
+  height: 40px;
 }
