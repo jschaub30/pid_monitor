@@ -6,9 +6,9 @@ cd $1
 SUFFIX=$2
 
 H=1 # Header flag
-for F in $(ls -tr *$SUFFIX)
+for F in $FILES
 do
-    [[ $H -eq 1 ]] && echo run_id,$(head -n1 $F)
+    [[ $H -eq 1 ]] && echo run_id,$(head -n1 $F) # Write header line
     H=0
     RUN_ID=$(echo $F | sed s"/$SUFFIX//")
     tail -n+2 $F | sed "s/^/$RUN_ID,/g"
