@@ -9,6 +9,7 @@ $.ajax({
     var config_list = $.trim(data).split('\n');
     
     $('#id_workload').text(data["workload"]);
+    $('#id_title').text(data["workload"]);
     $('#id_date').text(data["date"]);
     build_charts(data["run_ids"]);
   },
@@ -16,6 +17,51 @@ $.ajax({
     console.log(error);
   }
 });
+
+
+var summary_chart = c3.generate({
+  bindto: "#id_summary",
+  data: {
+    url: "summary.csv",
+    x: 'run_id',
+    axes: {
+      cpu_pct: 'y',
+      elapsed_time_sec: 'y2'
+    }
+  },
+  type: 'line',
+  grid: {
+    x: {
+      show: true
+    },
+    y: {
+      show: true
+    }
+  },
+  point: {
+    r: 5
+  },
+  axis: {
+    x: {
+      type: 'category',
+      // min: 0,
+      // max: 60,
+      // label: 'Elapsed time [ sec ]',
+    },
+    y: {
+      min: 0,
+      // max: 100,
+      label: 'CPU Usage [ % ]',
+    },
+    y2: {
+      min: 0,
+      show: true,
+      label: 'Execution time [ seconds ]',
+    }
+  }
+});
+
+
 
 function build_charts(run_ids) {
   var cpu_csv_fn  = run_ids[0] + '.cpu_pct.csv',
