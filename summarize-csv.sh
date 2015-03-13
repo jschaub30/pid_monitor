@@ -4,6 +4,7 @@
 
 cd $1
 SUFFIX=$2
+FILES=$(ls -tr *$SUFFIX)
 
 H=1 # Header flag
 for F in $FILES
