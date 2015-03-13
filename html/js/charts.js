@@ -23,11 +23,11 @@ var summary_chart = c3.generate({
   bindto: "#id_summary",
   data: {
     url: "summary.csv",
-    x: 'run_id',
-    axes: {
-      cpu_pct: 'y',
-      elapsed_time_sec: 'y2'
-    }
+    x: 'run_id'
+    // axes: {
+    //   cpu_pct: 'y',
+    //   elapsed_time_sec: 'y2'
+    // }
   },
   type: 'line',
   grid: {
@@ -53,11 +53,11 @@ var summary_chart = c3.generate({
       // max: 100,
       label: 'CPU Usage [ % ]',
     },
-    y2: {
-      min: 0,
-      show: true,
-      label: 'Execution time [ seconds ]',
-    }
+    // y2: {
+    //   min: 0,
+    //   show: true,
+    //   label: 'Execution time [ seconds ]',
+    // }
   }
 });
 
@@ -166,6 +166,3 @@ function build_charts(run_ids) {
     })
   }
 }
-
-
-
