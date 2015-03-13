@@ -79,7 +79,7 @@ rm $RUNDIR/data/final/summary.time.csv
 rm $RUNDIR/data/final/summary.pwatch.csv
 ./summarize-csv.sh $RUNDIR/data/final .time.csv > summary
 mv summary $RUNDIR/data/final/summary.time.csv
-cat $RUNDIR/data/final/summary.time.csv | cut -d',' -f1,3,4 > $RUNDIR/html/summary.csv
+cat $RUNDIR/data/final/summary.time.csv | cut -d',' -f1,4 > $RUNDIR/html/summary.csv
 
 ./summarize-csv.sh $RUNDIR/data/final .pwatch.csv > summary
 mv summary $RUNDIR/data/final/summary.pwatch.csv
