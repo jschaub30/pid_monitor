@@ -51,7 +51,7 @@ var summary_chart = c3.generate({
     y: {
       min: 0,
       // max: 100,
-      label: 'CPU Usage [ % ]',
+      label: 'Elapsed execution time [ seconds ]',
     },
     // y2: {
     //   min: 0,
