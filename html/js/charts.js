@@ -5,7 +5,7 @@ $.ajax({
   url: "config.clean.json",
   dataType: "json",
   success: function(data) {
-    console.log(data);
+    // console.log(data);
     var config_list = $.trim(data).split('\n');
     
     $('#id_workload').text(data["workload"]);
@@ -18,54 +18,74 @@ $.ajax({
   }
 });
 
+var parse_line = function(line) {
+  // console.log(line.run_id)
+  return {x:line.run_id.split('=')[1].split('.')[0],  //threads
+          y:line.elapsed_time_sec}
+}
 
-var summary_chart = c3.generate({
-  bindto: "#id_summary",
-  data: {
-    url: "summary.csv",
-    x: 'run_id'
-    // axes: {
-    //   cpu_pct: 'y',
-    //   elapsed_time_sec: 'y2'
-    // }
+$.ajax({
+  type: "GET",
+  url: "summary.csv",
+  dataType: "text",
+  success: function(data) {
+    var csv_data = $.csv.toObjects(data)
+    // console.log(csv_data);
+    csv_data = csv_data.map(parse_line);  // OPTIONALLY CUSTOMIZE EACH LINE
+    // console.log(parsed_data)
+    summary_chart(csv_data)
   },
-  type: 'line',
-  grid: {
-    x: {
-      show: true
-    },
-    y: {
-      show: true
-    }
-  },
-  point: {
-    r: 5
-  },
-  axis: {
-    x: {
-      type: 'category',
-      // min: 0,
-      // max: 60,
-      // label: 'Elapsed time [ sec ]',
-    },
-    y: {
-      min: 0,
-      // max: 100,
-      label: 'Elapsed execution time [ seconds ]',
-    },
-    // y2: {
-    //   min: 0,
-    //   show: true,
-    //   label: 'Execution time [ seconds ]',
-    // }
+  error: function (request, status, error) {
+    console.log(error);
   }
 });
 
+function summary_chart (data){
+  
+  c3.generate({
+    bindto: "#id_summary",
+    data: {
+      json: data,
+      keys: {
+        x: 'x',
+        value: ['y'],
+      },
+      names: {
+        y: 'Elapsed time [ sec ]',
+      },
+      type: 'scatter',
+    },
+    grid: {
+      // x: {
+      //   show: true
+      // },
+      y: {
+        show: true
+      }
+    },
+    point: {
+      r: 5
+    },
+    axis: {
+      x: {
+        // type: 'category',
+        min: 20,
+        max: 100,
+        label: 'Spark threads',
+      },
+      y: {
+        min: 0,
+        // max: 100,
+        label: 'Elapsed execution time [ seconds ]',
+      },
+    }
+  });
+}
 
 
 function build_charts(run_ids) {
   var cpu_csv_fn  = run_ids[0] + '.cpu_pct.csv',
-  mem_csv_fn  = run_ids[0] + '.mem_pct.csv';
+      mem_csv_fn  = run_ids[0] + '.mem_pct.csv';
   
   //Create c3js chart
   var cpu_chart = c3.generate({
@@ -138,11 +158,11 @@ function build_charts(run_ids) {
 
   function create_button(i, run_ids){
     var id        = run_ids[i],
-        button_id = "button" + String(i),
-        button    = $('<button></button>', {
-                      id:button_id,
-                      text:id
-                    }).insertBefore('#cpu_title').addClass('button');
+    button_id = "button" + String(i),
+    button    = $('<button></button>', {
+      id:button_id,
+      text:id
+    }).insertBefore('#cpu_title').addClass('button');
     
     if (i==0){
       button.addClass('active')
