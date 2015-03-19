@@ -35,13 +35,15 @@ CONFIG_FN=$RUNDIR/data/raw/$RUN_ID.config.txt
 WORKLOAD_STDOUT=$RUNDIR/data/raw/$RUN_ID.workload.stdout
 WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 STAT_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
-DSTAT_CSV=$RUNDIR/data/final/dstat.csv
+DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
 
 # STEP 2: DEFINE COMMANDS FOR ALL SYSTEM MONITORS
 STAT_CMD="./watch-process.sh $DELAY_SEC" 
 $STAT_CMD > $STAT_STDOUT &
 STAT_PID=$!
 DSTAT_CMD="dstat -v --output $DSTAT_CSV $DELAY_SEC"
+$DSTAT_CMD > /dev/null &
+DSTAT_PID=$!
 
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
 CONFIG=$CONFIG,timestamp,$TIMESTAMP
@@ -67,6 +69,7 @@ cd $CWD
 #STEP 6: KILL STAT MONITOR
 sleep 5
 kill -9 $STAT_PID 2> /dev/null 1>/dev/null
+kill -9 $DSTAT_PID 2> /dev/null 1>/dev/null
 sleep 1
 
 #STEP 7: ANALYZE DATA
@@ -77,12 +80,10 @@ echo Now tidying raw data into CSV files
 # Combine CSV files from all runs into summaries
 rm $RUNDIR/data/final/summary.time.csv
 rm $RUNDIR/data/final/summary.pwatch.csv
-./summarize-csv.sh $RUNDIR/data/final .time.csv > summary
-mv summary $RUNDIR/data/final/summary.time.csv
+./summarize-csv.py $RUNDIR/data/final .time.csv 2> $RUNDIR/data/final/errors.time.csv 1> $RUNDIR/data/final/summary.time.csv
 cat $RUNDIR/data/final/summary.time.csv | cut -d',' -f1,4 > $RUNDIR/html/summary.csv
 
-./summarize-csv.sh $RUNDIR/data/final .pwatch.csv > summary
-mv summary $RUNDIR/data/final/summary.pwatch.csv
+./summarize-csv.py $RUNDIR/data/final .pwatch.csv 2> $RUNDIR/data/final/errors.pwatch.csv 1>$RUNDIR/data/final/summary.pwatch.csv
 
 #STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
 echo Creating html charts
