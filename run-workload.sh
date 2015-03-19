@@ -81,7 +81,10 @@ echo Now tidying raw data into CSV files
 rm $RUNDIR/data/final/summary.time.csv
 rm $RUNDIR/data/final/summary.pwatch.csv
 ./summarize-csv.py $RUNDIR/data/final .time.csv 2> $RUNDIR/data/final/errors.time.csv 1> $RUNDIR/data/final/summary.time.csv
-cat $RUNDIR/data/final/summary.time.csv | cut -d',' -f1,4 > $RUNDIR/html/summary.csv
+
+# Copy data to plot.  Change filename so browser will render file instead of download
+cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
+cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
 
 ./summarize-csv.py $RUNDIR/data/final .pwatch.csv 2> $RUNDIR/data/final/errors.pwatch.csv 1>$RUNDIR/data/final/summary.pwatch.csv
 
