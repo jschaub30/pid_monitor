@@ -24,26 +24,66 @@ var parse_line = function(line) {
           y:line.elapsed_time_sec}
 }
 
+var calculate_mean = function(data) {
+  var x_unique     = new Array(),
+  x_array          = new Array(),
+  y_array          = new Array();
+  for (var i       = 0; i < data.length; i++){
+    x_array.push(data[i].x);
+    y_array.push(data[i].y);
+    if (x_unique.indexOf(data[i].x) == -1) {
+      x_unique.push(data[i].x);
+    }
+  }
+  // console.log(x_unique);
+
+  var sum,
+  idx,
+  count,
+  avg,
+  newData          = new Array();
+
+  for (i           = 0; i < x_unique.length; i++){
+    idx            = x_array.indexOf(x_unique[i]);
+    sum            = 0;
+    count          = 0;
+    while (idx != -1) {
+      sum         += Number(y_array[idx]);
+      count       += 1;
+      x_array.splice(idx, 1);
+      y_array.splice(idx, 1);
+      idx          = x_array.indexOf(x_unique[i]);
+    }
+    avg            = Math.round(100 * sum / count)/100;
+    newData[i]     = {x:Number(x_unique[i]), y:avg}
+  }
+  // console.log(newData);
+  return newData;
+}
+
+
 $.ajax({
   type: "GET",
-  url: "summary.csv",
+  url: "time_summary_csv",
   dataType: "text",
   success: function(data) {
     var csv_data = $.csv.toObjects(data)
     // console.log(csv_data);
     csv_data = csv_data.map(parse_line);  // OPTIONALLY CUSTOMIZE EACH LINE
+    avg_data = calculate_mean(csv_data);
     // console.log(parsed_data)
-    summary_chart(csv_data)
+    summary_chart(avg_data, "line", "#id_summary")
+    summary_chart(csv_data, "scatter", "#id_all_data")
   },
   error: function (request, status, error) {
     console.log(error);
   }
 });
 
-function summary_chart (data){
+function summary_chart (data, chart_type, id){
   
   c3.generate({
-    bindto: "#id_summary",
+    bindto: id,
     data: {
       json: data,
       keys: {
@@ -53,7 +93,7 @@ function summary_chart (data){
       names: {
         y: 'Elapsed time [ sec ]',
       },
-      type: 'scatter',
+      type: chart_type,
     },
     grid: {
       // x: {
@@ -69,8 +109,8 @@ function summary_chart (data){
     axis: {
       x: {
         // type: 'category',
-        min: 20,
-        max: 100,
+        min: 0,
+        //max: 100,
         label: 'Spark threads',
       },
       y: {

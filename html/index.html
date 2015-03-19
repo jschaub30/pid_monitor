@@ -15,7 +15,6 @@
 	.chart {
 		width: 800px;
 		height: 600px;
-		margin: auto;
 		padding-top: 2em;
 	}
   h3 {
@@ -34,9 +33,14 @@
 </header>
 	<h1 id="id_workload">WORKLOAD</h1>
   
-  <h3 id="summary_title">Summary</h3>
-  <div id="id_summary"></div>
-  <p><a href="summary.csv">RAW DATA</a></p>
+  <h3 id="summary_title">Runtime average (successful runs only)</h3>
+  <div class="chart" id="id_summary"></div>
+  <h3 id="summary_title">Runtime data (successful runs only)</h3>
+  <div class="chart" id="id_all_data"></div>
+  <ul>/usr/bin/time summary data
+  <li><a href="time_summary_csv">Successful runs</a></li>
+  <li><a href="time_errors_csv">Unsuccessful runs</a></li>
+  </ul>
   <h3 id="cpu_title">CPU</h3>
   <div id="id_cpu"></div>
   <h3 id="mem_title">Memory</h3>
