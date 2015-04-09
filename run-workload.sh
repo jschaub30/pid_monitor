@@ -41,7 +41,7 @@ DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
 STAT_CMD="./watch-process.sh $DELAY_SEC" 
 $STAT_CMD > $STAT_STDOUT &
 STAT_PID=$!
-DSTAT_CMD="dstat -v --output $DSTAT_CSV $DELAY_SEC"
+DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
 $DSTAT_CMD > /dev/null &
 DSTAT_PID=$!
 
@@ -76,6 +76,11 @@ sleep 1
 echo Now tidying raw data into CSV files
 ./tidy-pwatch.py $STAT_STDOUT $PROCESS_TO_GREP $RUN_ID > $RUNDIR/data/final/$RUN_ID.pwatch.csv
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
+tail -n +7 $DSTAT_CSV > $RUNDIR/html/$RUN_ID.dstat.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv time used buff cach free > $RUNDIR/html/$RUN_ID.mem.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv time read writ > $RUNDIR/html/$RUN_ID.io.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv time recv send > $RUNDIR/html/$RUN_ID.net.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv time usr sys idl wai > $RUNDIR/html/$RUN_ID.cpu.csv
 
 # Combine CSV files from all runs into summaries
 rm $RUNDIR/data/final/summary.time.csv
