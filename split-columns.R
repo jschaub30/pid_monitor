@@ -7,15 +7,19 @@
 # Usage:   
 #  ./split-columns.R [IN_CSV] [COLUMN NAMES]
 # Example: ./split-columns.R in.csv x z
- 
+
 args <- commandArgs(TRUE)
- 
+
 input_csv <- args[1]       # Input filename
 colnames  <- args[2:length(args)]
- 
+
 write(sprintf("Reading input file=%s", input_csv), stderr())
 write(sprintf("Splitting on column name=%s", colnames), stderr())
- 
+
 d <- read.csv(input_csv, header=TRUE)
-write.csv(d[colnames],row.names=FALSE)
+d1 <- d[colnames]
+try(t0 <- strptime(d$time[1], "%m-%d %H:%M:%OS"), silent = TRUE)
+try(d1$elapsed_time_sec <- as.numeric(strptime(d$time, "%m-%d %H:%M:%OS")-t0), silent = TRUE)
+
+write.csv(d1,row.names=FALSE)
 
