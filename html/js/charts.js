@@ -1,4 +1,5 @@
-// First read configuration from a file, then call build_charts
+// First read configuration from a file and update HTML
+var xlabel;
 
 $.ajax({
   type: "GET",
@@ -6,12 +7,15 @@ $.ajax({
   dataType: "json",
   success: function(data) {
     // console.log(data);
-    var config_list = $.trim(data).split('\n');
+    xlabel = data["xlabel"];
     
-    $('#id_workload').text(data["workload"]);
+    $('#id_workload').text(data["description"]);
     $('#id_title').text(data["workload"]);
     $('#id_date').text(data["date"]);
+    
+    load_summary();
     build_charts(data["run_ids"]);
+    
   },
   error: function (request, status, error) {
     console.log(error);
@@ -61,26 +65,33 @@ var calculate_mean = function(data) {
   return newData;
 }
 
+function load_summary(){
+  //Read summary data and create charts
+  $.ajax({
+    type: "GET",
+    url: "time_summary_csv",
+    dataType: "text",
+    success: function(data) {
+      var csv_data = $.csv.toObjects(data);
+      // console.log(csv_data);
+      csv_data     = csv_data.map(parse_line);  // OPTIONALLY CUSTOMIZE EACH LINE
+      avg_data     = calculate_mean(csv_data);
+      // console.log(csv_data);
+      setTimeout(function () {
+        summary_chart(avg_data, "line", "#id_summary");
+        summary_chart(csv_data, "scatter", "#id_all_data");
+      });
+    },
+    error: function (request, status, error) {
+      console.log(error);
+    }
+  });
+};
 
-$.ajax({
-  type: "GET",
-  url: "time_summary_csv",
-  dataType: "text",
-  success: function(data) {
-    var csv_data = $.csv.toObjects(data)
-    // console.log(csv_data);
-    csv_data = csv_data.map(parse_line);  // OPTIONALLY CUSTOMIZE EACH LINE
-    avg_data = calculate_mean(csv_data);
-    // console.log(parsed_data)
-    summary_chart(avg_data, "line", "#id_summary")
-    summary_chart(csv_data, "scatter", "#id_all_data")
-  },
-  error: function (request, status, error) {
-    console.log(error);
-  }
-});
 
 function summary_chart (data, chart_type, id){
+  // console.log(id);
+//   console.log(data);
   
   c3.generate({
     bindto: id,
@@ -111,7 +122,7 @@ function summary_chart (data, chart_type, id){
         // type: 'category',
         min: 0,
         //max: 100,
-        label: 'Spark threads',
+        label: xlabel,
       },
       y: {
         min: 0,
@@ -122,75 +133,53 @@ function summary_chart (data, chart_type, id){
   });
 }
 
+function csv_chart (csv_fn, chart_type, id, ylabel){
+  
+  var chart = c3.generate({
+    bindto: id,
+    data: {
+      url: csv_fn,
+      x: 'elapsed_time_sec',
+    },
+     grid: {
+      x: {
+        show: true
+      },
+     y: {
+        show: true
+      }
+    },
+    point: {
+      r: 5
+    },
+    axis: {
+      x: {
+        // type: 'category',
+        min: 0,
+        //max: 100,
+        label: 'Elapsed time [ sec ]',
+      },
+      y: {
+        min: 0,
+        // max: 100,
+        label: ylabel,
+      },
+    }
+  });
+  return chart
+}
 
 function build_charts(run_ids) {
-  var cpu_csv_fn  = run_ids[0] + '.cpu_pct.csv',
-      mem_csv_fn  = run_ids[0] + '.mem_pct.csv';
+  var cpu_csv_fn  = run_ids[0] + '.cpu.csv',
+  mem_csv_fn  = run_ids[0] + '.mem.csv',
+  io_csv_fn   = run_ids[0] + '.io.csv',
+  net_csv_fn  = run_ids[0] + '.net.csv';
   
-  //Create c3js chart
-  var cpu_chart = c3.generate({
-    bindto: "#id_cpu",
-    data: {
-      url: cpu_csv_fn,
-      x: 'x',
-    },
-    type: 'line',
-    grid: {
-      x: {
-        show: true
-      },
-      y: {
-        show: true
-      }
-    },
-    point: {
-      r: 5
-    },
-    axis: {
-      y: {
-        // min: 0,
-        // max: 100,
-        label: 'Usage [ % ]',
-      },
-      x: {
-        // min: 0,
-        // max: 60,
-        label: 'Elapsed time [ sec ]',
-      }
-    }
-  });
+  var cpu_chart = csv_chart(cpu_csv_fn, "line", "#id_cpu", "Usage [ % ]"),
+      mem_chart = csv_chart(mem_csv_fn, "line", "#id_mem", "Usage [ GB ]"),
+      io_chart  = csv_chart(io_csv_fn, "line", "#id_io", "Usage [ MB/s ]");
+      net_chart = csv_chart(net_csv_fn, "line", "#id_net", "Usage [ MB/s ]");
 
-  var mem_chart = c3.generate({
-    bindto: "#id_mem",
-    data: {
-      url: mem_csv_fn,
-      x: 'x',
-    },
-    type: 'line',
-    grid: {
-      x: {
-        show: true
-      },
-      y: {
-        show: true
-      }
-    },
-    point: {
-      r: 5
-    },
-    axis: {
-      y: {
-        // min: 0,
-        // max: 100,
-        label: 'Usage [ % ]',
-      },
-      x: {
-        // min: 0,
-        // max: 60,
-        label: 'Elapsed time [ sec ]',
-      }
-    }
-  });
 
   for (i in run_ids){
     create_button(i, run_ids)
@@ -217,10 +206,10 @@ function build_charts(run_ids) {
       }, 500);
       setTimeout(function () {
         cpu_chart.load({
-          url: id + '.cpu_pct.csv'
+          url: id + '.cpu.csv'
         });
         mem_chart.load({
-          url: id + '.mem_pct.csv'
+          url: id + '.mem.csv'
         });
       }, 1000);
     })

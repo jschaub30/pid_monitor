@@ -13,8 +13,8 @@
 	<title id="id_title">PID monitor</title>
 	<style type="text/css" media="screen">
 	.chart {
-		width: 800px;
-		height: 600px;
+		width: 960px;
+		height: 400px;
 		padding-top: 2em;
 	}
   h3 {
@@ -42,9 +42,13 @@
   <li><a href="time_errors_csv">Unsuccessful runs</a></li>
   </ul>
   <h3 id="cpu_title">CPU</h3>
-  <div id="id_cpu"></div>
+  <div class="chart" id="id_cpu"></div>
   <h3 id="mem_title">Memory</h3>
-  <div id="id_mem"></div>
+  <div class="chart" id="id_mem"></div>
+  <h3 id="mem_title">IO</h3>
+  <div class="chart" id="id_io"></div>
+  <h3 id="mem_title">Network traffic</h3>
+  <div class="chart" id="id_net"></div>
   
 	<script src='js/charts.js' type='text/javascript'> </script>
 
