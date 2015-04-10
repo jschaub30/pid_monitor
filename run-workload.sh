@@ -78,9 +78,9 @@ echo Now tidying raw data into CSV files
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
 tail -n +7 $DSTAT_CSV > $RUNDIR/html/$RUN_ID.dstat.csv
 ./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv used buff cach free > $RUNDIR/html/$RUN_ID.mem.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv read writ > $RUNDIR/html/$RUN_ID.io.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv recv send > $RUNDIR/html/$RUN_ID.net.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv usr sys idl wai > $RUNDIR/html/$RUN_ID.cpu.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1e-9 read writ > $RUNDIR/html/$RUN_ID.io.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1e-9 recv send > $RUNDIR/html/$RUN_ID.net.csv
+./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1 usr sys idl wai > $RUNDIR/html/$RUN_ID.cpu.csv
 
 # Combine CSV files from all runs into summaries
 rm $RUNDIR/data/final/summary.time.csv
