@@ -19,8 +19,8 @@ write(sprintf("Splitting on column name=%s", colnames), stderr())
 
 d <- read.csv(input_csv, header=TRUE)
 d1 <- round(d[colnames]*scale, 1)
-try(t0 <- strptime(d$time[1], "%m-%d %H:%M:%OS"), silent = TRUE)
-try(d1$elapsed_time_sec <- as.numeric(strptime(d$time, "%m-%d %H:%M:%OS")-t0), silent = TRUE)
+try(t0 <- strptime(d$time[1], "%d-%m %H:%M:%OS"), silent = TRUE)
+try(d1$elapsed_time_sec <- as.numeric(strptime(d$time, "%d-%m %H:%M:%OS")-t0), silent = TRUE)
 
 write.csv(d1,row.names=FALSE)
 
