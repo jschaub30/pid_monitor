@@ -203,6 +203,8 @@ function build_charts(run_ids) {
       setTimeout(function () {
         cpu_chart.unload();
         mem_chart.unload();
+        io_chart.unload();
+        net_chart.unload();
       }, 500);
       setTimeout(function () {
         cpu_chart.load({
@@ -210,6 +212,12 @@ function build_charts(run_ids) {
         });
         mem_chart.load({
           url: id + '.mem.csv'
+        });
+        io_chart.load({
+          url: id + '.io.csv'
+        });
+        net_chart.load({
+          url: id + '.net.csv'
         });
       }, 1000);
     })
