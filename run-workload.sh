@@ -1,4 +1,4 @@
-#!/bin/bash
+##!/bin/bash
 
 # To run a custom workload, define the following 4 variables and run this script
 
@@ -73,6 +73,7 @@ PERF_ITER=1
 while [[ -e /proc/$MAIN_PID ]]
 do
     echo Recording perf sample $PERF_ITER
+    sudo rm perf.data
     sudo perf record -a & PID=$!; echo pid is $PID; sleep 5; sudo kill $PID;
     sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> $RUNDIR/data/raw/$RUN_ID.perf.$PERF_ITER.prof
     PERF_ITER=$(( PERF_ITER + 1 ))

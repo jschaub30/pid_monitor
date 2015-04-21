@@ -15,11 +15,12 @@ def main(argList):
 		prefix = argList[1]
 		#fileList = filter(lambda x: x.startswith(prefix), next(os.walk(rootDir))[2])
 		fileList = glob.glob(os.path.join(rootDir, prefix + '*'))
+		print "Validating " + os.path.join(rootDir)
 		
 	if '-threads' in argList:
 		threads = int(argList[argList.index('-threads') + 1])
-		print "len(fileList)=%d" % (len(fileList))
-		print "threads=%d" % (threads)
+		#print "len(fileList)=%d" % (len(fileList))
+		#print "threads=%d" % (threads)
 		if threads > len(fileList):
 			threads = len(fileList)
 	else:
@@ -64,6 +65,8 @@ def stitch2(result):
 			c +=1
 		del elements[0]
 		del elements[1]
+        if c>0:
+            print "!!!!!!!!!!!!!!!!!!!! STITCHING VALIDAION ERRORS !!!!!!!!!!!!!!!!!!!!!!!\n" *4
 	print 'stitch errors = ' + str(c)
 	return 	
 	
@@ -72,6 +75,8 @@ def errors(result):
 	c = 0
 	for i in result:
 		c= c+ i[0]
+        if c>0:
+            print "!!!!!!!!!!!!!!!!!!!! NON-STITCHING VALIDATION ERRORS !!!!!!!!!!!!!!!!!!!!!!!\n" *4
 	print 'non-stitching error count = ' + str(c)
 	return
 
