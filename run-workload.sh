@@ -67,17 +67,16 @@ cd $WORKLOAD_DIR
 
 MAIN_PID=$!
 
-sleep 60
-
 PERF_ITER=1
+PERF_DELTA=120 # seconds
+sleep $PERF_DELTA
 while [[ -e /proc/$MAIN_PID ]]
 do
     echo Recording perf sample $PERF_ITER
-    sudo rm perf.data
-    sudo perf record -a & PID=$!; echo pid is $PID; sleep 5; sudo kill $PID;
-    sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> $RUNDIR/data/raw/$RUN_ID.perf.$PERF_ITER.prof
+    sudo perf record -a & PID=$!; echo pid is $PID; sleep 2; sudo kill $PID;
+    sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.prof
     PERF_ITER=$(( PERF_ITER + 1 ))
-    sleep 120
+    sleep $PERF_DELTA
 done
 
 cd $CWD
