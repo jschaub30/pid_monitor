@@ -63,7 +63,21 @@ cd $WORKLOAD_DIR
 
 # STEP 5: RUN WORKLOAD
 /usr/bin/time --verbose --output=$TIME_FN bash -c \
-    "$WORKLOAD_CMD 1> $WORKLOAD_STDOUT 2> $WORKLOAD_STDERR"
+    "$WORKLOAD_CMD 1> $WORKLOAD_STDOUT 2> $WORKLOAD_STDERR" &
+
+MAIN_PID=$!
+
+sleep 60
+
+PERF_ITER=1
+while [[ -e /proc/$MAIN_PID ]]
+do
+    echo Recording perf sample $PERF_ITER
+    sudo perf record -a & PID=$!; echo pid is $PID; sleep 5; sudo kill $PID;
+    sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> $RUNDIR/data/raw/$RUN_ID.perf.$PERF_ITER.prof
+    PERF_ITER=$(( PERF_ITER + 1 ))
+    sleep 120
+done
 
 cd $CWD
 #STEP 6: KILL STAT MONITOR
