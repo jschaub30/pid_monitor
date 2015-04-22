@@ -1,6 +1,7 @@
 ##!/bin/bash
 
-# To run a custom workload, define the following 4 variables and run this script
+# To run a custom workload, define the following variables and run this script
+# see example.sh and example-sweep.sh
 
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd && echo "dd workload"
 [ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"
@@ -94,7 +95,7 @@ else
     do
         echo Recording perf sample $PERF_ITER
         sudo perf record -a & PID=$!; echo pid is $PID; sleep 2; sudo kill $PID;
-        sudo rm /tmp/perf.report
+        sudo rm -f /tmp/perf.report
         sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
         # Only save first 1000 lines of perf report
         head -n 1000 /tmp/perf.report > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
@@ -106,10 +107,7 @@ fi
 cd $CWD
 #STEP 6: KILL STAT MONITOR
 kill_procs
-#sleep 5
-#kill -9 $STAT_PID 2> /dev/null 1>/dev/null
-#kill -9 $DSTAT_PID 2> /dev/null 1>/dev/null
-#sleep 1
+sleep 1
 
 #STEP 7: ANALYZE DATA
 echo Now tidying raw data into CSV files
