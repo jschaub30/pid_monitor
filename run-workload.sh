@@ -67,6 +67,7 @@ cd $WORKLOAD_DIR
 
 MAIN_PID=$!
 
+# Take perf snapshots periodically while workload is still running
 PERF_ITER=1
 PERF_DELTA=120 # seconds
 sleep $PERF_DELTA
@@ -74,7 +75,10 @@ while [[ -e /proc/$MAIN_PID ]]
 do
     echo Recording perf sample $PERF_ITER
     sudo perf record -a & PID=$!; echo pid is $PID; sleep 2; sudo kill $PID;
-    sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.prof
+    sudo rm /tmp/perf.report
+    sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
+    # Only save first 1000 lines of perf report
+    head -n 1000 /tmp/perf.report > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
     PERF_ITER=$(( PERF_ITER + 1 ))
     sleep $PERF_DELTA
 done
