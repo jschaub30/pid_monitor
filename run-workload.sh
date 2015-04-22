@@ -3,13 +3,12 @@
 # To run a custom workload, define the following 4 variables and run this script
 
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd && echo "dd workload"
-#[ -z "$PROCESSES_TO_WATCH" ]  && PROCESSES_TO_WATCH=(dd)
 [ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"
-[ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=128k count=16384"
+[ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1M count=1024 oflag=direct"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
 [ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
-[ -z "$RUN_ID" ]  && RUN_ID="RUN1"
+[ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
 
 if [ -z "$SWEEP_FLAG" ]
 then
@@ -36,14 +35,26 @@ WORKLOAD_STDOUT=$RUNDIR/data/raw/$RUN_ID.workload.stdout
 WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 STAT_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
 DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
+NMON_FN=$RUNDIR/data/raw/$RUN_ID.nmon.txt
 
 # STEP 2: DEFINE COMMANDS FOR ALL SYSTEM MONITORS
+# function to kill PIDs of process monitors
+kill_procs() {
+    echo "Stopping monitors"
+    kill -USR2 $NMON_PID
+    kill $STAT_PID $DSTAT_PID
+}
+
+trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
+
 STAT_CMD="./watch-process.sh $DELAY_SEC" 
 $STAT_CMD > $STAT_STDOUT &
 STAT_PID=$!
 DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
+NMON_CMD="nmon -s $DELAY_SEC -c 1000 -F $NMON_FN -p"
 $DSTAT_CMD > /dev/null &
 DSTAT_PID=$!
+NMON_PID=$($NMON_CMD)
 
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
 CONFIG=$CONFIG,timestamp,$TIMESTAMP
@@ -62,33 +73,43 @@ echo Working directory: $WORKLOAD_DIR
 cd $WORKLOAD_DIR
 
 # STEP 5: RUN WORKLOAD
-/usr/bin/time --verbose --output=$TIME_FN bash -c \
-    "$WORKLOAD_CMD 1> $WORKLOAD_STDOUT 2> $WORKLOAD_STDERR" &
+( /usr/bin/time --verbose --output=$TIME_FN bash -c \
+    "$WORKLOAD_CMD 1> $WORKLOAD_STDOUT 2> $WORKLOAD_STDERR " ) &
 
 MAIN_PID=$!
+echo Main PID is $MAIN_PID
 
-# Take perf snapshots periodically while workload is still running
-PERF_ITER=1
-PERF_DELTA=120 # seconds
-sleep $PERF_DELTA
-while [[ -e /proc/$MAIN_PID ]]
-do
-    echo Recording perf sample $PERF_ITER
-    sudo perf record -a & PID=$!; echo pid is $PID; sleep 2; sudo kill $PID;
-    sudo rm /tmp/perf.report
-    sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
-    # Only save first 1000 lines of perf report
-    head -n 1000 /tmp/perf.report > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
-    PERF_ITER=$(( PERF_ITER + 1 ))
+if [ -z "$SAMPLE_PERF" ]
+then
+    # Don't profile using perf
+    echo Waiting for $MAIN_PID to finish
+    wait $MAIN_PID
+else
+    # Take perf snapshots periodically while workload is still running
+    PERF_ITER=1
+    [ -z "PERF_DELTA" ] && PERF_DELTA=120 # seconds
+    echo Perf profiling enabled.  Sleeping for $PERF_DELTA seconds
     sleep $PERF_DELTA
-done
+    while [[ -e /proc/$MAIN_PID ]]
+    do
+        echo Recording perf sample $PERF_ITER
+        sudo perf record -a & PID=$!; echo pid is $PID; sleep 2; sudo kill $PID;
+        sudo rm /tmp/perf.report
+        sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
+        # Only save first 1000 lines of perf report
+        head -n 1000 /tmp/perf.report > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
+        PERF_ITER=$(( PERF_ITER + 1 ))
+        sleep $PERF_DELTA
+    done
+fi
 
 cd $CWD
 #STEP 6: KILL STAT MONITOR
-sleep 5
-kill -9 $STAT_PID 2> /dev/null 1>/dev/null
-kill -9 $DSTAT_PID 2> /dev/null 1>/dev/null
-sleep 1
+kill_procs
+#sleep 5
+#kill -9 $STAT_PID 2> /dev/null 1>/dev/null
+#kill -9 $DSTAT_PID 2> /dev/null 1>/dev/null
+#sleep 1
 
 #STEP 7: ANALYZE DATA
 echo Now tidying raw data into CSV files
