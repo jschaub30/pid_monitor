@@ -3,18 +3,22 @@
 # To run a custom workload, define the following variables and run this script
 # see example.sh and example-sweep.sh
 
-[ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd && echo "dd workload"
-[ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"
+[ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd  # No spaces!
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1M count=1024 oflag=direct"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
 [ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
 
-if [ -z "$SWEEP_FLAG" ]
+[ -z "$PWATCH_FLAG" ] && PWATCH_FLAG=""     # Turned off by default
+[ -z "$DSTAT_FLAG" ] && DSTAT_FLAG=1        # Required for html plots
+[ -z "$NMON_FLAG" ] && NMON_FLAG=1
+
+[ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"   # Only used if PWATCH_FLAG is set
+
+if [ ! -f $RUNDIR/html/config.json ]
 then
-    echo \{\"workload\":\"$WORKLOAD_NAME\", >> $RUNDIR/html/config.json
-    echo \"date\":\"$(date)\", >> $RUNDIR/html/config.json
+    ./create-json-header.sh
 fi
 echo \"$RUN_ID\", >> $RUNDIR/html/config.json
 
@@ -24,63 +28,76 @@ echo Running this workload:
 echo \"$WORKLOAD_CMD\"
 
 echo Putting results in $RUNDIR
+echo Run ID is $RUN_ID
 cp *sh $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 cp *R $RUNDIR/scripts
 
+###############################################################################
 # STEP 1: CREATE OUTPUT FILENAMES BASED ON TIMESTAMP
 TIMESTAMP=$(date +"%Y-%m-%d_%H:%M:%S")
 TIME_FN=$RUNDIR/data/raw/$RUN_ID.time.stdout
 CONFIG_FN=$RUNDIR/data/raw/$RUN_ID.config.txt
 WORKLOAD_STDOUT=$RUNDIR/data/raw/$RUN_ID.workload.stdout
 WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
-STAT_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
-DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
-NMON_FN=$RUNDIR/data/raw/$RUN_ID.nmon.txt
 
-# STEP 2: DEFINE COMMANDS FOR ALL SYSTEM MONITORS
+###############################################################################
+# STEP 2: START SYSTEM MONITORS
 # function to kill PIDs of process monitors
 kill_procs() {
     echo "Stopping monitors"
-    kill -USR2 $NMON_PID
-    kill $STAT_PID $DSTAT_PID
+    kill -USR2 $NMON_PID > /dev/null
+    kill $PWATCH_PID $DSTAT_PID > /dev/null
 }
 
 trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
 
-STAT_CMD="./watch-process.sh $DELAY_SEC" 
-$STAT_CMD > $STAT_STDOUT &
-STAT_PID=$!
-DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
-NMON_CMD="nmon -s $DELAY_SEC -c 1000 -F $NMON_FN -p"
-$DSTAT_CMD > /dev/null &
-DSTAT_PID=$!
-NMON_PID=$($NMON_CMD)
+if [[ $PWATCH_FLAG != "" ]]
+then
+    PWATCH_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
+    PWATCH_CMD="./watch-process.sh $DELAY_SEC" 
+    $PWATCH_CMD > $PWATCH_STDOUT &
+    PWATCH_PID=$!
+fi
+if [[ $DSTAT_FLAG != "" ]]
+then
+    DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
+    DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
+    $DSTAT_CMD > /dev/null &
+    DSTAT_PID=$!
+fi
+if [[ $NMON_FLAG != "" ]]
+then
+    NMON_FN=$RUNDIR/data/raw/$RUN_ID.nmon.txt
+    NMON_CMD="nmon -s $DELAY_SEC -c 1000 -F $NMON_FN -p"
+    NMON_PID=$($NMON_CMD)
+fi
 
+###############################################################################
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
 CONFIG=$CONFIG,timestamp,$TIMESTAMP
 CONFIG=$CONFIG,run_id,$RUN_ID
 CONFIG=$CONFIG,kernel,$(uname -r)
 CONFIG=$CONFIG,hostname,$(hostname -s)
 CONFIG=$CONFIG,workload_name,$WORKLOAD_NAME
-CONFIG=$CONFIG,stat_command,$STAT_CMD
+CONFIG=$CONFIG,stat_command,$PWATCH_CMD
 CONFIG=$CONFIG,workload_command,$WORKLOAD_CMD
 CONFIG=$CONFIG,workload_dir,$WORKLOAD_DIR
 CONFIG=$CONFIG,  # Add trailiing comma
 echo $CONFIG > $CONFIG_FN
 
+###############################################################################
+# STEP 4: RUN WORKLOAD
 CWD=$(pwd)
 echo Working directory: $WORKLOAD_DIR
 cd $WORKLOAD_DIR
-
-# STEP 5: RUN WORKLOAD
 ( /usr/bin/time --verbose --output=$TIME_FN bash -c \
     "$WORKLOAD_CMD 1> $WORKLOAD_STDOUT 2> $WORKLOAD_STDERR " ) &
 
 MAIN_PID=$!
 echo Main PID is $MAIN_PID
 
-if [ -z "$SAMPLE_PERF" ]
+if [[ -z "$SAMPLE_PERF" ]]
 then
     # Don't profile using perf
     echo Waiting for $MAIN_PID to finish
@@ -88,58 +105,83 @@ then
 else
     # Take perf snapshots periodically while workload is still running
     PERF_ITER=1
+    PERF_DURATION=2    # seconds
     [ -z "PERF_DELTA" ] && PERF_DELTA=120 # seconds
     echo Perf profiling enabled.  Sleeping for $PERF_DELTA seconds
-    sleep $PERF_DELTA
+    sleep $((PERF_DELTA - PERF_DURATION))
     while [[ -e /proc/$MAIN_PID ]]
     do
         echo Recording perf sample $PERF_ITER
-        sudo perf record -a & PID=$!; echo pid is $PID; sleep 2; sudo kill $PID;
+        sudo perf record -a & PID=$!
+        echo pid is $PID
+        sleep $((PERF_DELTA - PERF_DURATION))
+        sudo kill $PID
         sudo rm -f /tmp/perf.report
         sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
         # Only save first 1000 lines of perf report
-        head -n 1000 /tmp/perf.report > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
+        head -n 1000 /tmp/perf.report \
+            > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
         PERF_ITER=$(( PERF_ITER + 1 ))
         sleep $PERF_DELTA
     done
 fi
 
 cd $CWD
-#STEP 6: KILL STAT MONITOR
+
+###############################################################################
+# STEP 5: KILL SYSTEM MONITORS
 kill_procs
 sleep 1
 
-#STEP 7: ANALYZE DATA
-echo Now tidying raw data into CSV files
-./tidy-pwatch.py $STAT_STDOUT $PROCESS_TO_GREP $RUN_ID > $RUNDIR/data/final/$RUN_ID.pwatch.csv
-./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
-tail -n +7 $DSTAT_CSV > $RUNDIR/html/$RUN_ID.dstat.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1e-9 used buff cach free > $RUNDIR/html/$RUN_ID.mem.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1e-6 read writ > $RUNDIR/html/$RUN_ID.io.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1e-6 recv send > $RUNDIR/html/$RUN_ID.net.csv
-./split-columns.R $RUNDIR/html/$RUN_ID.dstat.csv 1 usr sys idl wai > $RUNDIR/html/$RUN_ID.cpu.csv
+###############################################################################
+# STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
+cp -R html $RUNDIR/.
 
 # Combine CSV files from all runs into summaries
-rm $RUNDIR/data/final/summary.time.csv
-rm $RUNDIR/data/final/summary.pwatch.csv
-./summarize-csv.py $RUNDIR/data/final .time.csv 2> $RUNDIR/data/final/errors.time.csv 1> $RUNDIR/data/final/summary.time.csv
+echo Now tidying raw data into CSV files
 
-# Copy data to plot.  Change filename so browser will render file instead of download
+# Always process data from /usr/bin/time
+./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
+rm -f $RUNDIR/data/final/summary.time.csv
+./summarize-csv.py $RUNDIR/data/final .time.csv \
+    2> $RUNDIR/data/final/errors.time.csv 1> $RUNDIR/data/final/summary.time.csv
+# Copy summary data. Change filename so browser will render file instead of download
 cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
 cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
 
-./summarize-csv.py $RUNDIR/data/final .pwatch.csv 2> $RUNDIR/data/final/errors.pwatch.csv 1>$RUNDIR/data/final/summary.pwatch.csv
-
-#STEP 8: PARSE FINAL CSV DATA INTO CSV DATA FOR CHARTS/JAVASCRIPT
-echo Creating html charts
-cp -R html $RUNDIR/.
-cd $RUNDIR/html
-../scripts/split-chartdata.R ../data/final/$RUN_ID.pwatch.csv pid elapsed_time_sec cpu_pct  $RUN_ID # Parse CPU data
-../scripts/split-chartdata.R ../data/final/$RUN_ID.pwatch.csv pid elapsed_time_sec mem_pct  $RUN_ID # Parse memory data
-cd $CWD
-
-if [ -z "$SWEEP_FLAG" ]
+if [[ $PWATCH_FLAG != "" ]]
 then
-    echo \]\} >> $RUNDIR/html/config.json
-    ./tidy-json.py $RUNDIR/html/config.json > $RUNDIR/html/config.clean.json
+    ./tidy-pwatch.py $PWATCH_STDOUT $PROCESS_TO_GREP $RUN_ID \
+        > $RUNDIR/data/final/$RUN_ID.pwatch.csv
+    rm -f $RUNDIR/data/final/summary.pwatch.csv
+    ./summarize-csv.py $RUNDIR/data/final .pwatch.csv \
+        2> $RUNDIR/data/final/errors.pwatch.csv \
+        1>$RUNDIR/data/final/summary.pwatch.csv
+    cd $RUNDIR/html/data
+    ../../scripts/split-chartdata.R ../../data/final/$RUN_ID.pwatch.csv \
+        pid elapsed_time_sec cpu_pct  $RUN_ID # Parse CPU data
+    ../../scripts/split-chartdata.R ../../data/final/$RUN_ID.pwatch.csv \
+        pid elapsed_time_sec mem_pct  $RUN_ID # Parse memory data
+    cd $CWD
 fi
+
+if [[ $DSTAT_FLAG != "" ]]
+then
+    tail -n +7 $DSTAT_CSV > $RUNDIR/html/data/$RUN_ID.dstat.csv
+    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-9 used buff cach free \
+        > $RUNDIR/html/data/$RUN_ID.mem.csv
+    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-6 read writ \
+        > $RUNDIR/html/data/$RUN_ID.io.csv
+    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-6 recv send \
+        > $RUNDIR/html/data/$RUN_ID.net.csv
+    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1 usr sys idl wai \
+        > $RUNDIR/html/data/$RUN_ID.cpu.csv
+fi
+
+#if [[ $NMON_FLAG != "" ]]
+#then
+    # TODO Write NMON parser
+#fi
+
+./create-json-footer.sh
+

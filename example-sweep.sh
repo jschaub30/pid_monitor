@@ -2,21 +2,20 @@
 
 export SWEEP_FLAG=1
 export WORKLOAD_NAME=EXAMPLE-SWEEP
-export PROCESS_TO_GREP="dd"
 export WORKLOAD_DIR="."
 export ESTIMATED_RUN_TIME_MIN=1
+export X_LABEL="Block size [ KB ]"
 
+# When sweeping, collect all files in the same run directory
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
-echo \{\"workload\":\"$WORKLOAD_NAME\", >> $RUNDIR/html/config.json
-echo \"date\":\"$(date)\", >> $RUNDIR/html/config.json
-echo \"run_ids\":\[ >> $RUNDIR/html/config.json
 
-for COUNT in 8192 16384
+for BLOCK_SIZE_KB in 128 256 512
 do
-	export RUN_ID="COUNT=$COUNT"
-	export WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=128k count=$COUNT"
-	./run-workload.sh
+    for ITER in 1 2
+    do
+	    export RUN_ID="BLOCK_SIZE_KB=$BLOCK_SIZE_KB.$ITER"
+	    export WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=${BLOCK_SIZE_KB}k count=1024 oflag=direct"
+	    ./run-workload.sh
+    done
 done
 
-echo \]\} >> $RUNDIR/html/config.json
-./tidy-json.py $RUNDIR/html/config.json > $RUNDIR/html/config.clean.json
