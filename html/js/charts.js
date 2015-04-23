@@ -170,10 +170,10 @@ function csv_chart (csv_fn, chart_type, id, ylabel){
 }
 
 function build_charts(run_ids) {
-  var cpu_csv_fn  = run_ids[0] + '.cpu.csv',
-  mem_csv_fn  = run_ids[0] + '.mem.csv',
-  io_csv_fn   = run_ids[0] + '.io.csv',
-  net_csv_fn  = run_ids[0] + '.net.csv';
+  var cpu_csv_fn  = 'data/' + run_ids[0] + '.cpu.csv',
+  mem_csv_fn  = 'data/' + run_ids[0] + '.mem.csv',
+  io_csv_fn   = 'data/' + run_ids[0] + '.io.csv',
+  net_csv_fn  = 'data/' + run_ids[0] + '.net.csv';
   
   var cpu_chart = csv_chart(cpu_csv_fn, "line", "#id_cpu", "Usage [ % ]"),
       mem_chart = csv_chart(mem_csv_fn, "line", "#id_mem", "Usage [ GB ]"),
@@ -208,16 +208,16 @@ function build_charts(run_ids) {
       }, 500);
       setTimeout(function () {
         cpu_chart.load({
-          url: id + '.cpu.csv'
+          url: 'data/' + id + '.cpu.csv'
         });
         mem_chart.load({
-          url: id + '.mem.csv'
+          url: 'data/' + id + '.mem.csv'
         });
         io_chart.load({
-          url: id + '.io.csv'
+          url: 'data/' + id + '.io.csv'
         });
         net_chart.load({
-          url: id + '.net.csv'
+          url: 'data/' + id + '.net.csv'
         });
       }, 1000);
     })

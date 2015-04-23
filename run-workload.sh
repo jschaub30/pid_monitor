@@ -114,7 +114,7 @@ else
         echo Recording perf sample $PERF_ITER
         sudo perf record -a & PID=$!
         echo pid is $PID
-        sleep $((PERF_DELTA - PERF_DURATION))
+        sleep $PERF_DURATION
         sudo kill $PID
         sudo rm -f /tmp/perf.report
         sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
@@ -122,7 +122,7 @@ else
         head -n 1000 /tmp/perf.report \
             > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
         PERF_ITER=$(( PERF_ITER + 1 ))
-        sleep $PERF_DELTA
+        sleep $((PERF_DELTA - PERF_DURATION))
     done
 fi
 
@@ -136,6 +136,7 @@ sleep 1
 ###############################################################################
 # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
 cp -R html $RUNDIR/.
+cp html/all_files.html $RUNDIR/data/raw
 
 # Combine CSV files from all runs into summaries
 echo Now tidying raw data into CSV files
