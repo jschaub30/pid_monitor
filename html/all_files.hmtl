@@ -21,7 +21,7 @@
   <script>
   
   (function(){
-    var f_types = ['dstat', 'nmon', 'config', 'time', 'perf'];
+    var f_types = ['workload', 'dstat', 'nmon', 'config', 'time', 'perf'];
     f_types.forEach(function(name){
       $('#' + name).hide();
     });
