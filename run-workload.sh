@@ -49,7 +49,6 @@ kill_procs() {
     kill -USR2 $NMON_PID > /dev/null
     kill $PWATCH_PID $DSTAT_PID > /dev/null
 }
-
 trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
 
 if [[ $PWATCH_FLAG != "" ]]
@@ -185,4 +184,7 @@ fi
 #fi
 
 ./create-json-footer.sh
+./summarize-time.py $RUNDIR/html/config.clean.json > $RUNDIR/html/summary.csv
+./csv2html.sh $RUNDIR/html/summary.csv > $RUNDIR/html/summary.html
+
 
