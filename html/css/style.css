@@ -164,3 +164,12 @@ iframe {
   width: 155px;
   height: 40px;
 }
+
+table, th, td {
+  border: 1px solid black;
+  margin: 0 0 4em 0;
+  text-align: center;
+}
+table {
+    border-collapse: collapse;
+}
