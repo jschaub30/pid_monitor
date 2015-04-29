@@ -5,6 +5,9 @@ export WORKLOAD_NAME=EXAMPLE-SWEEP
 export WORKLOAD_DIR="."
 export ESTIMATED_RUN_TIME_MIN=1
 export X_LABEL="Block size [ KB ]"
+#export SAMPLE_PERF=1    # Profile using perf
+#export PERF_DELTA=20    # Sleep time between perf profiles (optional, default=120)
+#export PERF_DURATION=2  # Take sample over this many seconds (optional, default=2)
 
 # When sweeping, collect all files in the same run directory
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)

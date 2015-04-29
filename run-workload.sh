@@ -104,13 +104,13 @@ then
 else
     # Take perf snapshots periodically while workload is still running
     PERF_ITER=1
-    PERF_DURATION=2    # seconds
-    [ -z "PERF_DELTA" ] && PERF_DELTA=120 # seconds
+    [ -z "$PERF_DURATION" ] && PERF_DURATION=2    # seconds
+    [ -z "$PERF_DELTA" ] && PERF_DELTA=120 # seconds
     echo Perf profiling enabled.  Sleeping for $PERF_DELTA seconds
     sleep $((PERF_DELTA - PERF_DURATION))
     while [[ -e /proc/$MAIN_PID ]]
     do
-        echo Recording perf sample $PERF_ITER
+        echo Recording perf sample $PERF_ITER for $PERF_DURATION seconds
         sudo perf record -a & PID=$!
         echo pid is $PID
         sleep $PERF_DURATION
