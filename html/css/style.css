@@ -165,6 +165,10 @@ iframe {
   height: 40px;
 }
 
+td, th { 
+  padding: 10px;
+}
+
 table, th, td {
   border: 1px solid black;
   margin: 0 0 4em 0;

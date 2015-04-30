@@ -27,7 +27,7 @@ def main(argList):
     config =  json.loads(blob)
 
     ids = config['run_ids']
-    header = 'run id,exit status,elapsed time [ sec ]'
+    header = 'run id,exit status,elapsed time [sec]'
     rows = ''
     for run_id in ids:
         raw_directory = os.path.join(os.path.dirname(config_fn),

@@ -121,7 +121,18 @@ else
         head -n 1000 /tmp/perf.report \
             > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
         PERF_ITER=$(( PERF_ITER + 1 ))
-        sleep $((PERF_DELTA - PERF_DURATION))
+        #sleep $((PERF_DELTA - PERF_DURATION))
+
+        # This loop will wait for either:
+        #   (A) the delay between PERF runs or 
+        #   (B) the MAIN_PID to finish
+        I=0
+        while [[ $I -le $((PERF_DELTA - PERF_DURATION)) ]]
+        do 
+            I=$(( I + 1 ))
+            sleep 1
+            [[ ! -e /proc/$MAIN_PID ]] && break
+        done
     done
 fi
 
