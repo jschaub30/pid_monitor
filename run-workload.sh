@@ -46,6 +46,7 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 # function to kill PIDs of process monitors
 kill_procs() {
     echo "Stopping monitors"
+    kill $MAIN_PID > /dev/null  # Kill main process if ctrl-c
     kill -USR2 $NMON_PID > /dev/null
     kill $PWATCH_PID $DSTAT_PID > /dev/null
 }
