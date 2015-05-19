@@ -52,12 +52,14 @@ kill_procs() {
 }
 trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
 
+MONITOR_CMD=""
 if [[ $PWATCH_FLAG != "" ]]
 then
     PWATCH_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
     PWATCH_CMD="./watch-process.sh $DELAY_SEC" 
     $PWATCH_CMD > $PWATCH_STDOUT &
     PWATCH_PID=$!
+    MONITOR_CMD="$MONITOR_CMD & $PWATCH_CMD > $PWATCH_STDOUT"
 fi
 if [[ $DSTAT_FLAG != "" ]]
 then
@@ -65,13 +67,17 @@ then
     DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
     $DSTAT_CMD > /dev/null &
     DSTAT_PID=$!
+    MONITOR_CMD="$MONITOR_CMD & $DSTAT_CMD > /dev/null"
 fi
 if [[ $NMON_FLAG != "" ]]
 then
     NMON_FN=$RUNDIR/data/raw/$RUN_ID.nmon.txt
     NMON_CMD="nmon -s $DELAY_SEC -c 1000 -F $NMON_FN -p"
     NMON_PID=$($NMON_CMD)
+    MONITOR_CMD="$MONITOR_CMD & $NMON_CMD"
 fi
+
+echo "MONITOR_CMD --> $MONITOR_CMD"
 
 ###############################################################################
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
