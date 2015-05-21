@@ -30,7 +30,8 @@ body {
     margin: 1em auto 4em auto;
     position: relative;
     tab-size: 2;
-    width: 960px;
+    width: 100%;
+        padding: 10px;
 }
 
 h1 {

@@ -78,7 +78,7 @@ function load_summary(){
       avg_data     = calculate_mean(csv_data);
       // console.log(csv_data);
       setTimeout(function () {
-        summary_chart(avg_data, "line", "#id_summary");
+        // summary_chart(avg_data, "line", "#id_summary");
         summary_chart(csv_data, "scatter", "#id_all_data");
       });
     },
@@ -95,6 +95,9 @@ function summary_chart (data, chart_type, id){
   
   c3.generate({
     bindto: id,
+    size: {
+            height: 400,
+      },
     data: {
       json: data,
       keys: {
@@ -120,7 +123,7 @@ function summary_chart (data, chart_type, id){
     axis: {
       x: {
         // type: 'category',
-        min: 0,
+        // min: 0,
         //max: 100,
         label: xlabel,
       },
@@ -137,7 +140,10 @@ function csv_chart (csv_fn, chart_type, id, ylabel){
   
   var chart = c3.generate({
     bindto: id,
-    data: {
+    size: {
+            height: 400,
+      },
+      data: {
       url: csv_fn,
       x: 'elapsed_time_sec',
     },
@@ -191,7 +197,7 @@ function build_charts(run_ids) {
     button    = $('<button></button>', {
       id:button_id,
       text:id
-    }).insertBefore('#cpu_title').addClass('button');
+    }).appendTo('#buttons').addClass('button');
     
     if (i==0){
       button.addClass('active')
