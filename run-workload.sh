@@ -10,11 +10,11 @@
 [ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
 
-[ -z "$PWATCH_FLAG" ] && PWATCH_FLAG=""     # Turned off by default
-[ -z "$DSTAT_FLAG" ] && DSTAT_FLAG=1        # Required for html plots
-[ -z "$NMON_FLAG" ] && NMON_FLAG=1
+[ -z "$SAMPLE_PWATCH" ] && SAMPLE_PWATCH=""     # Turned off by default
+[ -z "$SAMPLE_DSTAT" ] && SAMPLE_DSTAT=1        # Required for html plots
+[ -z "$SAMPLE_NMON" ] && SAMPLE_NMON=1
 
-[ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"   # Only used if PWATCH_FLAG is set
+[ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"   # Only used if SAMPLE_PWATCH is set
 
 if [ ! -f $RUNDIR/html/config.json ]
 then
@@ -53,7 +53,7 @@ kill_procs() {
 trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
 
 MONITOR_CMD=""
-if [[ $PWATCH_FLAG != "" ]]
+if [[ $SAMPLE_PWATCH -eq 1 ]]
 then
     PWATCH_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
     PWATCH_CMD="./watch-process.sh $DELAY_SEC" 
@@ -61,7 +61,7 @@ then
     PWATCH_PID=$!
     MONITOR_CMD="$MONITOR_CMD & $PWATCH_CMD > $PWATCH_STDOUT"
 fi
-if [[ $DSTAT_FLAG != "" ]]
+if [[ $SAMPLE_DSTAT -eq 1 ]]
 then
     DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
     DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
@@ -69,7 +69,7 @@ then
     DSTAT_PID=$!
     MONITOR_CMD="$MONITOR_CMD & $DSTAT_CMD > /dev/null"
 fi
-if [[ $NMON_FLAG != "" ]]
+if [[ $SAMPLE_NMON -eq 1 ]]
 then
     NMON_FN=$RUNDIR/data/raw/$RUN_ID.nmon.txt
     NMON_CMD="nmon -s $DELAY_SEC -c 1000 -F $NMON_FN -p"
@@ -167,7 +167,7 @@ rm -f $RUNDIR/data/final/summary.time.csv
 cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
 cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
 
-if [[ $PWATCH_FLAG != "" ]]
+if [[ $SAMPLE_PWATCH != "" ]]
 then
     ./tidy-pwatch.py $PWATCH_STDOUT $PROCESS_TO_GREP $RUN_ID \
         > $RUNDIR/data/final/$RUN_ID.pwatch.csv
@@ -183,7 +183,7 @@ then
     cd $CWD
 fi
 
-if [[ $DSTAT_FLAG != "" ]]
+if [[ $SAMPLE_DSTAT != "" ]]
 then
     tail -n +7 $DSTAT_CSV > $RUNDIR/html/data/$RUN_ID.dstat.csv
     ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-9 used buff cach free \
@@ -196,7 +196,7 @@ then
         > $RUNDIR/html/data/$RUN_ID.cpu.csv
 fi
 
-#if [[ $NMON_FLAG != "" ]]
+#if [[ $SAMPLE_NMON != "" ]]
 #then
     # TODO Write NMON parser
 #fi
