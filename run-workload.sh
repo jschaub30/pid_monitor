@@ -10,7 +10,7 @@
 [ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
 
-[ -z "$SAMPLE_PWATCH" ] && SAMPLE_PWATCH=""     # Turned off by default
+[ -z "$SAMPLE_PWATCH" ] && SAMPLE_PWATCH=0     # Turned off by default
 [ -z "$SAMPLE_DSTAT" ] && SAMPLE_DSTAT=1        # Required for html plots
 [ -z "$SAMPLE_NMON" ] && SAMPLE_NMON=1
 
@@ -102,8 +102,7 @@ cd $WORKLOAD_DIR
 
 MAIN_PID=$!
 echo Main PID is $MAIN_PID
-
-if [[ -z "$SAMPLE_PERF" ]]
+if [[ $SAMPLE_PERF -ne 1 ]]
 then
     # Don't profile using perf
     echo Waiting for $MAIN_PID to finish
@@ -167,7 +166,7 @@ rm -f $RUNDIR/data/final/summary.time.csv
 cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
 cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
 
-if [[ $SAMPLE_PWATCH != "" ]]
+if [[ $SAMPLE_PWATCH -eq 1 ]]
 then
     ./tidy-pwatch.py $PWATCH_STDOUT $PROCESS_TO_GREP $RUN_ID \
         > $RUNDIR/data/final/$RUN_ID.pwatch.csv
@@ -183,7 +182,7 @@ then
     cd $CWD
 fi
 
-if [[ $SAMPLE_DSTAT != "" ]]
+if [[ $SAMPLE_DSTAT -eq 1 ]]
 then
     tail -n +7 $DSTAT_CSV > $RUNDIR/html/data/$RUN_ID.dstat.csv
     ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-9 used buff cach free \
@@ -196,7 +195,7 @@ then
         > $RUNDIR/html/data/$RUN_ID.cpu.csv
 fi
 
-#if [[ $SAMPLE_NMON != "" ]]
+#if [[ $SAMPLE_NMON -eq 1 ]]
 #then
     # TODO Write NMON parser
 #fi
