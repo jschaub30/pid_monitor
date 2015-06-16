@@ -22,5 +22,9 @@ d1 <- round(d[colnames]*scale, 1)
 try(t0 <- strptime(d$time[1], "%d-%m %H:%M:%OS"), silent = TRUE)
 try(d1$elapsed_time_sec <- as.numeric(strptime(d$time, "%d-%m %H:%M:%OS")-t0), silent = TRUE)
 
+# move elapsed_time_sec to first column to help javascript
+len <- length(d1[1,])
+d1 <- d1[,c(len, 1:(len-1))]
+
 write.csv(d1,row.names=FALSE)
 
