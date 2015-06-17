@@ -9,6 +9,7 @@
 	<script src="js/c3.min.js" type="text/javascript"></script>
   <script src="js/jquery.min.js"></script>
 	<script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
+  <script type="text/javascript"  src="js/dygraph-combined.js"></script>
 
 	<title id="id_title">PID monitor</title>
 	<style type="text/css" media="screen">
@@ -19,20 +20,20 @@
 */  }
   section {
       width: 98%;
-      height: 400px;
+      min-height: 400px;
      /* background: aqua;*/
       margin: auto;
       padding: 10px;
   }
   div.one {
       width: 48%;
-      height: 400px;
+      min-height: 400px;
 /*      background: red;*/
       float: left;
   }
   div.two {
       margin-left: 52%;
-      height: 400px;
+      min-height: 400px;
 /*      background: black;*/
   }
   div#buttons {
@@ -93,13 +94,13 @@
   
   (function(){
     var WIN_WIDTH=$(window).width()
-    DIV_WIDTH=WIN_WIDTH/2-500;
+    DIV_WIDTH=WIN_WIDTH/2-100;
     console.log(DIV_WIDTH)
 
     // $('body').css('width', DIV_WIDTH);
   })();
   </script>
-	<script src='js/charts.js' type='text/javascript'> </script>
+	<script src='js/charts_dy.js' type='text/javascript'> </script>
 
 </body>
 </html>
