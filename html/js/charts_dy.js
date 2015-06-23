@@ -58,7 +58,7 @@ function summary_chart (data, id){
     document.getElementById(id),
     data, // path to CSV file
     {
-      xlabel: "Input size", 
+      xlabel: xlabel, 
       ylabel: "Elapsed time [ sec ]",
       xRangePad: 20,
       drawPoints: true,
