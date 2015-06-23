@@ -7,7 +7,7 @@
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1M count=1024 oflag=direct"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
-[ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
+[ -z "$RUNDIR" ]  && export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
 
 if [ ! -f $RUNDIR/html/config.json ]
@@ -25,7 +25,6 @@ echo Putting results in $RUNDIR
 echo Run ID is $RUN_ID
 cp *sh $RUNDIR/scripts
 cp *py $RUNDIR/scripts
-cp *R $RUNDIR/scripts
 
 ###############################################################################
 # STEP 1: CREATE OUTPUT FILENAMES BASED ON TIMESTAMP
@@ -40,7 +39,7 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 # function to kill PIDs of process monitors
 kill_procs() {
     echo "Stopping monitors"
-    kill $MAIN_PID > /dev/null  # Kill main process if ctrl-c
+    kill $MAIN_PID 2> /dev/null  # Kill main process if ctrl-c
     kill $DSTAT_PID > /dev/null
 }
 trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
@@ -50,9 +49,6 @@ DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
 DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
 $DSTAT_CMD > /dev/null &
 DSTAT_PID=$!
-MONITOR_CMD="$MONITOR_CMD & $DSTAT_CMD > /dev/null"
-
-echo "MONITOR_CMD --> $MONITOR_CMD"
 
 ###############################################################################
 # STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
@@ -132,7 +128,7 @@ cp html/all_files.html $RUNDIR/data/raw
 # Combine CSV files from all runs into summaries
 echo Now tidying raw data into CSV files
 
-cp $RUNDIR/data/raw/$RUN_ID.dstat.csv $RUNDIR/html/data/$RUN_ID.dstat.csv
+cp $DSTAT_CSV $RUNDIR/html/data/.
 
 # Always process data from /usr/bin/time
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
