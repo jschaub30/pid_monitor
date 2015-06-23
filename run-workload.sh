@@ -97,8 +97,8 @@ echo $CONFIG > $CONFIG_FN
 CWD=$(pwd)
 echo Working directory: $WORKLOAD_DIR
 cd $WORKLOAD_DIR
-( /usr/bin/time --verbose --output=$TIME_FN bash -c \
-    "$WORKLOAD_CMD 1> $WORKLOAD_STDOUT 2> $WORKLOAD_STDERR " ) &
+/usr/bin/time --verbose --output=$TIME_FN bash -c \
+    "$WORKLOAD_CMD 1> >(tee $WORKLOAD_STDOUT) 2> >(tee $WORKLOAD_STDERR) " &
 
 MAIN_PID=$!
 echo Main PID is $MAIN_PID

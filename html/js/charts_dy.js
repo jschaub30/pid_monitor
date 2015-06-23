@@ -25,8 +25,8 @@ $.ajax({
 
 var parse_line = function(line) {
   // console.log(line.run_id)
-  return [line.run_id.split('=')[1].split('.')[0],  //threads
-          line.elapsed_time_sec]
+  return [parseFloat(line.run_id.split('=')[1].split('.')[0]),  //threads
+          parseFloat(line.elapsed_time_sec)]
 }
 
 function load_summary(){
@@ -65,6 +65,8 @@ function summary_chart (data, chart_type, id){
       height: 400,
       drawPoints: true,
       strokeWidth: 2,
+      xRangePad: 10,
+      pointSize: 3
     }
   )
   return chart
