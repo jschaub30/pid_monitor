@@ -2,11 +2,7 @@
 <html>
 <head>
 	<link href="css/style.css" rel="stylesheet">
-	<!-- Load c3.css -->
-	<link href="css/c3.css" rel="stylesheet" type="text/css">
-	<!-- Load d3.js ,c3.js and jQuery -->
-	<script src="js/d3.min.js" charset="utf-8" type="text/javascript"></script>
-	<script src="js/c3.min.js" type="text/javascript"></script>
+	<!-- Load jQuery -->
   <script src="js/jquery.min.js"></script>
 	<script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
   <script type="text/javascript"  src="js/dygraph-combined.js"></script>
@@ -38,7 +34,7 @@
   }
   div#buttons {
     width: 100%;
-    min-height: 50px;
+    height: 50px;
   }
 	</style>
 </head>
@@ -52,9 +48,7 @@
 	<h1 id="id_workload">WORKLOAD</h1>
   <p><a href="../data/raw/all_files.html">All data files</a></p>
   <section>
-    <div class="one">
-      <div class="chart" id="id_all_data"></div>
-    </div>
+    <div class="one" "chart" id="id_all_data"></div>
     <div class="two">
       <div id="summary_table"><p>Summary_table</p></div>
     </div>
@@ -65,40 +59,31 @@
 	<p><br></p>
     <div id="dstat">
     <p><section>
-      <div class="one">
-        <h3>CPU</h3>
-        <div id="id_cpu"></div>
-      </div>
-      <div class="two">
-        <h3>Memory</h3>
-        <div id="id_mem"></div>
-      </div>
+      <div class="one chart" id="id_cpu"></div>
+      <div class="two chart" id="id_io"></div>
     </section>
   </div>
-	<p><br></p>
   <div>
     <section>
-      <div class="one">
-        <h3>IO</h3>
-        <div class="chart" id="id_io"></div>
-      </div>
-      <div class="two">
-        <h3>Network</h3>
-        <div class="chart" id="id_net"></div>
-      </div>
+      <div class="one chart" id="id_mem"></div>
+      <div class="two chart" id="id_net"></div>
+    </section>
+  </div>
+  <div>
+    <section>
+      <div class="one chart" id="id_sys"></div>
+      <div class="two chart" id="id_proc"></div>
+    </section>
+  </div>
+  <div>
+    <section>
+      <div class="one chart" id="id_pag"></div>
     </section>
   </div>
   
   <script>
   $("#summary_table").load('summary.html');
   
-  (function(){
-    var WIN_WIDTH=$(window).width()
-    DIV_WIDTH=WIN_WIDTH/2-100;
-    console.log(DIV_WIDTH)
-
-    // $('body').css('width', DIV_WIDTH);
-  })();
   </script>
 	<script src='js/charts_dy.js' type='text/javascript'> </script>
 

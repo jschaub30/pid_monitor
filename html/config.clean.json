@@ -1,0 +1,9 @@
+{"workload":"EXAMPLE",
+"date":"Tue Jun 16 14:37:00 CDT 2015",
+"hostname":"localhost",
+"description":"Example pid_monitor",
+"xlabel":"Example number",
+"run_ids":[
+"example=1",
+"example=2"
+]}

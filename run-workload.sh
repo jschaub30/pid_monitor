@@ -10,12 +10,6 @@
 [ -z "$RUNDIR" ]  && RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
 
-[ -z "$SAMPLE_PWATCH" ] && SAMPLE_PWATCH=0     # Turned off by default
-[ -z "$SAMPLE_DSTAT" ] && SAMPLE_DSTAT=1        # Required for html plots
-[ -z "$SAMPLE_NMON" ] && SAMPLE_NMON=1
-
-[ -z "$PROCESS_TO_GREP" ]  && PROCESS_TO_GREP="dd"   # Only used if SAMPLE_PWATCH is set
-
 if [ ! -f $RUNDIR/html/config.json ]
 then
     ./create-json-header.sh
@@ -47,35 +41,16 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 kill_procs() {
     echo "Stopping monitors"
     kill $MAIN_PID > /dev/null  # Kill main process if ctrl-c
-    kill -USR2 $NMON_PID > /dev/null
-    kill $PWATCH_PID $DSTAT_PID > /dev/null
+    kill $DSTAT_PID > /dev/null
 }
 trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
 
 MONITOR_CMD=""
-if [[ $SAMPLE_PWATCH -eq 1 ]]
-then
-    PWATCH_STDOUT=$RUNDIR/data/raw/$RUN_ID.pwatch.stdout
-    PWATCH_CMD="./watch-process.sh $DELAY_SEC" 
-    $PWATCH_CMD > $PWATCH_STDOUT &
-    PWATCH_PID=$!
-    MONITOR_CMD="$MONITOR_CMD & $PWATCH_CMD > $PWATCH_STDOUT"
-fi
-if [[ $SAMPLE_DSTAT -eq 1 ]]
-then
-    DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
-    DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
-    $DSTAT_CMD > /dev/null &
-    DSTAT_PID=$!
-    MONITOR_CMD="$MONITOR_CMD & $DSTAT_CMD > /dev/null"
-fi
-if [[ $SAMPLE_NMON -eq 1 ]]
-then
-    NMON_FN=$RUNDIR/data/raw/$RUN_ID.nmon.txt
-    NMON_CMD="nmon -s $DELAY_SEC -c 1000 -F $NMON_FN -p"
-    NMON_PID=$($NMON_CMD)
-    MONITOR_CMD="$MONITOR_CMD & $NMON_CMD"
-fi
+DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
+DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
+$DSTAT_CMD > /dev/null &
+DSTAT_PID=$!
+MONITOR_CMD="$MONITOR_CMD & $DSTAT_CMD > /dev/null"
 
 echo "MONITOR_CMD --> $MONITOR_CMD"
 
@@ -86,7 +61,7 @@ CONFIG=$CONFIG,run_id,$RUN_ID
 CONFIG=$CONFIG,kernel,$(uname -r)
 CONFIG=$CONFIG,hostname,$(hostname -s)
 CONFIG=$CONFIG,workload_name,$WORKLOAD_NAME
-CONFIG=$CONFIG,stat_command,$PWATCH_CMD
+CONFIG=$CONFIG,stat_command,$DSTAT_CMD
 CONFIG=$CONFIG,workload_command,$WORKLOAD_CMD
 CONFIG=$CONFIG,workload_dir,$WORKLOAD_DIR
 CONFIG=$CONFIG,  # Add trailiing comma
@@ -157,6 +132,8 @@ cp html/all_files.html $RUNDIR/data/raw
 # Combine CSV files from all runs into summaries
 echo Now tidying raw data into CSV files
 
+cp $RUNDIR/data/raw/$RUN_ID.dstat.csv $RUNDIR/html/data/$RUN_ID.dstat.csv
+
 # Always process data from /usr/bin/time
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
 rm -f $RUNDIR/data/final/summary.time.csv
@@ -166,42 +143,10 @@ rm -f $RUNDIR/data/final/summary.time.csv
 cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
 cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
 
-if [[ $SAMPLE_PWATCH -eq 1 ]]
-then
-    ./tidy-pwatch.py $PWATCH_STDOUT $PROCESS_TO_GREP $RUN_ID \
-        > $RUNDIR/data/final/$RUN_ID.pwatch.csv
-    rm -f $RUNDIR/data/final/summary.pwatch.csv
-    ./summarize-csv.py $RUNDIR/data/final .pwatch.csv \
-        2> $RUNDIR/data/final/errors.pwatch.csv \
-        1>$RUNDIR/data/final/summary.pwatch.csv
-    cd $RUNDIR/html/data
-    ../../scripts/split-chartdata.R ../../data/final/$RUN_ID.pwatch.csv \
-        pid elapsed_time_sec cpu_pct  $RUN_ID # Parse CPU data
-    ../../scripts/split-chartdata.R ../../data/final/$RUN_ID.pwatch.csv \
-        pid elapsed_time_sec mem_pct  $RUN_ID # Parse memory data
-    cd $CWD
-fi
-
-if [[ $SAMPLE_DSTAT -eq 1 ]]
-then
-    tail -n +7 $DSTAT_CSV > $RUNDIR/html/data/$RUN_ID.dstat.csv
-    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-9 used buff cach free \
-        > $RUNDIR/html/data/$RUN_ID.mem.csv
-    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-6 read writ \
-        > $RUNDIR/html/data/$RUN_ID.io.csv
-    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1e-6 recv send \
-        > $RUNDIR/html/data/$RUN_ID.net.csv
-    ./split-columns.R $RUNDIR/html/data/$RUN_ID.dstat.csv 1 usr sys idl wai \
-        > $RUNDIR/html/data/$RUN_ID.cpu.csv
-fi
-
-#if [[ $SAMPLE_NMON -eq 1 ]]
-#then
-    # TODO Write NMON parser
-#fi
-
 ./create-json-footer.sh
 ./summarize-time.py $RUNDIR/html/config.clean.json > $RUNDIR/html/summary.csv
 ./csv2html.sh $RUNDIR/html/summary.csv > $RUNDIR/html/summary.html
 
 
+echo View the html output using "cd $RUNDIR/html; python -m SimpleHTTPServer 12121"
+echo Then navigate to http://localhost:12121
