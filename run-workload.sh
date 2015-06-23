@@ -143,6 +143,7 @@ cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv
 ./summarize-time.py $RUNDIR/html/config.clean.json > $RUNDIR/html/summary.csv
 ./csv2html.sh $RUNDIR/html/summary.csv > $RUNDIR/html/summary.html
 
-
-echo View the html output using "cd $RUNDIR/html; python -m SimpleHTTPServer 12121"
+echo 
+echo View the html output using the following command:
+echo $ cd $RUNDIR/html; python -m SimpleHTTPServer 12121
 echo Then navigate to http://localhost:12121
