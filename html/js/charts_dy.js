@@ -24,11 +24,39 @@ $.ajax({
   }
 });
 
+var parse_summary_line = function(line) {
+  // console.log(line.run_id)
+  return [parseFloat(line.run_id.split('=')[1].split('.')[0]),  //threads
+  parseFloat(line.elapsed_time_sec)]
+}
 
-function summary_chart (id){
+function load_summary(){
+  //Read summary data and create charts
+  $.ajax({
+    type: "GET",
+    url: "time_summary_csv",
+    dataType: "text",
+    success: function(data) {
+      var csv_data = $.csv.toObjects(data);
+      // console.log(csv_data);
+      csv_data     = csv_data.map(parse_summary_line);  // OPTIONALLY CUSTOMIZE EACH LINE
+      // console.log(csv_data);
+      setTimeout(function () {
+        summary_chart(csv_data, "id_all_data");
+      });
+    },
+    error: function (request, status, error) {
+      console.log(error);
+    }
+  });
+};
+
+load_summary();
+
+function summary_chart (data, id){
   chart = new Dygraph(
     document.getElementById(id),
-    'formatted_time_summary', // path to CSV file
+    data, // path to CSV file
     {
       xlabel: "Input size", 
       ylabel: "Elapsed time [ sec ]",
@@ -40,7 +68,6 @@ function summary_chart (id){
   return chart
 }
 
-summary_chart("id_all_data")
 
 
 function csv_chart(data, id, title, labels, ylabel) {
