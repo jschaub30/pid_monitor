@@ -1,9 +1,10 @@
 // First read configuration from a file and update HTML
-var xlabel;
+var xlabel,
+    slave;
 
 $.ajax({
   type: "GET",
-  url: "config.clean.json",
+  url: "config.json",
   dataType: "json",
   success: function(data) {
     // console.log(data);
@@ -12,10 +13,9 @@ $.ajax({
     $('#id_workload').text(data["description"]);
     $('#id_title').text(data["workload"]);
     $('#id_date').text(data["date"]);
-    
-    // load_summary();
-    // build_charts(data["run_ids"][0]);
-    load_csv(data["run_ids"][0]);
+    slave = data["slaves"][0];
+
+    load_csv(slave + '.' + data["run_ids"][0]);
     create_buttons(data["run_ids"]);
     
   },
@@ -239,7 +239,7 @@ function create_button(i, run_id){
       //could use chart.updateOptions here
 
       // build_charts(run_id)
-      load_csv(run_id)
+      load_csv(slave + '.' + run_id)
     }, 500);
   })
 }

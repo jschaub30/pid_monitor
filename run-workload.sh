@@ -8,21 +8,59 @@
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
 [ -z "$RUNDIR" ]  && export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
-[ -z "$RUN_ID" ]  && RUN_ID="RUN=1.1"
+[ -z "$RUN_ID" ]  && export RUN_ID="RUN=1.1"
+[ -z "$SLAVES" ] && export SLAVES=$(hostname)
+[ -z "$VERBOSE" ] && export VERBOSE=0  # Set to 1 to turn on debug messages
+
+###############################################################################
+# Define functions
+debug_message(){
+  if [ "$VERBOSE" -eq 1 ]
+  then
+    echo "#### PID MONITOR ####: $@"
+  fi
+}
+
+stop_all() {
+  # function to kill PIDs of workload and process monitors
+  PIDS=$(pgrep -f "$WORKLOAD_CMD")
+  echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
+  kill $PIDS 2>/dev/null
+  #kill -9 $TIME_PID 2> /dev/null  # Kill main process if ctrl-c
+  stop_dstat&
+  sleep 1
+  exit
+}
+
+stop_dstat() {
+  for SLAVE in $SLAVES
+  do
+    #debug_message " Stopping dstat measurement on $SLAVE"
+    DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
+    PID=$(ssh $SLAVE "ps -fea | grep dstat" | grep $DSTAT_CSV | tr -s ' ' | cut -d' ' -f2)
+    ssh $SLAVE "kill -9 $PID 2> /dev/null"&
+  done
+}
+
+trap 'stop_all' SIGTERM SIGINT # Kill process monitors if killed early
 
 if [ ! -f $RUNDIR/html/config.json ]
 then
-    ./create-json-header.sh
+    ./create-json-config.sh
+else
+    # Remove closing brace, closing bracket, and add comma
+    cat $RUNDIR/html/config.json | sed -e '$s/\]\}/,/' > tmp.json
+    echo \"$RUN_ID\"\]\} >> tmp.json
+    cp tmp.json $RUNDIR/html/config.json
 fi
-echo \"$RUN_ID\", >> $RUNDIR/html/config.json
 
 DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
 
-echo Running this workload:
-echo \"$WORKLOAD_CMD\"
+echo "#### PID MONITOR ####: Running this workload:"
+echo "#### PID MONITOR ####: \"$WORKLOAD_CMD\""
 
-echo Putting results in $RUNDIR
-echo Run ID is $RUN_ID
+debug_message " Putting results in $RUNDIR"
+debug_message " RUN_ID=\"$RUN_ID\""
 cp *sh $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 
@@ -34,24 +72,20 @@ CONFIG_FN=$RUNDIR/data/raw/$RUN_ID.config.txt
 WORKLOAD_STDOUT=$RUNDIR/data/raw/$RUN_ID.workload.stdout
 WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 
-###############################################################################
-# STEP 2: START SYSTEM MONITORS
-# function to kill PIDs of process monitors
-kill_procs() {
-    echo "Stopping monitors"
-    kill $MAIN_PID 2> /dev/null  # Kill main process if ctrl-c
-    kill $DSTAT_PID > /dev/null
-}
-trap 'kill_procs' SIGTERM SIGINT # Kill process monitors if killed early
-
-MONITOR_CMD=""
-DSTAT_CSV=$RUNDIR/data/raw/$RUN_ID.dstat.csv
-DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
-$DSTAT_CMD > /dev/null &
-DSTAT_PID=$!
 
 ###############################################################################
-# STEP 3: COPY CONFIG FILES TO RAW DIRECTORY
+# STEP 2: START DSTAT USING SSH
+stop_dstat
+for SLAVE in $SLAVES
+do
+    DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
+    DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
+    ssh $SLAVE "rm -f $DSTAT_CSV; nohup $DSTAT_CMD > /dev/null &"
+    [ $? -ne 0 ] && debug_message " Problem connecting to host \"$SLAVE\" using ssh"
+done
+
+###############################################################################
+# STEP 3: COPY CONFIG FILES TO CONFIG FILE IN RAW DIRECTORY
 CONFIG=$CONFIG,timestamp,$TIMESTAMP
 CONFIG=$CONFIG,run_id,$RUN_ID
 CONFIG=$CONFIG,kernel,$(uname -r)
@@ -66,30 +100,29 @@ echo $CONFIG > $CONFIG_FN
 ###############################################################################
 # STEP 4: RUN WORKLOAD
 CWD=$(pwd)
-echo Working directory: $WORKLOAD_DIR
+debug_message " Working directory: $WORKLOAD_DIR"
 cd $WORKLOAD_DIR
 /usr/bin/time --verbose --output=$TIME_FN bash -c \
     "$WORKLOAD_CMD 1> >(tee $WORKLOAD_STDOUT) 2> >(tee $WORKLOAD_STDERR) " &
 
-MAIN_PID=$!
-echo Main PID is $MAIN_PID
+TIME_PID=$!
+debug_message " Main PID is $TIME_PID"
 if [[ $SAMPLE_PERF -ne 1 ]]
 then
     # Don't profile using perf
-    echo Waiting for $MAIN_PID to finish
-    wait $MAIN_PID
+    debug_message " Waiting for $TIME_PID to finish"
+    wait $TIME_PID
 else
     # Take perf snapshots periodically while workload is still running
     PERF_ITER=1
     [ -z "$PERF_DURATION" ] && PERF_DURATION=2    # seconds
     [ -z "$PERF_DELTA" ] && PERF_DELTA=120 # seconds
-    echo Perf profiling enabled.  Sleeping for $PERF_DELTA seconds
+    debug_message " Perf profiling enabled.  Sleeping for $PERF_DELTA seconds"
     sleep $((PERF_DELTA - PERF_DURATION))
-    while [[ -e /proc/$MAIN_PID ]]
+    while [[ -e /proc/$TIME_PID ]]
     do
-        echo Recording perf sample $PERF_ITER for $PERF_DURATION seconds
+        debug_message " Recording perf sample $PERF_ITER for $PERF_DURATION seconds"
         sudo perf record -a & PID=$!
-        echo pid is $PID
         sleep $PERF_DURATION
         sudo kill $PID
         sudo rm -f /tmp/perf.report
@@ -102,13 +135,13 @@ else
 
         # This loop will wait for either:
         #   (A) the delay between PERF runs or 
-        #   (B) the MAIN_PID to finish
+        #   (B) the TIME_PID to finish
         I=0
         while [[ $I -le $((PERF_DELTA - PERF_DURATION)) ]]
         do 
             I=$(( I + 1 ))
             sleep 1
-            [[ ! -e /proc/$MAIN_PID ]] && break
+            [[ ! -e /proc/$TIME_PID ]] && break
         done
     done
 fi
@@ -116,8 +149,8 @@ fi
 cd $CWD
 
 ###############################################################################
-# STEP 5: KILL SYSTEM MONITORS
-kill_procs
+# STEP 5: STOP_DSTAT
+stop_dstat
 sleep 1
 
 ###############################################################################
@@ -125,12 +158,15 @@ sleep 1
 cp -R html $RUNDIR/.
 cp html/all_files.html $RUNDIR/data/raw
 
-# Combine CSV files from all runs into summaries
-echo Now tidying raw data into CSV files
+debug_message " Now collecting CSV files"
+for SLAVE in $SLAVES
+do
+  DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
+  scp $SLAVE:$DSTAT_CSV $RUNDIR/html/data/.
+  cp $RUNDIR/html/data/$SLAVE.$RUN_ID.dstat.csv $RUNDIR/data/raw/.
+done
 
-cp $DSTAT_CSV $RUNDIR/html/data/.
-
-# Always process data from /usr/bin/time
+# Process data from /usr/bin/time command
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
 rm -f $RUNDIR/data/final/summary.time.csv
 ./summarize-csv.py $RUNDIR/data/final .time.csv \
@@ -138,12 +174,11 @@ rm -f $RUNDIR/data/final/summary.time.csv
 # Copy summary data. Change filename so browser will render file instead of download
 cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
 cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
-
-./create-json-footer.sh
-./summarize-time.py $RUNDIR/html/config.clean.json > $RUNDIR/html/summary.csv
+./summarize-time.py $RUNDIR/html/config.json > $RUNDIR/html/summary.csv
 ./csv2html.sh $RUNDIR/html/summary.csv > $RUNDIR/html/summary.html
 
-echo 
-echo View the html output using the following command:
-echo "$ cd $RUNDIR/html; python -m SimpleHTTPServer 12121"
-echo Then navigate to http://localhost:12121
+echo
+echo "#### PID MONITOR ####: View the html output using the following command:"
+echo "#### PID MONITOR ####: $ cd $RUNDIR/html; python -m SimpleHTTPServer 12121"
+echo "#### PID MONITOR ####: Then navigate to http://localhost:12121"
+echo

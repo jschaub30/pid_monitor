@@ -10,11 +10,18 @@
 [[ -z "$WORKLOAD_NAME" ]] && WORKLOAD_NAME="WORKLOAD"
 [[ -z "$X_LABEL" ]] && X_LABEL="X label"
 [[ -z "$DESCRIPTION" ]] && DESCRIPTION="DESCRIPTION"
+[[ -z "$SLAVES" ]] && SLAVES=$(hostname)
 
-echo \{\"workload\":\"$WORKLOAD_NAME\", >> $RUNDIR/html/config.json
+echo \{\"workload\":\"$WORKLOAD_NAME\", > $RUNDIR/html/config.json
 echo \"date\":\"$(date)\", >> $RUNDIR/html/config.json
 echo \"hostname\":\"$(hostname -s)\", >> $RUNDIR/html/config.json
 echo \"description\":\"$DESCRIPTION\", >> $RUNDIR/html/config.json
 echo \"xlabel\":\"$X_LABEL\", >> $RUNDIR/html/config.json
-echo \"run_ids\":\[ >> $RUNDIR/html/config.json
+ARR="\"slaves\":["
+for SLAVE in $SLAVES
+do
+  ARR=${ARR}\"${SLAVE}\",
+done
+echo $ARR | sed 's/.$/],/' >> $RUNDIR/html/config.json
+echo \"run_ids\":\[\"$RUN_ID\"\]\} >> $RUNDIR/html/config.json
 
