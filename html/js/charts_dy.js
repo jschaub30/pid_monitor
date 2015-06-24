@@ -1,6 +1,7 @@
 // First read configuration from a file and update HTML
 var xlabel,
-    slave;
+    slave,
+    run_id;
 
 $.ajax({
   type: "GET",
@@ -14,9 +15,10 @@ $.ajax({
     $('#id_title').text(data["workload"]);
     $('#id_date').text(data["date"]);
     slave = data["slaves"][0];
+    run_id = data["run_ids"][0];
 
-    load_csv(slave + '.' + data["run_ids"][0]);
-    create_buttons(data["run_ids"]);
+    load_csv();
+    create_buttons(data["slaves"], data["run_ids"]);
     
   },
   error: function (request, status, error) {
@@ -132,12 +134,13 @@ var parse_line = function() {
   return arr
 }
 
-function load_csv(run_id) {
+function load_csv() {
+  url = 'data/' + slave + '.' + run_id + '.dstat.csv';
   //Read csv data 
   //console.log('load_csv');
   $.ajax({
     type: "GET",
-    url: 'data/' + run_id + '.dstat.csv',
+    url: url,
     dataType: "text",
     success: function(data) {
       var i = 0,
@@ -212,20 +215,41 @@ function load_csv(run_id) {
   });
 };
 
-function create_buttons(run_ids){
-  // console.log('Creating buttons');
+function create_buttons(slaves, run_ids){
+  for (i in slaves){
+    create_cluster_button(i, slaves[i])
+  }
   for (i in run_ids){
-    // console.log(run_ids[i]);
     create_button(i, run_ids[i])
   }
 }
 
+function create_cluster_button(i, id){
+  var button_id = "cluster_button" + String(i),
+  button    = $('<button></button>', {
+    id:button_id,
+    text:id
+  }).appendTo('#cluster_buttons').addClass('button');
 
-function create_button(i, run_id){
+  if (i==0){
+    button.addClass('active')
+  }
+  $("#" + button_id).on('click', function(){
+    $this = $(this);
+    $this.addClass('active');
+    $this.siblings('button').removeClass('active');
+    slave = id;
+    setTimeout(function () {
+      load_csv()
+    }, 500);
+  })
+}
+
+function create_button(i, id){
   var button_id = "button" + String(i),
   button    = $('<button></button>', {
     id:button_id,
-    text:run_id
+    text:id
   }).appendTo('#buttons').addClass('button');
     
   if (i==0){
@@ -235,11 +259,9 @@ function create_button(i, run_id){
     $this = $(this);
     $this.addClass('active');
     $this.siblings('button').removeClass('active');
+    run_id = id;
     setTimeout(function () {
-      //could use chart.updateOptions here
-
-      // build_charts(run_id)
-      load_csv(slave + '.' + run_id)
+      load_csv()
     }, 500);
   })
 }
