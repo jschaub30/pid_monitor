@@ -35,7 +35,7 @@ stop_all() {
 stop_dstat() {
   for SLAVE in $SLAVES
   do
-    #debug_message " Stopping dstat measurement on $SLAVE"
+    #debug_message "Stopping dstat measurement on $SLAVE"
     DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
     PID=$(ssh $SLAVE "ps -fea | grep dstat" | grep $DSTAT_CSV | tr -s ' ' | cut -d' ' -f2)
     ssh $SLAVE "kill -9 $PID 2> /dev/null"&
@@ -59,14 +59,13 @@ DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every
 echo "#### PID MONITOR ####: Running this workload:"
 echo "#### PID MONITOR ####: \"$WORKLOAD_CMD\""
 
-debug_message " Putting results in $RUNDIR"
-debug_message " RUN_ID=\"$RUN_ID\""
+debug_message "Putting results in $RUNDIR"
+debug_message "RUN_ID=\"$RUN_ID\""
 cp *sh $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 
 ###############################################################################
-# STEP 1: CREATE OUTPUT FILENAMES BASED ON TIMESTAMP
-TIMESTAMP=$(date +"%Y-%m-%d_%H:%M:%S")
+# STEP 1: CREATE OUTPUT FILENAMES
 TIME_FN=$RUNDIR/data/raw/$RUN_ID.time.stdout
 CONFIG_FN=$RUNDIR/data/raw/$RUN_ID.config.txt
 WORKLOAD_STDOUT=$RUNDIR/data/raw/$RUN_ID.workload.stdout
@@ -81,17 +80,17 @@ do
     DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
     DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
     ssh $SLAVE "rm -f $DSTAT_CSV; nohup $DSTAT_CMD > /dev/null &"
-    [ $? -ne 0 ] && debug_message " Problem connecting to host \"$SLAVE\" using ssh"
+    [ $? -ne 0 ] && debug_message "Problem connecting to host \"$SLAVE\" using ssh"
 done
 
 ###############################################################################
 # STEP 3: COPY CONFIG FILES TO CONFIG FILE IN RAW DIRECTORY
-CONFIG=$CONFIG,timestamp,$TIMESTAMP
+CONFIG=$CONFIG,timestamp,$(date +"%Y-%m-%d_%H:%M:%S")
 CONFIG=$CONFIG,run_id,$RUN_ID
 CONFIG=$CONFIG,kernel,$(uname -r)
 CONFIG=$CONFIG,hostname,$(hostname -s)
 CONFIG=$CONFIG,workload_name,$WORKLOAD_NAME
-CONFIG=$CONFIG,stat_command,$DSTAT_CMD
+CONFIG=$CONFIG,dstat_command,$DSTAT_CMD
 CONFIG=$CONFIG,workload_command,$WORKLOAD_CMD
 CONFIG=$CONFIG,workload_dir,$WORKLOAD_DIR
 CONFIG=$CONFIG,  # Add trailiing comma
@@ -100,28 +99,28 @@ echo $CONFIG > $CONFIG_FN
 ###############################################################################
 # STEP 4: RUN WORKLOAD
 CWD=$(pwd)
-debug_message " Working directory: $WORKLOAD_DIR"
+debug_message "Working directory: $WORKLOAD_DIR"
 cd $WORKLOAD_DIR
 /usr/bin/time --verbose --output=$TIME_FN bash -c \
     "$WORKLOAD_CMD 1> >(tee $WORKLOAD_STDOUT) 2> >(tee $WORKLOAD_STDERR) " &
 
 TIME_PID=$!
-debug_message " Main PID is $TIME_PID"
+debug_message "Main PID is $TIME_PID"
 if [[ $SAMPLE_PERF -ne 1 ]]
 then
     # Don't profile using perf
-    debug_message " Waiting for $TIME_PID to finish"
+    debug_message "Waiting for $TIME_PID to finish"
     wait $TIME_PID
 else
     # Take perf snapshots periodically while workload is still running
     PERF_ITER=1
     [ -z "$PERF_DURATION" ] && PERF_DURATION=2    # seconds
     [ -z "$PERF_DELTA" ] && PERF_DELTA=120 # seconds
-    debug_message " Perf profiling enabled.  Sleeping for $PERF_DELTA seconds"
+    debug_message "Perf profiling enabled.  Sleeping for $PERF_DELTA seconds"
     sleep $((PERF_DELTA - PERF_DURATION))
     while [[ -e /proc/$TIME_PID ]]
     do
-        debug_message " Recording perf sample $PERF_ITER for $PERF_DURATION seconds"
+        debug_message "Recording perf sample $PERF_ITER for $PERF_DURATION seconds"
         sudo perf record -a & PID=$!
         sleep $PERF_DURATION
         sudo kill $PID
@@ -158,7 +157,7 @@ sleep 1
 cp -R html $RUNDIR/.
 cp html/all_files.html $RUNDIR/data/raw
 
-debug_message " Now collecting CSV files"
+debug_message "Now collecting CSV files"
 for SLAVE in $SLAVES
 do
   DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
@@ -166,14 +165,10 @@ do
   cp $RUNDIR/html/data/$SLAVE.$RUN_ID.dstat.csv $RUNDIR/data/raw/.
 done
 
-# Process data from /usr/bin/time command
+# Process data from this run's /usr/bin/time command
 ./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
-rm -f $RUNDIR/data/final/summary.time.csv
-./summarize-csv.py $RUNDIR/data/final .time.csv \
-    2> $RUNDIR/data/final/errors.time.csv 1> $RUNDIR/data/final/summary.time.csv
-# Copy summary data. Change filename so browser will render file instead of download
-cp $RUNDIR/data/final/summary.time.csv $RUNDIR/html/time_summary_csv  
-cp $RUNDIR/data/final/errors.time.csv $RUNDIR/html/time_errors_csv  
+
+# Process data from all runs into CSV and HTML table
 ./summarize-time.py $RUNDIR/html/config.json > $RUNDIR/html/summary.csv
 ./csv2html.sh $RUNDIR/html/summary.csv > $RUNDIR/html/summary.html
 

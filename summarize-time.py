@@ -40,7 +40,7 @@ def main(argList):
 def parse_time(fn):
     '''
     This parses the output of "/usr/bin/time --verbose"
-    Parsing these fields:  exit_status, user_time_sec, elapsed_time_sec, cpu_percent
+    Parsing these fields:  exit_status, elapsed_time_sec
     '''
     try:
         with open (fn, 'r') as f:

@@ -28,15 +28,15 @@ $.ajax({
 
 
 var parse_summary_line = function(line) {
-  return {x:line.run_id.split('=')[1].split('.')[0],  //threads
-          y:line.elapsed_time_sec}
+  return {x:line['run id'].split('=')[1].split('.')[0],  //threads
+          y:line['total time [sec]']}
 }
 
 function load_summary(){
   //Read summary data and create charts
   $.ajax({
     type: "GET",
-    url: "time_summary_csv",
+    url: "summary.csv",
     dataType: "text",
     success: function(data) {
       var csv_data = $.csv.toObjects(data);
