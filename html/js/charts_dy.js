@@ -26,10 +26,10 @@ $.ajax({
   }
 });
 
+
 var parse_summary_line = function(line) {
-  // console.log(line.run_id)
-  return [parseFloat(line.run_id.split('=')[1].split('.')[0]),  //threads
-  parseFloat(line.elapsed_time_sec)]
+  return {x:line.run_id.split('=')[1].split('.')[0],  //threads
+          y:line.elapsed_time_sec}
 }
 
 function load_summary(){
@@ -44,7 +44,7 @@ function load_summary(){
       csv_data     = csv_data.map(parse_summary_line);  // OPTIONALLY CUSTOMIZE EACH LINE
       // console.log(csv_data);
       setTimeout(function () {
-        summary_chart(csv_data, "id_all_data");
+        summary_chart(csv_data, "#id_all_data");
       });
     },
     error: function (request, status, error) {
@@ -56,21 +56,57 @@ function load_summary(){
 load_summary();
 
 function summary_chart (data, id){
-  chart = new Dygraph(
-    document.getElementById(id),
-    data, // path to CSV file
-    {
-      xlabel: xlabel, 
-      ylabel: "Elapsed time [ sec ]",
-      xRangePad: 20,
-      drawPoints: true,
-      pointSize: 3
+  console.log(id);
+  console.log(data);
+  
+  c3.generate({
+    bindto: id,
+    size: {
+            height: 400,
+  },
+    data: {
+      json: data,
+      keys: {
+        x: 'x',
+        value: ['y'],
+      },
+      names: {
+        y: 'Elapsed time [ sec ]',
+      },
+      type: "line",
+    },
+    grid: {
+      x: {
+        show: true
+      },
+      y: {
+        show: true
+      }
+    },
+    point: {
+      r: 5
+    },
+    axis: {
+      x: {
+        // type: 'category',
+        // min: 0,
+        //max: 100,
+        label: {
+          text: xlabel,
+          position: 'outer-right'
+        }
+      },
+      y: {
+        min: 0,
+        // max: 100,
+        label: {
+          text: 'Elapsed execution time [ seconds ]',
+          position: 'outer-middle'
+        }
+      },
     }
-  )
-  return chart
+  });
 }
-
-
 
 function csv_chart(data, id, title, labels, ylabel) {
   //console.log('csv_chart');
