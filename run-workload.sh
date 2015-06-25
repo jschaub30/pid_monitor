@@ -102,7 +102,7 @@ CWD=$(pwd)
 debug_message "Working directory: $WORKLOAD_DIR"
 cd $WORKLOAD_DIR
 /usr/bin/time --verbose --output=$TIME_FN bash -c \
-    "$WORKLOAD_CMD 1> >(tee $WORKLOAD_STDOUT) 2> >(tee $WORKLOAD_STDERR) " &
+    "$WORKLOAD_CMD 2> >(tee $WORKLOAD_STDERR) 1> >(tee $WORKLOAD_STDOUT)" &
 
 TIME_PID=$!
 debug_message "Main PID is $TIME_PID"

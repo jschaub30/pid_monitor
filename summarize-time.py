@@ -6,7 +6,7 @@ Output: stdout
 
 Summarize /usr/bin/time data from all runs into CSV file
 Jeremy Schaub
-$ ./summarize-time.py $RUNDIR/html/config.clean.json
+$ ./summarize-time.py $RUNDIR/html/config.json
 '''
 
 import sys
