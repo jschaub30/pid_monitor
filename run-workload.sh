@@ -12,6 +12,9 @@
 [ -z "$SLAVES" ] && export SLAVES=$(hostname)
 [ -z "$VERBOSE" ] && export VERBOSE=0  # Set to 1 to turn on debug messages
 
+WORKLOAD_NAME=$(echo $WORKLOAD_NAME | tr " " "_")  # Remove spaces
+RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
+
 ###############################################################################
 # Define functions
 debug_message(){
@@ -48,7 +51,7 @@ if [ ! -f $RUNDIR/html/config.json ]
 then
     ./create-json-config.sh
 else
-    # Remove closing brace, closing bracket, and add comma
+    # Add RUN_ID to json file. Remove closing brace, closing bracket, and add comma
     cat $RUNDIR/html/config.json | sed -e '$s/\]\}/,/' > tmp.json
     echo \"$RUN_ID\"\]\} >> tmp.json
     cp tmp.json $RUNDIR/html/config.json
@@ -166,11 +169,10 @@ do
 done
 
 # Process data from this run's /usr/bin/time command
-./tidy-time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
+./tidy_time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
 
 # Process data from all runs into CSV and HTML table
-./summarize-time.py $RUNDIR/html/config.json > $RUNDIR/html/summary.csv
-./csv2html.sh $RUNDIR/html/summary.csv > $RUNDIR/html/summary.html
+./summarize_time.py $RUNDIR/html/config.json
 
 echo
 echo "#### PID MONITOR ####: View the html output using the following command:"
