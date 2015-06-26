@@ -14,7 +14,11 @@ import os
 import json
 
 def main(args):
-    '''Read config.json and create a table for all run_ids'''
+    '''
+    Read config.json
+    Summarize result for each run_id
+    Write summary.csv and summary.html in same directory as input file
+    '''
     config_fn = os.path.realpath(args[0])
     os.chdir(os.path.dirname(config_fn))
 
@@ -23,7 +27,7 @@ def main(args):
     config = json.loads(blob)
 
     ids = config['run_ids']
-    csv_rows = ['run id,exit status,elapsed time [sec]']
+    csv_rows = ['run_id,exit_status,elapsed_time_sec,']
     html_rows = '</th><th>'.join(['Run ID', 'Exit Status',
                                   'Elapsed Time [sec]', '', '', ''])
     html_rows = ['<table>\n<tr><th>%s</th></tr>' % html_rows]
@@ -48,7 +52,7 @@ def create_row(run_id):
     exit_status, elapsed_time_sec, html_class = parse_time(time_fn)
     csv_row = ','.join([run_id, exit_status, elapsed_time_sec])
     html_row = '</td><td>'.join([run_id, exit_status, elapsed_time_sec, stdout_ref,
-                     stderr_ref, time_ref])
+                                 stderr_ref, time_ref])
     html_row = '<tr class="%s"><td>%s</td></tr>' % (html_class, html_row)
     return csv_row, html_row
 
@@ -61,7 +65,7 @@ def parse_time(time_fn):
         with open(time_fn, 'r') as fid:
             blob = fid.read()
         exit_status = blob.split('Exit status: ')[1].split('\n')[0].strip()
-        html_class = "success" if exit_status == 0 else "fail"
+        html_class = "success" if int(exit_status) == 0 else "fail"
         find_str = 'Elapsed (wall clock) time (h:mm:ss or m:ss): '
         val = blob.split(find_str)[1].split('\n')[0].strip()
         if len(val.split(':')) == 2:   # m:ss

@@ -28,8 +28,8 @@ $.ajax({
 
 
 var parse_summary_line = function(line) {
-  return {x:line['run id'].split('=')[1].split('.')[0],  //threads
-          y:line['total time [sec]']}
+  return {x:line['run_id'].split('=')[1].split('.')[0],  //threads
+          y:line['elapsed_time_sec']}
 }
 
 function load_summary(){
