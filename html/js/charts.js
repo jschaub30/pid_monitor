@@ -56,8 +56,8 @@ function load_summary(){
 load_summary();
 
 function summary_chart (data, id){
-  console.log(id);
-  console.log(data);
+  //console.log(id);
+  //console.log(data);
   
   c3.generate({
     bindto: id,
@@ -194,7 +194,7 @@ function load_csv() {
       body = lines.slice(i, lines.length);
       
       header = header.join([separator = '<br>']);
-      $("#id_header").html(header);
+      //$("#id_header").html(header);
       header_lines = i;  // Used in error message in parse_line()
 
       time0 = -1;

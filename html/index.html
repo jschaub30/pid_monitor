@@ -48,9 +48,7 @@
   </style>
 </head>
 <body>
-  <header>
-    <div class="date" id="id_date">DATE</div>
-  </header>
+  <div> <span id="id_header"></span><span class="date" id="id_date">DATE</span></div>
   <h1 id="id_workload">WORKLOAD</h1>
   <p><a href="../data/raw/all_files.html">All data files</a></p>
   <section>
@@ -89,7 +87,8 @@
   </div>
   
   <script>
-  $("#summary_table").load('summary.html');
+    $("#summary_table").load('summary.html');
+    $("#id_header").load('header.html');
   
   </script>
   <script src='js/charts.js' type='text/javascript'> </script>
