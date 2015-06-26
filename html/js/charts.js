@@ -171,7 +171,8 @@ var parse_line = function() {
 }
 
 function load_csv() {
-  url = '../data/raw' + run_id + '.' + slave + '.dstat.csv';
+  url = '../data/raw/' + run_id + '.' + slave + '.dstat.csv';
+  console.log(url);
   //Read csv data 
   //console.log('load_csv');
   $.ajax({

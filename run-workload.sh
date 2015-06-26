@@ -39,7 +39,7 @@ stop_dstat() {
   for SLAVE in $SLAVES
   do
     #debug_message "Stopping dstat measurement on $SLAVE"
-    DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
+    DSTAT_CSV=/tmp/$RUN_ID.$SLAVE.dstat.csv
     PID=$(ssh $SLAVE "ps -fea | grep dstat" | grep $DSTAT_CSV | tr -s ' ' | cut -d' ' -f2)
     ssh $SLAVE "kill -9 $PID 2> /dev/null"&
   done
@@ -80,7 +80,7 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 stop_dstat
 for SLAVE in $SLAVES
 do
-    DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
+    DSTAT_CSV=/tmp/$RUN_ID.$SLAVE.dstat.csv
     DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
     ssh $SLAVE "rm -f $DSTAT_CSV; nohup $DSTAT_CMD > /dev/null &"
     [ $? -ne 0 ] && debug_message "Problem connecting to host \"$SLAVE\" using ssh"
@@ -159,13 +159,13 @@ sleep 1
 # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
 cp -R html $RUNDIR/.
 cp html/all_files.html $RUNDIR/data/raw
-
+# Create symlink to allows python SimpleHTTPServer to serve files
+$(cd $RUNDIR/html; ln -sf ../data)
 debug_message "Now collecting CSV files"
 for SLAVE in $SLAVES
 do
-  DSTAT_CSV=/tmp/$SLAVE.$RUN_ID.dstat.csv
-  scp $SLAVE:$DSTAT_CSV $RUNDIR/html/data/.
-  cp $RUNDIR/html/data/$SLAVE.$RUN_ID.dstat.csv $RUNDIR/data/raw/.
+  DSTAT_CSV=/tmp/$RUN_ID.$SLAVE.dstat.csv
+  scp $SLAVE:$DSTAT_CSV $RUNDIR/data/raw/.
 done
 
 # Process data from this run's /usr/bin/time command
@@ -174,8 +174,11 @@ done
 # Process data from all runs into CSV and HTML table
 ./summarize_time.py $RUNDIR/html/config.json
 
+echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
+chmod u+x pid_webserver.sh
 echo
+echo "#### PID MONITOR ####: All data saved to $RUNDIR"
 echo "#### PID MONITOR ####: View the html output using the following command:"
-echo "#### PID MONITOR ####: $ cd $RUNDIR/html; python -m SimpleHTTPServer 12121"
+echo "#### PID MONITOR ####: $ ./pid_webserver.sh"
 echo "#### PID MONITOR ####: Then navigate to http://localhost:12121"
 echo
