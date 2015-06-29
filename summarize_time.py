@@ -13,6 +13,7 @@ import sys
 import os
 import json
 
+
 def main(args):
     '''
     Read config.json
@@ -41,20 +42,25 @@ def main(args):
     with open('summary.html', 'w') as fid:
         fid.write('\n'.join(html_rows) + '\n')
 
+
 def create_row(run_id):
     '''Return a CSV line that summarizes the run'''
     stdout_fn = os.path.join('..', 'data', 'raw', run_id + '.workload.stdout')
     stderr_fn = os.path.join('..', 'data', 'raw', run_id + '.workload.stderr')
     time_fn = os.path.join('..', 'data', 'raw', run_id + '.time.stdout')
-    stdout_ref = '<a href="%s">stdout</a>' % stdout_fn if os.path.isfile(stdout_fn) else ''
-    stderr_ref = '<a href="%s">stderr</a>' % stderr_fn if os.path.isfile(stderr_fn) else ''
-    time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(time_fn) else ''
+    stdout_ref = '<a href="%s">stdout</a>' % stdout_fn if os.path.isfile(
+        stdout_fn) else ''
+    stderr_ref = '<a href="%s">stderr</a>' % stderr_fn if os.path.isfile(
+        stderr_fn) else ''
+    time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(
+        time_fn) else ''
     exit_status, elapsed_time_sec, html_class = parse_time(time_fn)
     csv_row = ','.join([run_id, exit_status, elapsed_time_sec])
     html_row = '</td><td>'.join([run_id, exit_status, elapsed_time_sec, stdout_ref,
                                  stderr_ref, time_ref])
     html_row = '<tr class="%s"><td>%s</td></tr>' % (html_class, html_row)
     return csv_row, html_row
+
 
 def parse_time(time_fn):
     '''
@@ -69,11 +75,11 @@ def parse_time(time_fn):
         find_str = 'Elapsed (wall clock) time (h:mm:ss or m:ss): '
         val = blob.split(find_str)[1].split('\n')[0].strip()
         if len(val.split(':')) == 2:   # m:ss
-            val = str(int(val.split(':')[0])*60
+            val = str(int(val.split(':')[0]) * 60
                       + float(val.split(':')[1].strip()))
         elif len(val.split(':')) == 3:   # h:m:ss
-            val = str(int(val.split(':')[0])*3600
-                      + int(val.split(':')[1])*60
+            val = str(int(val.split(':')[0]) * 3600
+                      + int(val.split(':')[1]) * 60
                       + float(val.split(':')[2].strip()))
         elapsed_time_sec = val
 
