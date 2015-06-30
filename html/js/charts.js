@@ -12,7 +12,7 @@
                 y: line.elapsed_time_sec
             };
         },
-        parse_line = function(line, linenum, factor) {
+        parse_dstat_line = function(line, linenum, factor) {
             var day,
                 month,
                 time,
@@ -64,7 +64,7 @@
                     labelsDivWidth: 500,
                     title: title
                 }
-            )
+            );
             return chart;
         },
         load_dstat_csv = function() {
@@ -105,44 +105,44 @@
 
                     header = header.join(['<br>']);
                     //$("#id_header").html(header);
-                    header_lines = i; // Used in error message in parse_line()
+                    header_lines = i; // Used in error message in parse_dstat_line()
 
                     time0 = -1;
                     csv_data = $.csv.toObjects(body.join(['\n']));
                     // console.log(csv_data);
                     cpu_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1, "usr", "sys", "idl", "wai", "hiq", "siq");
+                            return parse_dstat_line(x, i, 1, "usr", "sys", "idl", "wai", "hiq", "siq");
                         }
                     );
                     mem_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1e-9, "used", "buff", "cach", "free");
+                            return parse_dstat_line(x, i, 1e-9, "used", "buff", "cach", "free");
                         }
                     );
                     io_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1e-6, "read", "writ");
+                            return parse_dstat_line(x, i, 1e-6, "read", "writ");
                         }
                     );
                     net_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1e-6, "recv", "send");
+                            return parse_dstat_line(x, i, 1e-6, "recv", "send");
                         }
                     );
                     sys_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1, "int", "csw");
+                            return parse_dstat_line(x, i, 1, "int", "csw");
                         }
                     );
                     proc_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1, "run", "blk", "new");
+                            return parse_dstat_line(x, i, 1, "run", "blk", "new");
                         }
                     );
                     pag_data = csv_data.map(
                         function(x, i) {
-                            return parse_line(x, i, 1, "in", "out");
+                            return parse_dstat_line(x, i, 1, "in", "out");
                         }
                     );
 
@@ -188,7 +188,7 @@
                 }).appendTo('#buttons').addClass('button');
 
             if (i === 0) {
-                button.addClass('active')
+                button.addClass('active');
             }
             $("#" + button_id).on('click', function() {
                 var $this = $(this);
@@ -206,7 +206,7 @@
                 create_cluster_button(i, slaves[i]);
             }
             for (i in run_ids) {
-                create_button(i, run_ids[i])
+                create_button(i, run_ids[i]);
             }
         },
         summary_chart = function(data, id) {
@@ -289,27 +289,27 @@
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
-                    xlabel = data["xlabel"];
+                    xlabel = data.xlabel;
                     data_dir = '../data/raw/';
                     if (data.hasOwnProperty('data_dir')) {
-                        data_dir = data["data_dir"];
+                        data_dir = data.data_dir;
                     }
 
-                    $('#id_workload').text(data["description"]);
-                    $('#id_title').text(data["workload"]);
-                    $('#id_date').text(data["date"]);
-                    slave = data["slaves"][0];
-                    run_id = data["run_ids"][0];
+                    $('#id_workload').text(data.description);
+                    $('#id_title').text(data.workload);
+                    $('#id_date').text(data.date);
+                    slave = data.slaves[0];
+                    run_id = data.run_ids[0];
 
                     load_dstat_csv();
-                    create_buttons(data["slaves"], data["run_ids"]);
+                    create_buttons(data.slaves, data.run_ids);
 
                 },
                 error: function(request, status, error) {
                     console.log(error);
                 }
             });
-        }
+        };
 
     load_summary();
     read_config();
