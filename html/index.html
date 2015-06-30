@@ -49,13 +49,13 @@
 <body>
     <div> <span id="id_header"></span><span class="date" id="id_date">DATE</span></div>
   <h1 id="id_workload">WORKLOAD</h1>
-  <p><a href="../data/raw/all_files.html">All data files</a></p>
+  <p><a id="id_data_dir" href="../data/raw/all_files.html">All data files</a></p>
   <div>
-      <div id="summary_table"></div> 
+      <div id="summary_table"></div>
       <div id="id_all_data"></div>
   </div>
   <p><br></p>
-  
+
   <div id="cluster_buttons"></div>
   <div id="buttons"></div>
   <p><br></p>
@@ -82,11 +82,11 @@
       <div class="one chart" id="id_pag"></div>
     </section>
   </div>
-  
+
   <script>
   $("#summary_table").load('summary.html');
   $("#id_header").load('header.html');
-  
+
   </script>
   <script src='js/charts.js' type='text/javascript'> </script>
 
