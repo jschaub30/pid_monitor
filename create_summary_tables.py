@@ -13,7 +13,7 @@ $ ./create_summary_tables.py $RUNDIR/html/config.json
 import sys
 import os
 import json
-
+import tidy
 
 def create_tables(config_fn):
     '''
@@ -54,47 +54,14 @@ def create_row(run_id):
         stderr_fn) else ''
     time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(
         time_fn) else ''
-    exit_status, elapsed_time_sec, html_class = parse_time(time_fn)
-    csv_row = ','.join([run_id, exit_status, elapsed_time_sec])
-    html_row = '</td><td>'.join([run_id, exit_status, elapsed_time_sec, stdout_ref,
+    meas = tidy.timeread.parse(time_fn)
+    html_class = "success" if int(meas.exit_status) == 0 else "fail"
+    csv_row = ','.join([run_id, meas.exit_status, meas.elapsed_time_sec])
+    html_row = '</td><td>'.join([run_id, meas.exit_status,
+                                 meas.elapsed_time_sec, stdout_ref,
                                  stderr_ref, time_ref])
     html_row = '<tr class="%s"><td>%s</td></tr>' % (html_class, html_row)
     return csv_row, html_row
-
-
-def parse_time(time_fn):
-    '''
-    This parses the output of "/usr/bin/time --verbose"
-    Parsing these fields:  exit_status, elapsed_time_sec
-    '''
-    try:
-        with open(time_fn, 'r') as fid:
-            blob = fid.read()
-        exit_status = blob.split('Exit status: ')[1].split('\n')[0].strip()
-        html_class = "success" if int(exit_status) == 0 else "fail"
-        find_str = 'Elapsed (wall clock) time (h:mm:ss or m:ss): '
-        val = blob.split(find_str)[1].split('\n')[0].strip()
-        if len(val.split(':')) == 2:   # m:ss
-            val = str(int(val.split(':')[0]) * 60
-                      + float(val.split(':')[1].strip()))
-        elif len(val.split(':')) == 3:   # h:m:ss
-            val = str(int(val.split(':')[0]) * 3600
-                      + int(val.split(':')[1]) * 60
-                      + float(val.split(':')[2].strip()))
-        elapsed_time_sec = val
-        exit_status = blob.split('Exit status: ')[1].split('\n')[0].strip()
-        if exit_status != '0':
-            sys.stderr.write(
-                "WARNING! non-zero exit status = %s in file \n\t%s\n" %
-                (exit_status, time_fn))
-        return exit_status, elapsed_time_sec, html_class
-    except Exception as err:
-        html_class = "error"
-        sys.stderr.write("!!! Error caught in script: %s\n" %
-                         os.path.basename(__file__))
-        sys.stderr.write("!!! while parsing " + time_fn + '\n')
-        sys.stderr.write('!!! ' + str(err) + '\n')
-        return 'NA', 'NA', html_class
 
 if __name__ == '__main__':
     create_tables(sys.argv[1])
