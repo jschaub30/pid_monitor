@@ -1,94 +1,112 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
+
 <head>
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/c3.min.css" rel="stylesheet">
-  <script src="js/d3.min.js" charset="utf-8"></script>
-  <script src="js/c3.min.js"></script>
-  <!-- Load jQuery -->
-  <script src="js/jquery.min.js"></script>
-  <script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
-  <script type="text/javascript"  src="js/dygraph-combined.js"></script>
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/c3.min.css" rel="stylesheet">
+    <script src="js/d3.min.js" charset="utf-8"></script>
+    <script src="js/c3.min.js"></script>
+    <!-- Load jQuery -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/dygraph-combined.js"></script>
 
-  <title id="id_title">PID monitor</title>
-  <style type="text/css" media="screen">
-  h3 {
-    text-align: center;
-    margin:auto;
-  }
-  section {
-    width: 98%;
-    margin: auto;
-    padding: 10px;
-  }
-  #id_all_data {
-    width: 48%;
-  }
+    <title id="id_title">PID monitor</title>
+    <style type="text/css" media="screen">
+        h3 {
+            text-align: center;
+            margin: auto;
+        }
 
-  div.one {
-    width: 48%;
-    min-height: 400px;
-    float: left;
-  }
-  div.two {
-    margin-left: 52%;
-    min-height: 400px;
-  }
-  div#buttons {
-    width: 100%;
-    height: 50px;
-  }
-  .c3-axis-y-label {
-    font-size: 12px;
-  }
-  .c3-axis-x-label {
-    font-size: 12px;
-  }
-  </style>
+        section {
+            width: 98%;
+            margin: auto;
+            padding: 10px;
+        }
+
+        #id_all_data {
+            width: 48%;
+        }
+
+        div.one {
+            width: 48%;
+            min-height: 400px;
+            float: left;
+        }
+
+        div.two {
+            margin-left: 52%;
+            min-height: 400px;
+        }
+
+        div#buttons {
+            width: 100%;
+            height: 50px;
+        }
+
+        .c3-axis-y-label {
+            font-size: 12px;
+        }
+
+        .c3-axis-x-label {
+            font-size: 12px;
+        }
+    </style>
 </head>
+
 <body>
-    <div> <span id="id_header"></span><span class="date" id="id_date">DATE</span></div>
-  <h1 id="id_workload">WORKLOAD</h1>
-  <p><a id="id_data_dir" href="../data/raw/all_files.html">All data files</a></p>
-  <div>
-      <div id="summary_table"></div>
-      <div id="id_all_data"></div>
-  </div>
-  <p><br></p>
+    <div>
+        <span id="id_header"></span>
+        <span class="date" id="id_date">DATE</span>
+    </div>
+    <h1 id="id_workload">WORKLOAD</h1>
+    <div id="id_error"></div>
+    <p><a id="id_data_dir" href="../data/raw/all_files.html">All data files</a></p>
+    <div>
+        <div id="summary_table"></div>
+        <div id="id_all_data"></div>
+    </div>
+    <p>
+        <br>
+    </p>
 
-  <div id="cluster_buttons"></div>
-  <div id="buttons"></div>
-  <p><br></p>
-  <div id="dstat">
-    <p><section>
-      <div class="one chart" id="id_cpu"></div>
-      <div class="two chart" id="id_io"></div>
-    </section>
-  </div>
-  <div>
-    <section>
-      <div class="one chart" id="id_mem"></div>
-      <div class="two chart" id="id_net"></div>
-    </section>
-  </div>
-  <div>
-    <section>
-      <div class="one chart" id="id_sys"></div>
-      <div class="two chart" id="id_proc"></div>
-    </section>
-  </div>
-  <div>
-    <section>
-      <div class="one chart" id="id_pag"></div>
-    </section>
-  </div>
+    <div id="cluster_buttons"></div>
+    <div id="buttons"></div>
+    <p>
+        <br>
+    </p>
+    <div id="dstat">
+        <p>
+            <section>
+                <div class="one chart" id="id_cpu"></div>
+                <div class="two chart" id="id_io"></div>
+            </section>
+    </div>
+    <div>
+        <section>
+            <div class="one chart" id="id_mem"></div>
+            <div class="two chart" id="id_net"></div>
+        </section>
+    </div>
+    <div>
+        <section>
+            <div class="one chart" id="id_sys"></div>
+            <div class="two chart" id="id_proc"></div>
+        </section>
+    </div>
+    <div>
+        <section>
+            <div class="one chart" id="id_pag"></div>
+        </section>
+    </div>
 
-  <script>
-  $("#summary_table").load('summary.html');
-  $("#id_header").load('header.html');
-
-  </script>
-  <script src='js/charts.js' type='text/javascript'> </script>
+    <script>
+        $("#summary_table").load('summary.html');
+        $("#id_header").load('header.html');
+    </script>
+    <script src='js/charts.js' type='text/javascript'>
+    </script>
 
 </body>
+
 </html>

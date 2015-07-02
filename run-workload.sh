@@ -136,11 +136,11 @@ else
         #sleep $((PERF_DELTA - PERF_DURATION))
 
         # This loop will wait for either:
-        #   (A) the delay between PERF runs or 
+        #   (A) the delay between PERF runs or
         #   (B) the TIME_PID to finish
         I=0
         while [[ $I -le $((PERF_DELTA - PERF_DURATION)) ]]
-        do 
+        do
             I=$(( I + 1 ))
             sleep 1
             [[ ! -e /proc/$TIME_PID ]] && break
@@ -168,11 +168,8 @@ do
   scp $SLAVE:$DSTAT_CSV $RUNDIR/data/raw/.
 done
 
-# Process data from this run's /usr/bin/time command
-./tidy_time.py $TIME_FN $RUN_ID >> $RUNDIR/data/final/$RUN_ID.time.csv
-
 # Process data from all runs into CSV and HTML table
-./summarize_time.py $RUNDIR/html/config.json
+./create_summary_tables.py $RUNDIR/html/config.json
 
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh

@@ -2,11 +2,12 @@
 
 '''
 Input:  config.json file
-Output: CSV summary on stdout
+Output: CSV summary as "summary.csv"
+        HTML summary as "summary.html"
 
 Summarize /usr/bin/time data from all runs into CSV file
 Jeremy Schaub
-$ ./summarize-time.py $RUNDIR/html/config.json
+$ ./create_summary_tables.py $RUNDIR/html/config.json
 '''
 
 import sys
@@ -14,13 +15,12 @@ import os
 import json
 
 
-def main(args):
+def create_tables(config_fn):
     '''
-    Read config.json
+    Read run_id's from config.json
     Summarize result for each run_id
-    Write summary.csv and summary.html in same directory as input file
+    Write summary.csv and summary.html in same directory as config.json
     '''
-    config_fn = os.path.realpath(args[0])
     os.chdir(os.path.dirname(config_fn))
 
     with open(config_fn, 'r') as fid:
@@ -82,7 +82,11 @@ def parse_time(time_fn):
                       + int(val.split(':')[1]) * 60
                       + float(val.split(':')[2].strip()))
         elapsed_time_sec = val
-
+        exit_status = blob.split('Exit status: ')[1].split('\n')[0].strip()
+        if exit_status != '0':
+            sys.stderr.write(
+                "WARNING! non-zero exit status = %s in file \n\t%s\n" %
+                (exit_status, time_fn))
         return exit_status, elapsed_time_sec, html_class
     except Exception as err:
         html_class = "error"
@@ -93,4 +97,4 @@ def parse_time(time_fn):
         return 'NA', 'NA', html_class
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    create_tables(sys.argv[1])

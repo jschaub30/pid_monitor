@@ -1,7 +1,7 @@
 (function() {
     "use strict";
     var xlabel,
-        slave,
+        hostname,
         run_id,
         time0 = -1,
         header_lines,
@@ -19,7 +19,7 @@
                 arr,
                 time_ms,
                 err_str,
-                i;
+                index;
 
             try {
                 day = line.time.split('-')[0];
@@ -37,8 +37,8 @@
                 // console.log((time_ms - time0) / 1000);
                 arr.push((time_ms - time0) / 1000);
 
-                for (i = 3; i < arguments.length; i += 1) {
-                    arr.push(factor * line[arguments[i]]);
+                for (index = 3; index < arguments.length; index += 1) {
+                    arr.push(factor * line[arguments[index]]);
                 }
             } catch (err) {
                 err_str = "Problem reading CSV file near line ";
@@ -67,8 +67,88 @@
             );
             return chart;
         },
+        create_dstat_charts = function(data) {
+            var index = 0,
+                flag = true,
+                lines = data.split('\n'),
+                labels,
+                header,
+                body,
+                csv_data,
+                cpu_data,
+                mem_data,
+                io_data,
+                net_data,
+                sys_data,
+                proc_data,
+                pag_data;
+
+            while (flag) {
+                // Skip first few lines of dstat file
+                if (lines[index].indexOf("system") !== -1) {
+                    flag = false;
+                }
+                index += 1;
+            }
+            labels = lines[index];
+            header = lines.slice(0, index - 2);
+            body = lines.slice(index, lines.length);
+
+            header = header.join(['<br>']);
+            //$("#id_header").html(header);
+            header_lines = index; // Used in error message in parse_dstat_line()
+
+            time0 = -1;
+            csv_data = $.csv.toObjects(body.join(['\n']));
+            // console.log(csv_data);
+            cpu_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1, "usr", "sys", "idl", "wai", "hiq", "siq");
+                }
+            );
+            mem_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1e-9, "used", "buff", "cach", "free");
+                }
+            );
+            io_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1e-6, "read", "writ");
+                }
+            );
+            net_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1e-6, "recv", "send");
+                }
+            );
+            sys_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1, "int", "csw");
+                }
+            );
+            proc_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1, "run", "blk", "new");
+                }
+            );
+            pag_data = csv_data.map(
+                function(x, index) {
+                    return parse_dstat_line(x, index, 1, "in", "out");
+                }
+            );
+
+            csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", "idle", "wait", "hiq", "siq"], "Usage [ % ]");
+            csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", "cache", "free"], "Usage [ GB ]");
+            csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], "Usage [ MB/s ]");
+            csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], "Usage [ MB/s ]");
+            csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
+            csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
+            csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
+        },
         load_dstat_csv = function() {
-            var url = data_dir + run_id + '.' + slave + '.dstat.csv';
+            // Read dstat data based on current value of 'run_id'
+            // and 'hostname'
+            var url = data_dir + run_id + '.' + hostname + '.dstat.csv';
             $("#id_data_dir").attr("href", data_dir + "all_files.html");
             // console.log(url);
             //Read csv data
@@ -76,118 +156,41 @@
                 type: "GET",
                 url: url,
                 dataType: "text",
-                success: function(data) {
-                    var i = 0,
-                        flag = true,
-                        lines = data.split('\n'),
-                        labels,
-                        header,
-                        body,
-                        csv_data,
-                        cpu_data,
-                        mem_data,
-                        io_data,
-                        net_data,
-                        sys_data,
-                        proc_data,
-                        pag_data;
-
-                    while (flag) {
-                        // Skip first few lines of dstat file
-                        if (lines[i].indexOf("system") !== -1) {
-                            flag = false;
-                        }
-                        i += 1;
-                    }
-                    labels = lines[i];
-                    header = lines.slice(0, i - 2);
-                    body = lines.slice(i, lines.length);
-
-                    header = header.join(['<br>']);
-                    //$("#id_header").html(header);
-                    header_lines = i; // Used in error message in parse_dstat_line()
-
-                    time0 = -1;
-                    csv_data = $.csv.toObjects(body.join(['\n']));
-                    // console.log(csv_data);
-                    cpu_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1, "usr", "sys", "idl", "wai", "hiq", "siq");
-                        }
-                    );
-                    mem_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1e-9, "used", "buff", "cach", "free");
-                        }
-                    );
-                    io_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1e-6, "read", "writ");
-                        }
-                    );
-                    net_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1e-6, "recv", "send");
-                        }
-                    );
-                    sys_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1, "int", "csw");
-                        }
-                    );
-                    proc_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1, "run", "blk", "new");
-                        }
-                    );
-                    pag_data = csv_data.map(
-                        function(x, i) {
-                            return parse_dstat_line(x, i, 1, "in", "out");
-                        }
-                    );
-
-                    csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", "idle", "wait", "hiq", "siq"], "Usage [ % ]");
-                    csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", "cache", "free"], "Usage [ GB ]");
-                    csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], "Usage [ MB/s ]");
-                    csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], "Usage [ MB/s ]");
-                    csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
-                    csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
-                    csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
-                },
+                success: create_dstat_charts,
                 error: function(request, status, error) {
                     console.log(status);
                     console.log(error);
                 }
             });
         },
-        create_cluster_button = function(i, id) {
-            var button_id = "cluster_button" + String(i),
+        create_host_button = function(index, id) {
+            var button_id = "cluster_button" + String(index),
                 button = $('<button></button>', {
                     id: button_id,
                     text: id
                 }).appendTo('#cluster_buttons').addClass('button');
 
-            if (i === 0) {
+            if (index === 0) {
                 button.addClass('active');
             }
             $("#" + button_id).on('click', function() {
                 var $this = $(this);
                 $this.addClass('active');
                 $this.siblings('button').removeClass('active');
-                slave = id;
+                hostname = id;
                 setTimeout(function() {
                     load_dstat_csv();
                 }, 500);
             });
         },
-        create_button = function(i, id) {
-            var button_id = "button" + String(i),
+        create_run_button = function(index, id) {
+            var button_id = "button" + String(index),
                 button = $('<button></button>', {
                     id: button_id,
                     text: id
                 }).appendTo('#buttons').addClass('button');
 
-            if (i === 0) {
+            if (index === 0) {
                 button.addClass('active');
             }
             $("#" + button_id).on('click', function() {
@@ -200,13 +203,13 @@
                 }, 500);
             });
         },
-        create_buttons = function(slaves, run_ids) {
-            var i;
-            for (i in slaves) {
-                create_cluster_button(i, slaves[i]);
+        create_all_buttons = function(hostnames, run_ids) {
+            var index;
+            for (index = 0; index < hostnames.length; ++index) {
+                create_host_button(index, hostnames[index]);
             }
-            for (i in run_ids) {
-                create_button(i, run_ids[i]);
+            for (index = 0; index < run_ids.length; ++index) {
+                create_run_button(index, run_ids[index]);
             }
         },
         summary_chart = function(data, id) {
@@ -262,7 +265,7 @@
             });
         },
         load_summary = function() {
-            //Read summary data and create charts
+            //Read summary CSV data and create summary chart
             $.ajax({
                 type: "GET",
                 url: "summary.csv",
@@ -270,7 +273,7 @@
                 success: function(data) {
                     var csv_data = $.csv.toObjects(data);
                     // console.log(csv_data);
-                    csv_data = csv_data.map(parse_summary_line); // OPTIONALLY CUSTOMIZE EACH LINE
+                    csv_data = csv_data.map(parse_summary_line);
                     // console.log(csv_data);
                     setTimeout(function() {
                         summary_chart(csv_data, "#id_all_data");
@@ -281,32 +284,51 @@
                 }
             });
         },
-        read_config = function() {
+        update_page = function(data, showTest) {
+            // console.log(data);
+            if (showTest) {
+                var msg = 'Problem with config.json file.<br>';
+                msg += 'Loading test data.';
+                $('#id_error').html(msg);
+            }
+            xlabel = data.xlabel;
+            data_dir = '../data/raw/';
+            if (data.hasOwnProperty('data_dir')) {
+                data_dir = data.data_dir;
+            }
 
+            $('#id_workload').text(data.description);
+            $('#id_title').text(data.workload);
+            $('#id_date').text(data.date);
+            hostname = data.slaves[0];
+            run_id = data.run_ids[0];
+
+            create_all_buttons(data.slaves, data.run_ids);
+            load_dstat_csv();
+        },
+        read_config = function() {
+            // Read config data, update page, then
+            // create buttons and dstat charts
             $.ajax({
                 type: "GET",
                 url: "config.json",
                 dataType: "json",
                 success: function(data) {
-                    console.log(data);
-                    xlabel = data.xlabel;
-                    data_dir = '../data/raw/';
-                    if (data.hasOwnProperty('data_dir')) {
-                        data_dir = data.data_dir;
-                    }
-
-                    $('#id_workload').text(data.description);
-                    $('#id_title').text(data.workload);
-                    $('#id_date').text(data.date);
-                    slave = data.slaves[0];
-                    run_id = data.run_ids[0];
-
-                    load_dstat_csv();
-                    create_buttons(data.slaves, data.run_ids);
-
+                    update_page(data);
                 },
                 error: function(request, status, error) {
-                    console.log(error);
+                    //if problem with config.json, try config.test.json
+                    $.ajax({
+                        type: "GET",
+                        url: "config.test.json",
+                        dataType: "json",
+                        success: function(data) {
+                            update_page(data, true);
+                        },
+                        error: function(request, status, error) {
+                            console.log(error);
+                        }
+                    });
                 }
             });
         };

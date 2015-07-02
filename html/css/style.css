@@ -166,7 +166,7 @@ iframe {
   height: 40px;
 }
 
-td, th { 
+td, th {
   padding: 10px;
 }
 
@@ -179,11 +179,14 @@ table {
     border-collapse: collapse;
 }
 th {
-  background-color: #EEEEEE;  
+  background-color: #EEEEEE;
 }
 tr.fail {
-  background-color: rgba(255, 0, 0, 0.1);  
+  background-color: rgba(255, 0, 0, 0.1);
 }
 tr.error {
-  background-color: rgba(255, 0, 0, 0.2);  
+  background-color: rgba(255, 0, 0, 0.2);
+}
+div#id_error {
+    background-color: rgba(255, 0, 0, 0.1);    
 }
