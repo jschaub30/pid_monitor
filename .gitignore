@@ -1,3 +1,2 @@
-../rundir/*
-main.sh
-
+tidy
+*pyc
