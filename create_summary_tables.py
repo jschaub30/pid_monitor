@@ -13,7 +13,8 @@ $ ./create_summary_tables.py $RUNDIR/html/config.json
 import sys
 import os
 import json
-import tidy
+#from tidy import timeread
+import tidy.timeread
 
 def create_tables(config_fn):
     '''
