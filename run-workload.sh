@@ -4,11 +4,11 @@
 # see example.sh and example-sweep.sh
 
 if [ ! -e "tidy/timeread.py" ]
-do
+then
   echo Downloading package needed to parse files from https://github.com/jschaub30/tidy
   git clone https://github.com/jschaub30/tidy
   [ "$!" -ne 0 ] && Problem downloading tidy package. Quitting... ; exit 1
-done
+fi
   
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd  # No spaces!
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1M count=1024 oflag=direct"
