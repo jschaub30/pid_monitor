@@ -2,10 +2,9 @@
 
 '''
 Input:  config.json file
-Output: CSV summary as "summary.csv"
-        HTML summary as "summary.html"
+Output: HTML summary as "summary.html" in same directory as config.json
 
-Summarize /usr/bin/time data from all runs into CSV file
+Summarize /usr/bin/time data from all runs into HTML table
 Jeremy Schaub
 $ ./create_summary_tables.py $RUNDIR/html/config.json
 '''
@@ -16,7 +15,7 @@ import json
 #from tidy import timeread
 import tidy.timeread
 
-def create_tables(config_fn):
+def create_table(config_fn):
     '''
     Read run_id's from config.json
     Summarize result for each run_id
@@ -37,7 +36,7 @@ def create_tables(config_fn):
     html_rows = []
     fields = ['exit_status', 'stdout', 'stderr', 'time', 'elapsed_time_sec']
     for run_id in ids:
-        meas = create_measurement(run_id, path=data_dir)
+        meas = time_measurement(run_id, path=data_dir)
         html_rows.append(meas.rowhtml(fields=fields))
     table = html_table(fields, html_rows)
     with open('summary.html', 'w') as fid:
@@ -51,7 +50,7 @@ def html_table(fields, rows):
     table += '</table>\n'
     return table
 
-def create_measurement(run_id, path=''):
+def time_measurement(run_id, path=''):
     '''
     Create a measurement instance that summarizes the run
     Add fields that link to the time, stdout and stderr files
@@ -76,4 +75,4 @@ def create_measurement(run_id, path=''):
     return meas
 
 if __name__ == '__main__':
-    create_tables(sys.argv[1])
+    create_table(sys.argv[1])
