@@ -12,8 +12,8 @@ $ ./create_summary_tables.py $RUNDIR/html/config.json
 import sys
 import os
 import json
-#from tidy import timeread
 import tidy.timeread
+
 
 def create_table(config_fn):
     '''
@@ -29,26 +29,25 @@ def create_table(config_fn):
     config = json.loads(blob)
 
     ids = config['run_ids']
-    if 'data_dir' in config.keys():
-        data_dir = config['data_dir']
-    else:
-        data_dir = os.path.join('..', 'data', 'raw')
-    html_rows = []
+    data_dir = config['data_dir']
+    table_rows = []
     fields = ['exit_status', 'stdout', 'stderr', 'time', 'elapsed_time_sec']
     for run_id in ids:
         meas = time_measurement(run_id, path=data_dir)
-        html_rows.append(meas.rowhtml(fields=fields))
-    table = html_table(fields, html_rows)
+        table_rows.append(meas.rowhtml(fields=fields))
+    table = html_table(fields, table_rows)
     with open('summary.html', 'w') as fid:
         fid.write(table)
 
 
 def html_table(fields, rows):
-    table = '<table>\n<tr>\n<th>%s</th>\n</tr>\n' % ('</th>\n<th>'.join(fields))
+    header_row = '<tr>\n<th>%s</th>\n</tr>\n' % ('</th>\n<th>'.join(fields))
+    table = '<table>\n' + header_row
     for row in rows:
         table += row
     table += '</table>\n'
     return table
+
 
 def time_measurement(run_id, path=''):
     '''
