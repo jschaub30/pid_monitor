@@ -3,13 +3,6 @@
 # To run a custom workload, define the following variables and run this script
 # see example.sh and example-sweep.sh
 
-if [ ! -e "tidy/timeread.py" ]
-then
-  echo Downloading package needed to parse files from https://github.com/jschaub30/tidy
-  git clone https://github.com/jschaub30/tidy
-  [ "$?" -ne 0 ] && Problem downloading tidy package. Quitting... ; exit 1
-fi
-  
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd  # No spaces!
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1M count=1024 oflag=direct"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
@@ -175,8 +168,8 @@ do
   scp $SLAVE:$DSTAT_CSV $RUNDIR/data/raw/.
 done
 
-# Process data from all runs into CSV and HTML table
-./create_summary_tables.py $RUNDIR/html/config.json
+# Process data from all runs into HTML tables
+./create_time_table.py $RUNDIR/html/config.json
 
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh

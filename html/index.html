@@ -63,7 +63,10 @@
     <div id="id_error"></div>
     <p><a id="id_data_dir" href="../data/raw/all_files.html">All data files</a></p>
     <div>
+        <span id="summary_title"></span>
         <div id="summary_table"></div>
+        <span id="spark_title"></span>
+        <div id="spark_table"></div>
         <div id="id_all_data"></div>
     </div>
     <p>
@@ -101,7 +104,17 @@
     </div>
 
     <script>
-        $("#summary_table").load('summary.html');
+        $("#summary_table").load('summary.html', function( response, status ) {
+          if ( status = "success" ) {
+            $( "#summary_title" ).html( '<h2> Summary table</h2>' );
+          }
+        });
+        $( "#spark_table" ).load( "spark.html", function( response, status ) {
+          if ( status = "success" ) {
+            $( "#spark_title" ).html( '<h2> Spark table</h2>' );
+          }
+        });
+                $("#spark_table").load('spark.html');
         $("#id_header").load('header.html');
     </script>
     <script src='js/charts.js' type='text/javascript'>

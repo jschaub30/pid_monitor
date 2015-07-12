@@ -2,9 +2,9 @@
 
 '''
 Input:  config.json file
-Output: HTML summary as "summary.html" in same directory as config.json
+Output: HTML summary as "spark.html" in same directory as config.json
 
-Summarize /usr/bin/time data from all runs into HTML table
+Summarize spark stderr filess from all runs into HTML table
 Jeremy Schaub
 $ ./create_summary_tables.py $RUNDIR/html/config.json
 '''
@@ -12,7 +12,7 @@ $ ./create_summary_tables.py $RUNDIR/html/config.json
 import sys
 import os
 import json
-import tidy.timeread
+import tidy.sparkread
 
 
 def create_table(config_fn):
@@ -31,12 +31,14 @@ def create_table(config_fn):
     ids = config['run_ids']
     data_dir = config['data_dir']
     table_rows = []
-    fields = ['exit_status', 'stdout', 'stderr', 'time', 'elapsed_time_sec']
+    header_fields = ['run_id', 'stdout', 'stderr', 'spill_count',
+                     'total_time_sec', 'stage 0 [sec]', 'stage 1 [sec]',
+                     'stage 2 [sec]']
     for run_id in ids:
-        meas = time_measurement(run_id, path=data_dir)
-        table_rows.append(meas.rowhtml(fields=fields))
-    table = html_table(fields, table_rows)
-    with open('summary.html', 'w') as fid:
+        meas = spark_measurement(run_id, path=data_dir, num_stages=3)
+        table_rows.append(meas.rowhtml(header_fields=header_fields))
+    table = html_table(header_fields, table_rows)
+    with open('spark.html', 'w') as fid:
         fid.write(table)
 
 
@@ -49,28 +51,26 @@ def html_table(fields, rows):
     return table
 
 
-def time_measurement(run_id, path=''):
+def spark_measurement(run_id, path='', num_stages=0):
     '''
     Create a measurement instance that summarizes the run
     Add fields that link to the time, stdout and stderr files
     '''
 
-    time_fn = os.path.join(path, run_id + '.time.stdout')
-    time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(
-        time_fn) else ''
-    meas = tidy.timeread.Measurement()
-    meas.parse(time_fn)
-    meas.addfield('time', time_ref)
+    stderr_fn = os.path.join(path, run_id + '.workload.stderr')
+    stderr_ref = '<a href="%s">stderr</a>' % stderr_fn if os.path.isfile(
+        stderr_fn) else ''
+    meas = tidy.sparkread.Measurement()
+    meas.set_num_stages(num_stages)
+    meas.parse(stderr_fn)
+    meas.addfield('stderr', stderr_ref)
 
     stdout_fn = os.path.join(path, run_id + '.workload.stdout')
     stdout_ref = '<a href="%s">stdout</a>' % stdout_fn if os.path.isfile(
         stdout_fn) else ''
     meas.addfield('stdout', stdout_ref)
+    meas.addfield('run_id', run_id)
 
-    stderr_fn = os.path.join(path, run_id + '.workload.stderr')
-    stderr_ref = '<a href="%s">stderr</a>' % stderr_fn if os.path.isfile(
-        stderr_fn) else ''
-    meas.addfield('stderr', stderr_ref)
     return meas
 
 if __name__ == '__main__':

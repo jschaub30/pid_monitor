@@ -17,6 +17,8 @@ do
 	    export RUN_ID="BLOCK_SIZE_KB=$BLOCK_SIZE_KB.$ITER"
 	    export WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=${BLOCK_SIZE_KB}k count=1024 oflag=direct"
 	    ./run-workload.sh
+        # Optionally create new HTML tables here
+        # e.g. for spark workloads:
+        #  ./create_spark_table.py $RUNDIR/html/config.json
     done
 done
-
