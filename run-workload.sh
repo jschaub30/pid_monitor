@@ -107,10 +107,13 @@ cd $WORKLOAD_DIR
 # check for /usr/bin/time
 TIME_PATH=/usr/bin/time
 $TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
-[ "$?" -ne "0" ] && echo /usr/bin/time not working.  Trying gtime...
-TIME_PATH=gtime  # For OSX
-$TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
-[ "$?" -ne "0" ] && echo gnu-time not found.  Exiting ... && exit 1
+if [ "$?" -ne "0" ]
+then
+    echo /usr/bin/time not working.  Trying gtime...
+    TIME_PATH=gtime  # For OSX
+    $TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
+    [ "$?" -ne "0" ] && echo gnu-time not found.  Exiting ... && exit 1
+fi
 
 $TIME_PATH --verbose --output=$TIME_FN bash -c \
     "$WORKLOAD_CMD 2> >(tee $WORKLOAD_STDERR) 1> >(tee $WORKLOAD_STDOUT)" &

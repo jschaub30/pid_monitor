@@ -148,7 +148,7 @@
         load_dstat_csv = function() {
             // Read dstat data based on current value of 'run_id'
             // and 'hostname'
-            var url = data_dir + run_id + '.' + hostname + '.dstat.csv';
+            var url = data_dir + '/' + run_id + '.' + hostname + '.dstat.csv';
             $("#id_data_dir").attr("href", data_dir + "all_files.html");
             // console.log(url);
             //Read csv data
@@ -276,7 +276,7 @@
                     csv_data = csv_data.map(parse_summary_line);
                     // console.log(csv_data);
                     setTimeout(function() {
-                        summary_chart(csv_data, "#id_all_data");
+                        summary_chart(csv_data, "#summary_chart");
                     });
                 },
                 error: function(request, status, error) {
@@ -292,7 +292,7 @@
                 $('#id_error').html(msg);
             }
             xlabel = data.xlabel;
-            data_dir = '../data/raw/';
+            data_dir = '../data/raw';
             if (data.hasOwnProperty('data_dir')) {
                 data_dir = data.data_dir;
             }

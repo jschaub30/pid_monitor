@@ -37,7 +37,7 @@ class Measurement(object):
         '''
         if not fields:
             fields = self.fields()
-        return ','.join(self.fields())
+        return ','.join(fields)
 
     def headerhtml(self, fields=None):
         '''

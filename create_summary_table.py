@@ -77,7 +77,7 @@ def html_table(fields, rows):
 def csv_table(header, rows):
     table = header + '\n'
     for row in rows:
-        table += row + '\n'
+        table += row
     return table
 
 

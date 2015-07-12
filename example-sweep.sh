@@ -14,9 +14,9 @@ for BLOCK_SIZE_KB in 128 256 512
 do
     for ITER in 1 2
     do
-	    export RUN_ID="BLOCK_SIZE_KB=$BLOCK_SIZE_KB.$ITER"
-	    export WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=${BLOCK_SIZE_KB}k count=1024 oflag=direct"
-	    ./run-workload.sh
+        export RUN_ID="BLOCK_SIZE_KB=$BLOCK_SIZE_KB.$ITER"
+        export WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=$((BLOCK_SIZE_KB*1024)) count=1024"
+        ./run-workload.sh
         # Optionally create new HTML tables here
         # e.g. for spark workloads:
         #  ./create_spark_table.py $RUNDIR/html/config.json
