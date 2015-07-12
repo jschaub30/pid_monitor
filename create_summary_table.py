@@ -49,13 +49,20 @@ def create_table(config_fn):
     config = json.loads(blob)
 
     ids = config['run_ids']
-    table_rows = []
-    fields = ['exit_status', 'stdout', 'stderr', 'time', 'elapsed_time_sec']
+    html_rows = []
+    csv_rows = []
+    fields = ['run_id', 'exit_status', 'stdout', 'stderr', 'time', 'elapsed_time_sec']
+    csv_fields = ['run_id', 'exit_status', 'elapsed_time_sec']
     for run_id in ids:
         meas = time_measurement(run_id, config=config)
-        table_rows.append(meas.rowhtml(fields=fields))
-    table = html_table(fields, table_rows)
+        html_rows.append(meas.rowhtml(fields=fields))
+        csv_rows.append(meas.rowcsv(fields=csv_fields))
+    table = html_table(fields, html_rows)
     with open('summary.html', 'w') as fid:
+        fid.write(table)
+    header = meas.headercsv(fields=csv_fields)
+    table = csv_table(header, csv_rows)
+    with open('summary.csv', 'w') as fid:
         fid.write(table)
 
 
@@ -67,6 +74,12 @@ def html_table(fields, rows):
     table += '</table>\n'
     return table
 
+def csv_table(header, rows):
+    table = header + '\n'
+    for row in rows:
+        table += row + '\n'
+    return table
+
 
 def time_measurement(run_id, config=None):
     '''
@@ -75,10 +88,12 @@ def time_measurement(run_id, config=None):
     '''
     data_dir = config['data_dir']
     time_fn = os.path.join(data_dir, run_id + config['time_ext'])
-    time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(
-        time_fn) else ''
     meas = tidy.timeread.TimeMeasurement()
     meas.parse(time_fn)
+    meas.addfield('run_id', run_id)
+
+    time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(
+        time_fn) else ''
     meas.addfield('time', time_ref)
 
     stdout_fn = os.path.join(data_dir, run_id + config['stdout_ext'])

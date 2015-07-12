@@ -4,7 +4,7 @@
 # see example.sh and example-sweep.sh
 
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd  # No spaces!
-[ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1M count=1024 oflag=direct"
+[ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1048576 count=1024"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
 [ -z "$RUNDIR" ]  && export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
@@ -104,7 +104,15 @@ echo $CONFIG > $CONFIG_FN
 CWD=$(pwd)
 debug_message "Working directory: $WORKLOAD_DIR"
 cd $WORKLOAD_DIR
-/usr/bin/time --verbose --output=$TIME_FN bash -c \
+# check for /usr/bin/time
+TIME_PATH=/usr/bin/time
+$TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
+[ "$?" -ne "0" ] && echo /usr/bin/time not working.  Trying gtime...
+TIME_PATH=gtime  # For OSX
+$TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
+[ "$?" -ne "0" ] && echo gnu-time not found.  Exiting ... && exit 1
+
+$TIME_PATH --verbose --output=$TIME_FN bash -c \
     "$WORKLOAD_CMD 2> >(tee $WORKLOAD_STDERR) 1> >(tee $WORKLOAD_STDOUT)" &
 
 TIME_PID=$!
@@ -157,6 +165,7 @@ sleep 1
 
 ###############################################################################
 # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
+rm -rf html/data  # For historical reasons
 cp -R html $RUNDIR/.
 cp html/all_files.html $RUNDIR/data/raw
 # Create symlink to allows python SimpleHTTPServer to serve files
@@ -169,7 +178,7 @@ do
 done
 
 # Process data from all runs into HTML tables
-./create_time_table.py $RUNDIR/html/config.json
+./create_summary_table.py $RUNDIR/html/config.json
 
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh

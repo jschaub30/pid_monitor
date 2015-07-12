@@ -31,10 +31,12 @@ class Measurement(object):
         fields = [i for i in self.__dict__.keys() if i[:1] != '_']
         return fields
 
-    def headercsv(self):
+    def headercsv(self, fields=None):
         '''
         Returns a csv string with all header fields
         '''
+        if not fields:
+            fields = self.fields()
         return ','.join(self.fields())
 
     def headerhtml(self, fields=None):
