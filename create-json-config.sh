@@ -11,7 +11,7 @@
 [[ -z "$TIME_EXT" ]] && TIME_EXT=".time.stdout"
 [[ -z "$SLAVES" ]] && SLAVES=$(hostname)
 
-CONFIG_FH=$RUNDIR/html/config.json
+CONFIG_FN=$RUNDIR/html/config.json
 
 echo \{\"workload\":\"$WORKLOAD_NAME\", > $CONFIG_FN
 echo \"date\":\"$(date)\", >> $CONFIG_FN
