@@ -77,7 +77,7 @@ def time_measurement(run_id, config=None):
     time_fn = os.path.join(data_dir, run_id + config['time_ext'])
     time_ref = '<a href="%s">time</a>' % time_fn if os.path.isfile(
         time_fn) else ''
-    meas = tidy.timeread.Measurement()
+    meas = tidy.timeread.TimeMeasurement()
     meas.parse(time_fn)
     meas.addfield('time', time_ref)
 
