@@ -60,7 +60,7 @@ def spark_measurement(run_id, path='', num_stages=0):
     stderr_fn = os.path.join(path, run_id + '.workload.stderr')
     stderr_ref = '<a href="%s">stderr</a>' % stderr_fn if os.path.isfile(
         stderr_fn) else ''
-    meas = tidy.sparkread.Measurement()
+    meas = tidy.SparkMeasurement()
     meas.set_num_stages(num_stages)
     meas.parse(stderr_fn)
     meas.addfield('stderr', stderr_ref)
