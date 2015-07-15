@@ -19,6 +19,6 @@ do
         ./run-workload.sh
         # Optionally create new HTML tables here
         # e.g. for spark workloads:
-        #  ./create_spark_table.py $RUNDIR/html/config.json
+        #  ./create_spark_table.py $RUNDIR/html/config.json > $RUNDIR/html/workload.html
     done
 done

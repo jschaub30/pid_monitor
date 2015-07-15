@@ -38,8 +38,9 @@ def create_table(config_fn):
         meas = spark_measurement(run_id, path=data_dir, num_stages=3)
         table_rows.append(meas.rowhtml(header_fields=header_fields))
     table = html_table(header_fields, table_rows)
-    with open('spark.html', 'w') as fid:
-        fid.write(table)
+    #with open('spark.html', 'w') as fid:
+    #    fid.write(table)
+    sys.stdout.write(table)
 
 
 def html_table(fields, rows):

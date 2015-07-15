@@ -181,7 +181,7 @@ do
 done
 
 # Process data from all runs into HTML tables
-./create_summary_table.py $RUNDIR/html/config.json
+./create_summary_table.py $RUNDIR/html/config.json > $RUNDIR/html/summary.html
 
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh

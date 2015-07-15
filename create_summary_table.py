@@ -58,8 +58,9 @@ def create_table(config_fn):
         html_rows.append(meas.rowhtml(fields=fields))
         csv_rows.append(meas.rowcsv(fields=csv_fields))
     table = html_table(fields, html_rows)
-    with open('summary.html', 'w') as fid:
-        fid.write(table)
+    #with open('summary.html', 'w') as fid:
+    #    fid.write(table)
+    sys.stdout.write(table)
     header = meas.headercsv(fields=csv_fields)
     table = csv_table(header, csv_rows)
     with open('summary.csv', 'w') as fid:
