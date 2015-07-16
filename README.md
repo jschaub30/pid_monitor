@@ -9,15 +9,15 @@ Written in bash, python, html and javascript.
 
 Also uses:
 - [Dygraphs](http://dygraphs.com/) for javascript charts (included).
-- [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing
+- [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing (included).
+- GNU-time /usr/bin/time
 
 Start by viewing:
-- [example.sh](https://github.com/jschaub30/pid_monitor/blob/master/example.sh) 
-- [example-sweep.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh)
+- [example.sh](https://github.com/jschaub30/pid_monitor/blob/master/example.sh) Simple write to disk example
+- [example-sweep.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Sweeping block size while writing to disk
+- [example-cluster.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Shows how to monitor workload on 2 machines at once
 
-This will create the follwing directories:
+This will create the following directories:
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/final # Parsed CSV data in "tidy" data format
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/script     # Measurement and analysis scripts
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/img        # Any image files from analyzing data
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts

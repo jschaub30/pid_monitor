@@ -8,6 +8,10 @@ export ESTIMATED_RUN_TIME_MIN=1
 export VERBOSE=0 # Turn off most messages
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 
+# Simple example--run workload on same machine twice
+# Setup password-less ssh to localhost before running
+export SLAVES="localhost $(hostname)"
+
 ./run-workload.sh
 # Optionally create new HTML table here
 # e.g. for spark workloads:
