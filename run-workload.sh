@@ -26,10 +26,10 @@ debug_message(){
 
 stop_all() {
   # function to kill PIDs of workload and process monitors
+  kill -9 $TIME_PID 2> /dev/null  # Kill main process if ctrl-c
   PIDS=$(pgrep -f "$WORKLOAD_CMD")
   echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
   kill $PIDS 2>/dev/null
-  #kill -9 $TIME_PID 2> /dev/null  # Kill main process if ctrl-c
   stop_dstat&
   sleep 1
   exit

@@ -149,7 +149,7 @@
             // Read dstat data based on current value of 'run_id'
             // and 'hostname'
             var url = data_dir + '/' + run_id + '.' + hostname + '.dstat.csv';
-            $("#id_data_dir").attr("href", data_dir + "all_files.html");
+            $("#id_data_dir").attr("href", data_dir + "/all_files.html");
             // console.log(url);
             //Read csv data
             $.ajax({
