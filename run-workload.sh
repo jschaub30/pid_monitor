@@ -30,18 +30,21 @@ stop_all() {
   PIDS=$(pgrep -f "$WORKLOAD_CMD")
   echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
   kill $PIDS 2>/dev/null
-  stop_dstat&
+  stop_monitors&
   sleep 1
   exit
 }
 
-stop_dstat() {
+stop_monitors() {
   for SLAVE in $SLAVES
   do
-    #debug_message "Stopping dstat measurement on $SLAVE"
-    DSTAT_CSV=/tmp/$RUN_ID.$SLAVE.dstat.csv
-    PID=$(ssh $SLAVE "ps -fea | grep dstat" | grep $DSTAT_CSV | tr -s ' ' | cut -d' ' -f2)
-    ssh $SLAVE "kill -9 $PID 2> /dev/null"&
+    debug_message "Stopping dstat measurement on $SLAVE"
+    DSTAT_CSV=$RUN_ID.$SLAVE.dstat.csv
+    ./stop_dstat.sh $SLAVE $DSTAT_CSV $RUNDIR/data/raw/.
+    debug_message "Stopping operf measurement on $SLAVE"
+    ./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
+    #debug_message "Stopping perf measurement on $SLAVE"
+    #./stop_perf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.perf.report
   done
 }
 
@@ -76,14 +79,17 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 
 
 ###############################################################################
-# STEP 2: START DSTAT USING SSH
-stop_dstat
+# STEP 2: START MONITORS USING SSH
+CWD=$(pwd)
 for SLAVE in $SLAVES
 do
-    DSTAT_CSV=/tmp/$RUN_ID.$SLAVE.dstat.csv
-    DSTAT_CMD="dstat --time -v --net --output $DSTAT_CSV $DELAY_SEC"
-    ssh $SLAVE "rm -f $DSTAT_CSV; nohup $DSTAT_CMD > /dev/null &"
-    [ $? -ne 0 ] && debug_message "Problem connecting to host \"$SLAVE\" using ssh"
+    DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
+    ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
+    [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\""
+    ./start_operf.sh $SLAVE
+    [ $? -ne 0 ] && debug_message "Problem starting operf on host \"$SLAVE\""
+    #./start_perf.sh $SLAVE
+    #[ $? -ne 0 ] && debug_message "Problem starting perf on host \"$SLAVE\""
 done
 
 ###############################################################################
@@ -101,7 +107,6 @@ echo $CONFIG > $CONFIG_FN
 
 ###############################################################################
 # STEP 4: RUN WORKLOAD
-CWD=$(pwd)
 debug_message "Working directory: $WORKLOAD_DIR"
 cd $WORKLOAD_DIR
 # check for /usr/bin/time
@@ -119,51 +124,14 @@ $TIME_PATH --verbose --output=$TIME_FN bash -c \
     "$WORKLOAD_CMD 2> >(tee $WORKLOAD_STDERR) 1> >(tee $WORKLOAD_STDOUT)" &
 
 TIME_PID=$!
-debug_message "Main PID is $TIME_PID"
-if [[ $SAMPLE_PERF -ne 1 ]]
-then
-    # Don't profile using perf
-    debug_message "Waiting for $TIME_PID to finish"
-    wait $TIME_PID
-else
-    # Take perf snapshots periodically while workload is still running
-    PERF_ITER=1
-    [ -z "$PERF_DURATION" ] && PERF_DURATION=2    # seconds
-    [ -z "$PERF_DELTA" ] && PERF_DELTA=120 # seconds
-    debug_message "Perf profiling enabled.  Sleeping for $PERF_DELTA seconds"
-    sleep $((PERF_DELTA - PERF_DURATION))
-    while [[ -e /proc/$TIME_PID ]]
-    do
-        debug_message "Recording perf sample $PERF_ITER for $PERF_DURATION seconds"
-        sudo perf record -a & PID=$!
-        sleep $PERF_DURATION
-        sudo kill $PID
-        sudo rm -f /tmp/perf.report
-        sudo perf report --kallsyms=/proc/kallsyms 2> /dev/null 1> /tmp/perf.report
-        # Only save first 1000 lines of perf report
-        head -n 1000 /tmp/perf.report \
-            > $RUNDIR/data/raw/$RUN_ID.perf.$((PERF_ITER * PERF_DELTA))sec.txt
-        PERF_ITER=$(( PERF_ITER + 1 ))
-        #sleep $((PERF_DELTA - PERF_DURATION))
-
-        # This loop will wait for either:
-        #   (A) the delay between PERF runs or
-        #   (B) the TIME_PID to finish
-        I=0
-        while [[ $I -le $((PERF_DELTA - PERF_DURATION)) ]]
-        do
-            I=$(( I + 1 ))
-            sleep 1
-            [[ ! -e /proc/$TIME_PID ]] && break
-        done
-    done
-fi
+debug_message "Waiting for $TIME_PID to finish"
+wait $TIME_PID
 
 cd $CWD
 
 ###############################################################################
 # STEP 5: STOP_DSTAT
-stop_dstat
+stop_monitors
 sleep 1
 
 ###############################################################################
@@ -173,12 +141,6 @@ cp -R html $RUNDIR/.
 cp html/all_files.html $RUNDIR/data/raw
 # Create symlink to allows python SimpleHTTPServer to serve files
 $(cd $RUNDIR/html; ln -sf ../data)
-debug_message "Now collecting CSV files"
-for SLAVE in $SLAVES
-do
-  DSTAT_CSV=/tmp/$RUN_ID.$SLAVE.dstat.csv
-  scp $SLAVE:$DSTAT_CSV $RUNDIR/data/raw/.
-done
 
 # Process data from all runs into HTML tables
 ./create_summary_table.py $RUNDIR/html/config.json > $RUNDIR/html/summary.html
