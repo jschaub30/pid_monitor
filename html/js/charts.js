@@ -8,7 +8,8 @@
         data_dir,
         parse_summary_line = function(line) {
             return {
-                x: line.run_id.split('=')[1].split('.')[0], //threads
+                x: line.run_id,
+                //x: line.run_id.split('=')[1].split('.')[0], //threads
                 y: line.elapsed_time_sec
             };
         },
@@ -230,7 +231,7 @@
                     names: {
                         y: 'Elapsed time [ sec ]'
                     },
-                    type: "line"
+                    type: "bar"
                 },
                 grid: {
                     x: {
@@ -245,7 +246,7 @@
                 },
                 axis: {
                     x: {
-                        // type: 'category',
+                        type: 'category',
                         // min: 0,
                         //max: 100,
                         label: {
