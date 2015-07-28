@@ -77,7 +77,6 @@
             }
             for (var i = 1; i < new_array.length; i++) {
                 dt = new_array[i][0] - new_array[i-1][0];
-                console.log(dt);
                 for (var j = 1; j < new_array[0].length; j++) {
                   new_array[i][j] = new_array[i-1][j] + dt*new_array[i][j];
                 }
@@ -160,13 +159,13 @@
             csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", "idle", "wait", "hiq", "siq"], "Usage [ % ]");
             csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", "cache", "free"], "Usage [ GB ]");
             if (cumsum_flag) {
-                csv_chart(io_sum_data, "id_io", "cumsum(IO)", ["time", "read", "write"], "Usage [ MB ]");
+                csv_chart(io_sum_data, "id_io", "&#x222b; IO", ["time", "read", "write"], "Usage [ MB ]");
             } else {
                 csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], "Usage [ MB/s ]");
             }
 
             if (cumsum_flag) {
-                csv_chart(net_sum_data, "id_net", "cumsum(Network)", ["time", "recv", "send"], "Usage [ MB ]");
+                csv_chart(net_sum_data, "id_net", "&#x222b; Network", ["time", "recv", "send"], "Usage [ MB ]");
             } else {
                 csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], "Usage [ MB/s ]");
             }
