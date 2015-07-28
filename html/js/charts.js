@@ -6,6 +6,7 @@
         time0 = -1,
         header_lines,
         data_dir,
+        cumsum_flag = false,
         parse_summary_line = function(line) {
             return {
                 x: line.run_id,
@@ -68,6 +69,21 @@
             );
             return chart;
         },
+        calc_cumsum = function(data) {
+            var new_array = [],
+                dt;
+            for (var i = 0; i < data.length; i++) {
+                new_array.push(data[i].slice(0));
+            }
+            for (var i = 1; i < new_array.length; i++) {
+                dt = new_array[i][0] - new_array[i-1][0];
+                console.log(dt);
+                for (var j = 1; j < new_array[0].length; j++) {
+                  new_array[i][j] = new_array[i-1][j] + dt*new_array[i][j];
+                }
+            }
+            return new_array;
+        },
         create_dstat_charts = function(data) {
             var index = 0,
                 flag = true,
@@ -117,11 +133,14 @@
                     return parse_dstat_line(x, index, 1e-6, "read", "writ");
                 }
             );
+            var io_sum_data = calc_cumsum(io_data);
+
             net_data = csv_data.map(
                 function(x, index) {
                     return parse_dstat_line(x, index, 1e-6, "recv", "send");
                 }
             );
+            var net_sum_data = calc_cumsum(net_data);
             sys_data = csv_data.map(
                 function(x, index) {
                     return parse_dstat_line(x, index, 1, "int", "csw");
@@ -140,8 +159,18 @@
 
             csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", "idle", "wait", "hiq", "siq"], "Usage [ % ]");
             csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", "cache", "free"], "Usage [ GB ]");
-            csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], "Usage [ MB/s ]");
-            csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], "Usage [ MB/s ]");
+            if (cumsum_flag) {
+                csv_chart(io_sum_data, "id_io", "cumsum(IO)", ["time", "read", "write"], "Usage [ MB ]");
+            } else {
+                csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], "Usage [ MB/s ]");
+            }
+
+            if (cumsum_flag) {
+                csv_chart(net_sum_data, "id_net", "cumsum(Network)", ["time", "recv", "send"], "Usage [ MB ]");
+            } else {
+                csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], "Usage [ MB/s ]");
+            }
+
             csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
             csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
             csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
@@ -204,6 +233,22 @@
                 }, 500);
             });
         },
+        create_sum_button = function() {
+            var button_id = "sum_button",
+                button = $('<button></button>', {
+                    id: button_id,
+                    text: "Integrate IO and network"
+                }).appendTo('#sum_buttons').addClass('button');
+
+            $("#" + button_id).on('click', function() {
+                var $this = $(this);
+                $this.toggleClass('active');
+                cumsum_flag = !cumsum_flag;
+                setTimeout(function() {
+                    load_dstat_csv();
+                }, 500);
+            });
+        },
         create_all_buttons = function(hostnames, run_ids) {
             var index;
             for (index = 0; index < hostnames.length; ++index) {
@@ -212,6 +257,7 @@
             for (index = 0; index < run_ids.length; ++index) {
                 create_run_button(index, run_ids[index]);
             }
+            create_sum_button();
         },
         summary_chart = function(data, id) {
             //console.log(id);
