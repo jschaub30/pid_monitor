@@ -41,8 +41,8 @@ stop_monitors() {
     debug_message "Stopping dstat measurement on $SLAVE"
     DSTAT_CSV=$RUN_ID.$SLAVE.dstat.csv
     ./stop_dstat.sh $SLAVE $DSTAT_CSV $RUNDIR/data/raw/.
-    debug_message "Stopping operf measurement on $SLAVE"
-    ./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
+    #debug_message "Stopping operf measurement on $SLAVE"
+    #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
     #debug_message "Stopping perf measurement on $SLAVE"
     #./stop_perf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.perf.report
   done
@@ -86,8 +86,8 @@ do
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
     [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\""
-    ./start_operf.sh $SLAVE
-    [ $? -ne 0 ] && debug_message "Problem starting operf on host \"$SLAVE\""
+    #./start_operf.sh $SLAVE
+    #[ $? -ne 0 ] && debug_message "Problem starting operf on host \"$SLAVE\""
     #./start_perf.sh $SLAVE
     #[ $? -ne 0 ] && debug_message "Problem starting perf on host \"$SLAVE\""
 done
