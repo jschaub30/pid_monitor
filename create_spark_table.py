@@ -2,7 +2,7 @@
 
 '''
 Input:  config.json file
-Output: HTML summary as "spark.html" in same directory as config.json
+Output: HTML summary on stdout
 
 Summarize spark stderr filess from all runs into HTML table
 Jeremy Schaub

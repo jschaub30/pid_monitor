@@ -12,6 +12,15 @@ Output: stdout
 import sys
 import measurement
 
+def calc_stage_stats(lines, stage_num):
+    task_times = []
+    for line in lines:
+        if 'Finished task' in line and 'stage %d' % stage_num in line:
+            t = line.split(') in ')[1].split(' ms on ')[0]
+            task_times.append(float(t)/1000)
+    return "(%.1f/%.1f/%.1f)" % (min(task_times),
+            sum(task_times)/len(task_times), max(task_times))
+
 class SparkMeasurement(measurement.Measurement):
 
     '''
@@ -85,24 +94,26 @@ class SparkMeasurement(measurement.Measurement):
         '''
         This parses the output of the spark stderr file
         '''
-        try:
-            with open(spark_fn, 'r') as f:
-                blob = f.read()
-            if self._num_stages == 0:
-                self._num_stages = len(blob.split('finished in ')[1:])
-            stage_times = ['' for i in range(self._num_stages)]
-            i = 0
-            total_time_sec = 0
-            for a in blob.split('finished in ')[1:]:
-                stage_times[i] = round(float(a.split(' s\n')[0]), 1)
-                total_time_sec += round(stage_times[i], 1)
-                i += 1
-            self.total_time_sec = str(total_time_sec)
-            self._stage_times = [str(i) for i in stage_times]
-            self.spill_count = str(blob.lower().count('spill'))
-        except Exception as err:
-            sys.stderr.write('Problem parsing time file %s\n' % spark_fn)
-            sys.stderr.write(str(err) + '\n')
+        #try:
+        with open(spark_fn, 'r') as f:
+            blob = f.read()
+        if self._num_stages == 0:
+            self._num_stages = len(blob.split('finished in ')[1:])
+        stage_times = ['' for i in range(self._num_stages)]
+        i = 0
+        total_time_sec = 0
+        for a in blob.split('finished in ')[1:]:
+            stage_time = round(float(a.split(' s\n')[0]), 1)
+            stats = calc_stage_stats(blob.split('\n'), i)
+            stage_times[i] = '%.1f %s' % (stage_time, stats)
+            total_time_sec += stage_time
+            i += 1
+        self.total_time_sec = str(total_time_sec)
+        self._stage_times = [str(i) for i in stage_times]
+        self.spill_count = str(blob.lower().count('spill'))
+        #except Exception as err:
+            #sys.stderr.write('Problem parsing time file %s\n' % spark_fn)
+            #sys.stderr.write(str(err) + '\n')
 
 
 def main(spark_fn):
