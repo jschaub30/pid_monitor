@@ -7,6 +7,7 @@
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1048576 count=1024"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
 [ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
+[ "$ESTIMATED_RUN_TIME_MIN" -lt "1" ]  && ESTIMATED_RUN_TIME_MIN=1
 [ -z "$RUNDIR" ]  && export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && export RUN_ID="RUN=1.1"
 [ -z "$SLAVES" ] && export SLAVES=$(hostname)
