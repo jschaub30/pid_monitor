@@ -15,9 +15,12 @@ import measurement
 def calc_stage_stats(lines, stage_num):
     task_times = []
     for line in lines:
-        if 'Finished task' in line and 'stage %d' % stage_num in line:
-            t = line.split(') in ')[1].split(' ms on ')[0]
-            task_times.append(float(t)/1000)
+        if 'TaskSetManager: Finished task' in line and 'stage %d' % stage_num in line:
+            try:
+                t = line.split(') in ')[1].split(' ms on ')[0]
+                task_times.append(float(t)/1000)
+            except IndexError:
+                sys.stderr.write("Error parsing task time in this line:\n%s\n" % line)
     return "(%.1f/%.1f/%.1f)" % (min(task_times),
             sum(task_times)/len(task_times), max(task_times))
 
