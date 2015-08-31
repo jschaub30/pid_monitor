@@ -21,8 +21,12 @@ def calc_stage_stats(lines, stage_num):
                 task_times.append(float(t)/1000)
             except IndexError:
                 sys.stderr.write("Error parsing task time in this line:\n%s\n" % line)
-    return "(%.1f/%.1f/%.1f)" % (min(task_times),
-            sum(task_times)/len(task_times), max(task_times))
+    if len(task_times) > 0:
+        return "(%.1f/%.1f/%.1f)" % (min(task_times),
+                sum(task_times)/len(task_times), max(task_times))
+    else:
+        sys.stderr.write("Found no tasks in stage %d\n" % stage_num)
+        return ""
 
 class SparkMeasurement(measurement.Measurement):
 
@@ -109,9 +113,10 @@ class SparkMeasurement(measurement.Measurement):
             stage_time = round(float(a.split(' s\n')[0]), 1)
             stats = calc_stage_stats(blob.split('\n'), i)
             stage_times[i] = '%.1f %s' % (stage_time, stats)
-            total_time_sec += stage_time
+            #total_time_sec += stage_time
             i += 1
-        self.total_time_sec = str(total_time_sec)
+        total_time_sec = blob.split('Job 0 finished')[1].split('took ')[1].split(' s')[0]
+        self.total_time_sec = str(round(float(total_time_sec), 1))
         self._stage_times = [str(i) for i in stage_times]
         self.spill_count = str(blob.lower().count('spill'))
         #except Exception as err:

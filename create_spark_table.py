@@ -35,6 +35,7 @@ def create_table(config_fn):
                      'total_time_sec', 'stage 0 [sec]', 'stage 1 [sec]',
                      'stage 2 [sec]']
     for run_id in ids:
+        sys.stderr.write("Parsing %s stderr file\n" % run_id)
         meas = spark_measurement(run_id, path=data_dir, num_stages=3)
         table_rows.append(meas.rowhtml(header_fields=header_fields))
     table = html_table(header_fields, table_rows)
