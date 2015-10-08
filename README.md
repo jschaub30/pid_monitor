@@ -21,3 +21,11 @@ This will create the following directories:
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/script     # Measurement and analysis scripts
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
+
+Try it out:
+```
+git clone https://github.com/jschaub30/pid_monitor
+cd pid_monitor/
+./example.sh
+./pid_webserver.sh
+```
