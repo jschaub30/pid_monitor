@@ -11,31 +11,31 @@
 </head>
 <body>
 
-  <p><a href="javascript:history.back()">Back to summary</a></p>
+  <p><a href="javascript:history.back()">Back toaaaa summary</a></p>
 
   <div id          = "workload"><h3>WORKLOAD files</h3></div>
   <div id          = "time"><h3>TIME files</h3></div>
   <div id          = "dstat"><h3>DSTAT files</h3></div>
+  <div id          = "ocount"><h3>OCOUNT files</h3></div>
   <div id          = "config"><h3>CONFIG files</h3></div>
-  <div id          = "perf"><h3>PERF files</h3></div>
   <div id          = "all"><h3>All files</h3></div>
 
   <script>
-  
+
   (function(){
-    var f_types = ['workload', 'dstat', 'nmon', 'config', 'time', 'perf'];
+    var f_types = ['workload', 'dstat', 'ocount', 'config', 'time'];
     f_types.forEach(function(name){
       $('#' + name).hide();
     });
-    
+
     $.ajax({
       url: ".",
       success: function(data){
         $(data).find("a").each(function(){
           $this      = $(this);
-          // will loop through 
+          // will loop through
           var link   = $this.attr("href");
-        
+
           f_types.forEach(function(name){
             $('#' + name).show();
             if (link.indexOf(name) != -1){
