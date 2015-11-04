@@ -154,6 +154,9 @@ $(cd $RUNDIR/html; ln -sf ../data)
 # Process data from all runs into HTML tables
 ./create_summary_table.py $RUNDIR/html/config.json > $RUNDIR/html/summary.html
 
+# Create tarball of raw data
+tar cfz $RUNDIR/data/all_raw_data.tar.gz $RUNDIR/data/raw/
+
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh
 echo
