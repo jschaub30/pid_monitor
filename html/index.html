@@ -22,21 +22,30 @@
             width: 98%;
             margin: auto;
             padding: 10px;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
         }
 
-        #summary_chart {
+        /*#summary_chart {
             width: 48%;
-        }
+        }*/
 
         div.one {
-            width: 48%;
+            /*width: 48%;*/
             min-height: 400px;
             float: left;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
         }
 
         div.two {
-            margin-left: 52%;
+            /*margin-left: 52%;*/
             min-height: 400px;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
         }
 
         .c3-axis-y-label {
@@ -58,8 +67,8 @@
     <div id="id_error"></div>
     <p><a id="id_data_dir" href="../data/raw/all_files.html">All data files</a></p>
     <div>
-            <section>
         <span id="summary_title"></span>
+        <section>
                 <div class="one chart" id="summary_table"></div>
                 <div class="two chart" id="summary_chart"></div>
             </section>
@@ -98,6 +107,7 @@
     <div>
         <section>
             <div class="one chart" id="id_pag"></div>
+            <div class="two chart" id="id_dummy"></div>
         </section>
     </div>
 

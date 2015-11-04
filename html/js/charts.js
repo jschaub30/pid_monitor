@@ -264,9 +264,9 @@
 
             c3.generate({
                 bindto: id,
-                size: {
-                    height: 400
-                },
+                // size: {
+                    // height: 600
+                // },
                 data: {
                     json: data,
                     keys: {
