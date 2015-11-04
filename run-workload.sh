@@ -27,10 +27,10 @@ debug_message(){
 
 stop_all() {
   # function to kill PIDs of workload and process monitors
-  kill -9 $TIME_PID 2> /dev/null  # Kill main process if ctrl-c
+  kill -9 $TIME_PID 2> /dev/null  &# Kill main process if ctrl-c
   PIDS=$(pgrep -f "$WORKLOAD_CMD")
   echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
-  kill $PIDS 2>/dev/null
+  kill $PIDS 2>/dev/null &
   stop_monitors&
   sleep 1
   exit
@@ -39,9 +39,11 @@ stop_all() {
 stop_monitors() {
   for SLAVE in $SLAVES
   do
+    DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     debug_message "Stopping dstat measurement on $SLAVE"
-    DSTAT_CSV=$RUN_ID.$SLAVE.dstat.csv
-    ./stop_dstat.sh $SLAVE $DSTAT_CSV $RUNDIR/data/raw/.
+    ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
+    OCOUNT_FN=$RUN_ID.$SLAVE.ocount
+    [ $OCOUNT_FLAG -eq 1 ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
     #debug_message "Stopping perf measurement on $SLAVE"
@@ -87,6 +89,12 @@ do
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
     [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\""
+    if [ $OCOUNT_FLAG -eq 1 ]
+    then
+        OCOUNT_FN=$RUN_ID.$SLAVE.ocount
+        ./start_ocount.sh $SLAVE $OCOUNT_FN $DELAY_SEC $OCOUNT_PID $OCOUNT_EVENTS
+        [ $? -ne 0 ] && debug_message "Problem starting ocount on host \"$SLAVE\""
+    fi
     #./start_operf.sh $SLAVE
     #[ $? -ne 0 ] && debug_message "Problem starting operf on host \"$SLAVE\""
     #./start_perf.sh $SLAVE
