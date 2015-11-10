@@ -43,7 +43,7 @@ stop_monitors() {
     debug_message "Stopping dstat measurement on $SLAVE"
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
     OCOUNT_FN=$RUN_ID.$SLAVE.ocount
-    [ $OCOUNT_FLAG -eq 1 ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
+    [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
     #debug_message "Stopping perf measurement on $SLAVE"
@@ -89,7 +89,7 @@ do
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
     [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\""
-    if [ $OCOUNT_FLAG -eq 1 ]
+    if [ "$OCOUNT_FLAG" == "1" ]
     then
         OCOUNT_FN=$RUN_ID.$SLAVE.ocount
         ./start_ocount.sh $SLAVE $OCOUNT_FN $DELAY_SEC $OCOUNT_PID $OCOUNT_EVENTS
@@ -155,7 +155,9 @@ $(cd $RUNDIR/html; ln -sf ../data)
 ./create_summary_table.py $RUNDIR/html/config.json > $RUNDIR/html/summary.html
 
 # Create tarball of raw data
-tar cfz $RUNDIR/data/all_raw_data.tar.gz $RUNDIR/data/raw/
+cd $RUNDIR/data
+tar cfz all_raw_data.tar.gz raw
+cd $CWD
 
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh
