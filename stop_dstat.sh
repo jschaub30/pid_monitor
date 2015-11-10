@@ -5,7 +5,9 @@
 HOST=$1
 DSTAT_FN=/tmp/pid_monitor/$(basename $2)
 OUT_DIR=$3
-ssh $HOST "killall -SIGINT dstat"
+#ssh $HOST "killall -SIGINT dstat"
+CMD="kill $(ps -ef | grep $USER | grep -E 'python.*dstat' | grep -v grep | awk -F ' ' '{print $2}' | tr '\n' ' ')"
+ssh $HOST "$CMD"
 sleep 1
 if [ "$#" -eq "3" ]
 then
