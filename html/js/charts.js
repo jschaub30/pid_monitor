@@ -173,6 +173,7 @@
             csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
             csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
             csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
+            $('#id_progress').hide();
         },
         load_dstat_csv = function() {
             // Read dstat data based on current value of 'run_id'
