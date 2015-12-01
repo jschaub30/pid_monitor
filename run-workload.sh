@@ -44,6 +44,8 @@ stop_monitors() {
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
     OCOUNT_FN=$RUN_ID.$SLAVE.ocount
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
+    [ "$OCOUNT_FLAG" == "1" ] && ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
+        $RUNDIR/data/raw/$OCOUNT_FN.csv
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
     #debug_message "Stopping perf measurement on $SLAVE"
@@ -92,7 +94,7 @@ do
     if [ "$OCOUNT_FLAG" == "1" ]
     then
         OCOUNT_FN=$RUN_ID.$SLAVE.ocount
-        ./start_ocount.sh $SLAVE $OCOUNT_FN $DELAY_SEC $OCOUNT_PID $OCOUNT_EVENTS
+        ./start_ocount.sh $SLAVE $OCOUNT_FN $DELAY_SEC $OCOUNT_EVENTS $OCOUNT_PID
         [ $? -ne 0 ] && debug_message "Problem starting ocount on host \"$SLAVE\""
     fi
     #./start_operf.sh $SLAVE

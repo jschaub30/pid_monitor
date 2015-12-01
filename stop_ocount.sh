@@ -5,7 +5,7 @@
 HOST=$1
 OCOUNT_FN=/tmp/pid_monitor/$(basename $2)
 OUT_DIR=$3
-ssh $HOST "killall -SIGINT ocount"
+ssh $HOST "sudo killall -SIGINT ocount"
 sleep 1
 if [ "$#" -eq "3" ]
 then
