@@ -28,8 +28,8 @@ def main(ocount_fn):
                     HEADER = False
                 sys.stdout.write(','.join(vals) + '\n')
         if START:
-            fieldname,count,time = line.split(',')
-            vals.append(count)
+            fieldname,count,pct_time = line.split(',')
+            vals.append(str(int(int(count)/float(pct_time)*100)))
             if HEADER:
                 fields.append(fieldname)
         if line.startswith('t:'):  # start of new measurement
