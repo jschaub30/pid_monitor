@@ -90,7 +90,7 @@ for SLAVE in $SLAVES
 do
     # Gather system summary
     ./system_snapshot.sh $SLAVE $(basename $RUNDIR)
-    mv index.html $RUNDIR/html/$SLAVE.html
+    mv ${SLAVE}.html $RUNDIR/html/.
 
     # Start dstat monitor
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv

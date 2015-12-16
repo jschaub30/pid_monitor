@@ -13,4 +13,4 @@ SSH_CMD="mkdir -p $TMPDIR; \
            ./linux_summary.sh"
 
 $(ssh $HOST $SSH_CMD) 2>/dev/null 
-scp $HOST:$TMPDIR/linux_summary/index.html .
+scp $HOST:$TMPDIR/linux_summary/index.html $HOST.html
