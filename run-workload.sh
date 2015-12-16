@@ -88,9 +88,14 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 CWD=$(pwd)
 for SLAVE in $SLAVES
 do
+    # Gather system summary
+    ./system_snapshot.sh $SLAVE $(basename $RUNDIR)
+    mv index.html $RUNDIR/html/$SLAVE.html
+
+    # Start dstat monitor
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
-    [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\""
+    [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\"" && exit 1
     if [ "$OCOUNT_FLAG" == "1" ]
     then
         OCOUNT_FN=$RUN_ID.$SLAVE.ocount
