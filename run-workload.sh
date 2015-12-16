@@ -168,9 +168,10 @@ cd $CWD
 
 echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
 chmod u+x pid_webserver.sh
+IP=$(hostname -I | cut -d' ' -f1)
 echo
 echo "#### PID MONITOR ####: All data saved to $RUNDIR"
 echo "#### PID MONITOR ####: View the html output using the following command:"
 echo "#### PID MONITOR ####: $ ./pid_webserver.sh"
-echo "#### PID MONITOR ####: Then navigate to http://localhost:12121"
+echo "#### PID MONITOR ####: Then navigate to http://${IP}:12121"
 echo
