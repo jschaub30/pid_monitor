@@ -67,11 +67,6 @@ fi
 
 DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
 
-echo "#### PID MONITOR ####: Running this workload:"
-echo "#### PID MONITOR ####: \"$WORKLOAD_CMD\""
-
-debug_message "Putting results in $RUNDIR"
-debug_message "RUN_ID=\"$RUN_ID\""
 cp *sh $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 
@@ -88,10 +83,15 @@ WORKLOAD_STDERR=$RUNDIR/data/raw/$RUN_ID.workload.stderr
 CWD=$(pwd)
 for SLAVE in $SLAVES
 do
+    debug_message "Collecting system snapshot on $SLAVE"
     # Gather system summary
-    ./system_snapshot.sh $SLAVE $(basename $RUNDIR)
+    ./system_snapshot.sh $SLAVE
     mv ${SLAVE}.html $RUNDIR/html/.
+done
 
+for SLAVE in $SLAVES
+do
+    debug_message "Starting monitors on $SLAVE"
     # Start dstat monitor
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
@@ -107,6 +107,12 @@ do
     #./start_perf.sh $SLAVE
     #[ $? -ne 0 ] && debug_message "Problem starting perf on host \"$SLAVE\""
 done
+
+echo "#### PID MONITOR ####: Running this workload:"
+echo "#### PID MONITOR ####: \"$WORKLOAD_CMD\""
+
+debug_message "Putting results in $RUNDIR"
+debug_message "RUN_ID=\"$RUN_ID\""
 
 ###############################################################################
 # STEP 3: COPY CONFIG FILES TO CONFIG FILE IN RAW DIRECTORY
