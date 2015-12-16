@@ -2,6 +2,8 @@
 
 [ "$#" -lt "2" ] && echo Usage: $0 HOSTNAME DATETIME && exit 1
 
+echo Collecting system snapshot on $HOST
+
 HOST=$1
 TMPDIR=/tmp/pid_monitor/$2
 
