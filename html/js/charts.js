@@ -213,6 +213,12 @@
                 }, 500);
             });
         },
+        create_snapshot_link = function(hostname) {
+            var link = $('<a></a>', {
+                    href: hostname + '.html',
+                    text: hostname
+                }).appendTo('#id_snapshot').addClass('snapshot');
+        },
         create_run_button = function(index, id) {
             var button_id = "button" + String(index),
                 button = $('<button></button>', {
@@ -253,6 +259,7 @@
             var index;
             for (index = 0; index < hostnames.length; ++index) {
                 create_host_button(index, hostnames[index]);
+                create_snapshot_link(hostnames[index])
             }
             for (index = 0; index < run_ids.length; ++index) {
                 create_run_button(index, run_ids[index]);

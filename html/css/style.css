@@ -188,5 +188,10 @@ tr.error {
   background-color: rgba(255, 0, 0, 0.2);
 }
 div#id_error {
-    background-color: rgba(255, 0, 0, 0.1);    
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.snapshot {
+  width: 200px;
+  margin: 1em;
 }
