@@ -73,17 +73,17 @@ a:not(:hover) {
 }
 #run_id_buttons {
   display: inline-block;
-	/*width: 65%;*/
+	width: 67%;
 }
 #cluster_buttons {
   display: inline-block;
-	max-width: 15%;
+	max-width: 20%;
 	margin-right: 4em;
   float: left;
 }
 #sum_buttons {
   display: inline-block;
-	max-width: 15%;
+	max-width: 12%;
 	float: right;
 }
 td, th {
