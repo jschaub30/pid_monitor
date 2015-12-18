@@ -224,7 +224,7 @@
                 button = $('<button></button>', {
                     id: button_id,
                     text: id
-                }).appendTo('#buttons').addClass('button');
+                }).appendTo('#run_id_buttons').addClass('button');
 
             if (index === 0) {
                 button.addClass('active');

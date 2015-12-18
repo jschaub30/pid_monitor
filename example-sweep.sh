@@ -12,10 +12,7 @@ export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 
 for BLOCK_SIZE_KB in 128 256 512
 do
-        export RUN_ID="BSIZE_KB=$BLOCK_SIZE_KB"
-        export WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=$((BLOCK_SIZE_KB*1024)) count=1024"
-        ./run-workload.sh
-        # Optionally create new HTML tables here
-        # e.g. for spark workloads:
-        #  ./create_spark_table.py $RUNDIR/html/config.json > $RUNDIR/html/workload.html
+  export RUN_ID="BSIZE_KB=$BLOCK_SIZE_KB"
+  export WORKLOAD_CMD="./dd_test.sh ${BLOCK_SIZE_KB}k"
+  ./run-workload.sh
 done

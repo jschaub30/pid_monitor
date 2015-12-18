@@ -59,25 +59,31 @@ a:not(:hover) {
   border-radius: 11px;
   font-family: Arial;
   color: #1f628d;
-  font-size: 16px;
+  font-size: 12px;
   background: #ffffff;
-  padding: 5px 5px 5px 5px;
+  padding: 2px 5px 2px 5px;
   border: solid #1f628d 1px;
   text-decoration: none;
+  max-width: 160px;
 }
 
 .active {
   background: #1f628d;
   color: #ffffff;
 }
-
 #run_id_buttons {
-	width: 80%;
+  display: inline-block;
+	/*width: 65%;*/
 }
 #cluster_buttons {
+  display: inline-block;
+	max-width: 15%;
 	margin-right: 4em;
+  float: left;
 }
 #sum_buttons {
+  display: inline-block;
+	max-width: 15%;
 	float: right;
 }
 td, th {
