@@ -1,148 +1,102 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
-<html>
-
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/c3.min.css" rel="stylesheet">
-    <script src="js/d3.min.js" charset="utf-8"></script>
-    <script src="js/c3.min.js"></script>
-    <!-- Load jQuery -->
-    <script src="js/jquery.min.js"></script>
-    <script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
-    <script type="text/javascript" src="js/dygraph-combined.js"></script>
+	<link href="css/c3.min.css" rel="stylesheet">
+  <script src="js/d3.min.js" charset="utf-8"></script>
+  <script src="js/c3.min.js"></script>
+  <!-- Load jQuery -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
+  <script type="text/javascript" src="js/dygraph-combined.js"></script>
 
-    <title id="id_title">PID monitor</title>
-    <style type="text/css" media="screen">
-        h3 {
-            text-align: center;
-            margin: auto;
-        }
+  <title id="id_title">PID monitor</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
 
-        section {
-            width: 98%;
-            margin: auto;
-            padding: 10px;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-        }
-
-        /*#summary_chart {
-            width: 48%;
-        }*/
-
-        div.one {
-            /*width: 48%;*/
-            min-height: 400px;
-            float: left;
-            -webkit-flex: 1;
-            -ms-flex: 1;
-            flex: 1;
-        }
-
-        div.two {
-            /*margin-left: 52%;*/
-            min-height: 400px;
-            -webkit-flex: 1;
-            -ms-flex: 1;
-            flex: 1;
-        }
-
-        .c3-axis-y-label {
-            font-size: 12px;
-        }
-
-        .c3-axis-x-label {
-            font-size: 12px;
-        }
-    </style>
 </head>
 
 <body>
-    <a href="https://github.com/jschaub30/pid_monitor" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="fork_me.png"></a>
-    <div>
-        <span id="id_header"></span>
-        <span class="date" id="id_date">DATE</span>
-    </div>
-    <h1 id="id_workload">WORKLOAD</h1>
-    <div id="id_error"></div>
-    <p><a id="id_data_dir" href="../data/raw/all_files.html">All data files</a></p>
-    <p><a id="id_tarball" href="../data/all_raw_data.tar.gz">all_raw_data.tar.gz</a></p>
-    <div>
-        <span id="summary_title"></span>
-        <section>
-                <div class="one chart" id="summary_table"></div>
-                <div class="two chart" id="summary_chart"></div>
-            </section>
-        <span id="workload_title"></span>
-        <div id="workload_table"></div>
-    </div>
-    <div>
-      <h1>Snapshot of system(s)</h1>
-        <span id="id_snapshot"></span>
-    </div>
-    <p>
-        <br>
-    </p>
 
-    <div id="cluster_buttons"></div>
-    <div id="buttons"></div>
-    <div id="sum_buttons"></div>
-    <div id="id_progress">
-        <p class="wait" id="id_progress"><img src="ajax-loader.gif"></img>
-        Please wait for data to load</p>
-    </div>
-    <p>
-        <br>
-    </p>
-    <div id="dstat">
-        <p>
-            <section>
-                <div class="one chart" id="id_cpu"></div>
-                <div class="two chart" id="id_io"></div>
-            </section>
-    </div>
-    <div>
-        <section>
-            <div class="one chart" id="id_mem"></div>
-            <div class="two chart" id="id_net"></div>
-        </section>
-    </div>
-    <div>
-        <section>
-            <div class="one chart" id="id_sys"></div>
-            <div class="two chart" id="id_proc"></div>
-        </section>
-    </div>
-    <div>
-        <section>
-            <div class="one chart" id="id_pag"></div>
-            <div class="two chart" id="id_dummy"></div>
-        </section>
-    </div>
+	<div class="content">
+		<a href="https://github.com/jschaub30/pid_monitor" target="_blank">
+			<img style="position: absolute; top: 0; right: 0; border: 0;" src="fork_me.png">
+		</a>
+		<div>
+			<span id="id_header"></span>
+			<span class="date" id="id_date">DATE</span>
+		</div>
+		<h1 id="id_workload">WORKLOAD</h1>
+		<div id="id_error"></div>
+		<div>
+			<span id="summary_title"></span>
+			<p>
+				Node snapshots:
+				<span id="id_snapshot"></span>
+			</p>
+			<p class="wait" id="id_progress">
+				<img src="ajax-loader.gif"></img>
+				Please wait for data to load</p>
+			<section>
+				<div class="one chart">
+					<span id="summary_table"></span>
+					<a id="id_data_dir" href="../data/raw/all_files.html">All data files</a>
+					<a id="id_tarball" href="../data/all_raw_data.tar.gz">all_raw_data.tar.gz</a>
+				</div>
+				<div class="two chart" id="summary_chart"></div>
+			</section>
+			<span id="workload_title"></span>
+			<div id="workload_table"></div>
+		</div>
 
-    <script>
-        $("#summary_table").load('summary.html', function( response, status ) {
-          if ( status === "success" ) {
-            $( "#summary_title" ).html( '<h2>Time summary</h2>' );
-          }
-        });
-        $( "#workload_table" ).load( "workload.html", function( response, status ) {
-          if ( status === "success" ) {
-            $( "#workload_title" ).html( '<h2>Workload summary</h2>' );
-          }
-        });
-                $("#workload_table").load('workload.html');
-        $("#id_header").load('header.html');
-    </script>
+		</p>
+		<div id="dstat">
+			<p>
+				<section>
+					<div class="one chart" id="id_cpu"></div>
+					<div class="two chart" id="id_io"></div>
+				</section>
+		</div>
+		<div>
+			<section>
+				<div class="one chart" id="id_mem"></div>
+				<div class="two chart" id="id_net"></div>
+			</section>
+		</div>
+		<div>
+			<section>
+				<div class="one chart" id="id_sys"></div>
+				<div class="two chart" id="id_proc"></div>
+			</section>
+		</div>
+		<div>
+			<section>
+				<div class="one chart" id="id_pag"></div>
+				<div class="two chart" id="id_dummy"></div>
+			</section>
+		</div>
+	</div> <!-- content -->
+	 <div class="footer">
+		 <span id="cluster_buttons">Nodes: </span>
+		 <span id="buttons">Run ID: </span>
+		 <span id="sum_buttons"></span>
+	 </div>
 
-    <script src='js/charts.js' type='text/javascript'>
-    </script>
+	<script>
+		$("#summary_table").load('summary.html', function(response, status) {
+			if (status === "success") {
+				// $("#summary_title").html('<h2>Time summary</h2>');
+			}
+		});
+		$("#workload_table").load("workload.html", function(response, status) {
+			if (status === "success") {
+				$("#workload_title").html('<h2>Workload summary</h2>');
+			}
+		});
+		$("#workload_table").load('workload.html');
+		$("#id_header").load('header.html');
+	</script>
 
-
-</body>
-
-</html>
+  <script src='js/charts.js' type='text/javascript'>
+	</script>
 
 </body>
 
