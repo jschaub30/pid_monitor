@@ -71,6 +71,9 @@ a:not(:hover) {
   color: #ffffff;
 }
 
+#run_id_buttons {
+	width: 80%;
+}
 #cluster_buttons {
 	margin-right: 4em;
 }
