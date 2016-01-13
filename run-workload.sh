@@ -46,6 +46,9 @@ stop_monitors() {
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
     [ "$OCOUNT_FLAG" == "1" ] && ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
         $RUNDIR/data/raw/$OCOUNT_FN.csv
+    [ "$OCOUNT_FLAG" == "1" ] && ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
+        $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
+
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
     #debug_message "Stopping perf measurement on $SLAVE"
