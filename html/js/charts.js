@@ -69,6 +69,25 @@
             );
             return chart;
         },
+        membw_chart = function(data) {
+            //console.log('csv_chart');
+            //console.log(data);
+            var chart = new Dygraph(
+                document.getElementById("id_membw"),
+                data, {
+                    // labels: labels,
+                    //http://colorbrewer2.org/  <- qualitative, 6 classes
+                    colors: ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'],
+                    xlabel: "Elapsed time [ sec ]",
+                    // ylabel: ylabel,
+                    strokeWidth: 2,
+                    legend: 'always',
+                    labelsDivWidth: 500,
+                    title: "Memory Bandwidth [ GB/s ]"
+                }
+            );
+            return chart;
+        },
         calc_cumsum = function(data) {
             var new_array = [],
                 dt;
@@ -173,6 +192,7 @@
             csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
             csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
             csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
+            load_membw_csv();
             $('#id_progress').hide();
         },
         load_dstat_csv = function() {
@@ -187,6 +207,23 @@
                 url: url,
                 dataType: "text",
                 success: create_dstat_charts,
+                error: function(request, status, error) {
+                    console.log(status);
+                    console.log(error);
+                }
+            });
+        },
+        load_membw_csv = function() {
+            // Read dstat data based on current value of 'run_id'
+            // and 'hostname'
+            var url = data_dir + '/' + run_id + '.' + hostname + '.ocount.memory.csv';
+            // console.log(url);
+            //Read csv data
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "text",
+                success: membw_chart,
                 error: function(request, status, error) {
                     console.log(status);
                     console.log(error);
@@ -359,6 +396,7 @@
 
             create_all_buttons(data.slaves, data.run_ids);
             load_dstat_csv();
+            load_membw_csv();
         },
         read_config = function() {
             // Read config data, update page, then
