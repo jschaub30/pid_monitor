@@ -216,7 +216,7 @@
         load_membw_csv = function() {
             // Read dstat data based on current value of 'run_id'
             // and 'hostname'
-            var url = data_dir + '/' + run_id + '.' + hostname + '.ocount.memory.csv';
+            var url = data_dir + '/' + run_id + '.' + hostname + '.ocount.memory_bw.csv';
             // console.log(url);
             //Read csv data
             $.ajax({
