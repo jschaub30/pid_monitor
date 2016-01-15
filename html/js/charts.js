@@ -83,7 +83,7 @@
                     strokeWidth: 2,
                     legend: 'always',
                     labelsDivWidth: 500,
-                    title: "Memory Bandwidth [ GB/s ]"
+                    title: "Cache/Memory Bandwidth [ GB/s ]"
                 }
             );
             return chart;
