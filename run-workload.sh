@@ -18,6 +18,10 @@ RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
 
 ###############################################################################
 # Define functions
+fatal_message(){
+  echo "#### PID MONITOR - FATAL ####: $@"
+  exit 1
+}
 debug_message(){
   if [ "$VERBOSE" -eq 1 ]
   then
@@ -98,12 +102,16 @@ do
     # Start dstat monitor
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
-    [ $? -ne 0 ] && debug_message "Problem starting dstat on host \"$SLAVE\"" && exit 1
+    [ $? -ne 0 ] && fatal_message "Problem starting dstat on host \"$SLAVE\""
     if [ "$OCOUNT_FLAG" == "1" ]
     then
         OCOUNT_FN=$RUN_ID.$SLAVE.ocount
         ./start_ocount.sh $SLAVE $OCOUNT_FN $DELAY_SEC $OCOUNT_EVENTS $OCOUNT_PID
-        [ $? -ne 0 ] && debug_message "Problem starting ocount on host \"$SLAVE\""
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting ocount on host \"$SLAVE\""
+          exit 1
+        fi
     fi
     #./start_operf.sh $SLAVE
     #[ $? -ne 0 ] && debug_message "Problem starting operf on host \"$SLAVE\""

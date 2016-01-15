@@ -13,7 +13,16 @@ PID=${ARGS[4]}
 
 [ "$DELAY_SEC" -lt "1" ] && echo Setting DELAY_SEC to 1 instead of $3; DELAY_SEC=1
 
-echo Ocount Monitoring PID=$PID on $HOST
+echo Checking to see if ocount is running on $HOST
+CMD="ps -efa | grep ocount | grep -v grep | grep -v start_ocount | wc -l"
+RC=$(ssh $HOST $CMD)
+if [ $RC -ne 0 ]
+then
+  echo ocount appears to be running on $HOST.
+  echo Please stop ocount. Exiting...
+  exit 1
+fi
+echo Starting ocount monitoring on $HOST
 #echo Events are $EVENT_LIST
 
 OCOUNT_CMD="mkdir -p /tmp/pid_monitor/; \
@@ -22,7 +31,7 @@ OCOUNT_CMD="mkdir -p /tmp/pid_monitor/; \
            sleep 0.1; \
            sudo bash -c \"ulimit -n 100000;ocount -b -i $((DELAY_SEC*1000)) --events ${EVENT_LIST} --system-wide  >> $OCOUNT_FN 2>&1 < /dev/null &\""
            #sudo ocount -i $((DELAY_SEC*1000)) --events ${EVENT_LIST} -p $PID  >> $OCOUNT_FN 2>&1 < /dev/null &"
-echo $OCOUNT_CMD
+#echo $OCOUNT_CMD
 
 $(ssh $HOST $OCOUNT_CMD) 2>/dev/null &
 
