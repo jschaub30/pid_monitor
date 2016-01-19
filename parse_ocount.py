@@ -30,7 +30,7 @@ def main(ocount_fn):
         if START:
             fieldname,count,pct_time = line.split(',')
             #vals.append(str(int(int(count)/float(pct_time)*100)))
-            vals.append(str(int(count)*100))
+            vals.append(count)
             if HEADER:
                 fields.append(fieldname)
         if line.startswith('t:'):  # start of new measurement
