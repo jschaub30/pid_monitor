@@ -14,7 +14,7 @@ PID=${ARGS[4]}
 [ "$DELAY_SEC" -lt "1" ] && echo Setting DELAY_SEC to 1 instead of $3; DELAY_SEC=1
 
 echo Checking to see if ocount is running on $HOST
-CMD="ps -efa | grep ocount | grep -v grep | grep -v start_ocount | wc -l"
+CMD="ps -efa | grep ocount | grep -v grep | grep -v start_ocount | grep -v vim | wc -l"
 RC=$(ssh $HOST $CMD)
 if [ $RC -ne 0 ]
 then

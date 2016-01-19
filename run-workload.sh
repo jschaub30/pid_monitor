@@ -75,6 +75,7 @@ fi
 DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
 
 cp *sh $RUNDIR/scripts
+cp *R $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 
 ###############################################################################

@@ -17,7 +17,8 @@ d1$L2 <- L1_cache_line_size * tot_ld_l_L2
 tot_ld_l_L3 <- d$PM_DATA_FROM_L3 / (1024*1024*1024) #Total Loads from local L3
 d1$L3 <- L2_cache_line_size * tot_ld_l_L3
 #tot_ld_mem = (d$PM_DATA_FROM_RMEM + d$PM_DATA_FROM_LMEM) / (1024*1024*1024)
-tot_ld_mem = d$PM_DATA_ALL_FROM_MEMORY / (1024*1024*1024)
+#tot_ld_mem = d$PM_DATA_ALL_FROM_MEMORY / (1024*1024*1024)
+tot_ld_mem = (d$PM_L3_PREF_ALL + d$PM_DATA_ALL_FROM_LMEM + d$PM_DATA_ALL_FROM_RMEM + d$PM_DATA_ALL_FROM_DMEM + d$PM_DATA_ALL_FROM_LL4) / (1024*1024*1024)
 d1$MEM <- L3_cache_line_size * tot_ld_mem
 write.csv(d1, row.names=FALSE, quote=FALSE, stdout())
 
