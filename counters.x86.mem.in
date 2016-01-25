@@ -1,0 +1,1 @@
+mem_load_uops_retired:l1_hit,mem_load_uops_retired:l2_hit,mem_load_uops_retired:l3_hit,LLC_MISSES
