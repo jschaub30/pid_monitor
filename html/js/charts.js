@@ -70,7 +70,6 @@
             return chart;
         },
         membw_chart = function(data) {
-            //console.log('csv_chart');
             //console.log(data);
             var chart = new Dygraph(
                 document.getElementById("id_membw"),
@@ -88,13 +87,36 @@
             );
             return chart;
         },
+        gpu_chart = function(id, data) {
+            console.log(data);
+            gpu.show();
+            var title_str = "GPU Utilization [ % ]";
+            if(id === "id_gpu_mem"){
+                title_str = "GPU Memory Utilization [ % ]";
+            }
+            var chart = new Dygraph(
+                document.getElementById(id),
+                data, {
+                    // labels: labels,
+                    //http://colorbrewer2.org/  <- qualitative, 6 classes
+                    colors: ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'],
+                    xlabel: "Elapsed time [ sec ]",
+                    // ylabel: ylabel,
+                    strokeWidth: 2,
+                    legend: 'always',
+                    labelsDivWidth: 500,
+                    title: title_str
+                }
+            );
+            return chart;
+        },
         calc_cumsum = function(data) {
             var new_array = [],
                 dt;
             for (var i = 0; i < data.length; i++) {
                 new_array.push(data[i].slice(0));
             }
-            for (var i = 1; i < new_array.length; i++) {
+            for (i = 1; i < new_array.length; i++) {
                 dt = new_array[i][0] - new_array[i-1][0];
                 for (var j = 1; j < new_array[0].length; j++) {
                   new_array[i][j] = new_array[i-1][j] + dt*new_array[i][j];
@@ -193,6 +215,8 @@
             csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
             csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
             load_membw_csv();
+            load_gpu_gpu_csv();
+            load_gpu_mem_csv();
             $('#id_progress').hide();
         },
         load_dstat_csv = function() {
@@ -214,8 +238,6 @@
             });
         },
         load_membw_csv = function() {
-            // Read dstat data based on current value of 'run_id'
-            // and 'hostname'
             var url = data_dir + '/' + run_id + '.' + hostname + '.ocount.memory_bw.csv';
             // console.log(url);
             //Read csv data
@@ -225,12 +247,48 @@
                 dataType: "text",
                 success: membw_chart,
                 error: function(request, status, error) {
-                    console.log(status);
-                    console.log(error);
+                    // console.log(status);
+                    // console.log(error);
+                    console.log('Ocount data not found');
                 }
             });
         },
-        create_host_button = function(index, id) {
+        load_gpu_gpu_csv = function() {
+            var url = data_dir + '/' + run_id + '.' + hostname + '.gpu.gpu.csv';
+            console.log(url);
+            //Read csv data
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "text",
+                success: function(data) {
+                    gpu_chart("id_gpu_gpu", data);
+                },
+                error: function(request, status, error) {
+                    // console.log(status);
+                    // console.log(error);
+                    console.log('GPU data not found');
+                }
+            });
+        },
+        load_gpu_mem_csv = function() {
+            var url = data_dir + '/' + run_id + '.' + hostname + '.gpu.mem.csv';
+            console.log(url);
+            //Read csv data
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "text",
+                success: function(data) {
+                    gpu_chart("id_gpu_mem", data);
+                },
+                error: function(request, status, error) {
+                    // console.log(status);
+                    // console.log(error);
+                    console.log('GPU data not found');
+                }
+            });
+        },        create_host_button = function(index, id) {
             var button_id = "cluster_button" + String(index),
                 button = $('<button></button>', {
                     id: button_id,
@@ -296,7 +354,7 @@
             var index;
             for (index = 0; index < hostnames.length; ++index) {
                 create_host_button(index, hostnames[index]);
-                create_snapshot_link(hostnames[index])
+                create_snapshot_link(hostnames[index]);
             }
             for (index = 0; index < run_ids.length; ++index) {
                 create_run_button(index, run_ids[index]);
@@ -397,6 +455,8 @@
             create_all_buttons(data.slaves, data.run_ids);
             load_dstat_csv();
             load_membw_csv();
+            load_gpu_gpu_csv();
+            load_gpu_mem_csv();
         },
         read_config = function() {
             // Read config data, update page, then
