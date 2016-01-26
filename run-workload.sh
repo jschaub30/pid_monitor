@@ -46,15 +46,14 @@ stop_monitors() {
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     debug_message "Stopping dstat measurement on $SLAVE"
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
-    GPU_FN=$RUN_ID.$SLAVE.gpu
     [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
-    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.py $RUNDIR/data/raw/$GPU_FN > \
-    OCOUNT_FN=$RUN_ID.$SLAVE.ocount
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
+    # Now parse
     [ "$OCOUNT_FLAG" == "1" ] && ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
         $RUNDIR/data/raw/$OCOUNT_FN.csv
     [ "$OCOUNT_FLAG" == "1" ] && ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
         $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
+    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN
 
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
