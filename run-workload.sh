@@ -46,6 +46,9 @@ stop_monitors() {
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     debug_message "Stopping dstat measurement on $SLAVE"
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
+    GPU_FN=$RUN_ID.$SLAVE.gpu
+    [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
+    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.py $RUNDIR/data/raw/$GPU_FN > \
     OCOUNT_FN=$RUN_ID.$SLAVE.ocount
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
     [ "$OCOUNT_FLAG" == "1" ] && ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
@@ -111,6 +114,16 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting ocount on host \"$SLAVE\""
+          exit 1
+        fi
+    fi
+    if [ "$GPU_FLAG" == "1" ]
+    then
+        GPU_FN=$RUN_ID.$SLAVE.gpu
+        ./start_gpu.sh $SLAVE $GPU_FN $DELAY_SEC
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
           exit 1
         fi
     fi
