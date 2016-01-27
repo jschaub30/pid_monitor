@@ -3,7 +3,7 @@
 [ "$#" -lt "1" ] && echo Usage: $0 HOSTNAME FN OUT_DIR && exit 1
 
 HOST=$1
-FN=/tmp/pid_monitor/$(basename $2)
+[ "$#" -gt 1 ] && FN=/tmp/pid_monitor/$(basename $2)
 OUT_DIR=$3
 ssh $HOST "sudo killall -SIGINT nvidia-smi"
 sleep 1

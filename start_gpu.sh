@@ -8,7 +8,7 @@ HOST=${ARGS[0]}
 FN=/tmp/pid_monitor/$(basename ${ARGS[1]})
 DELAY_SEC=${ARGS[2]}
 
-[ "$DELAY_SEC" -lt "1" ] && echo Setting DELAY_SEC to 1 instead of $DELAY_SEC; DELAY_SEC=1
+[ "$DELAY_SEC" -lt "1" ] && echo Setting DELAY_SEC to 1 instead of $DELAY_SEC && DELAY_SEC=1
 
 echo Checking to see if nvidia-smi is running on $HOST
 CMD="ps -efa | grep nvidia-smi | grep -v grep | grep -v $0 | grep -v vim | wc -l"
@@ -28,7 +28,7 @@ CMD="mkdir -p /tmp/pid_monitor/; \
            rm -f $FN; \
            sleep 0.1; \
            sudo bash -c \"$GPU_CMD &\""
-#echo $CMD
+echo $CMD
 
 $(ssh $HOST $CMD) 2>/dev/null &
 
