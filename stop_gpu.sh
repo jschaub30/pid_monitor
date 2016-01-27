@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ "$#" -lt "3" ] && echo Usage: $0 HOSTNAME FN OUT_DIR && exit 1
+[ "$#" -lt "1" ] && echo Usage: $0 HOSTNAME FN OUT_DIR && exit 1
 
 HOST=$1
 FN=/tmp/pid_monitor/$(basename $2)

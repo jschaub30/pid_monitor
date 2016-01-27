@@ -48,7 +48,7 @@ stop_monitors() {
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
     [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
-    # Now parse
+    # Now parse monitor output files
     [ "$OCOUNT_FLAG" == "1" ] && ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
         $RUNDIR/data/raw/$OCOUNT_FN.csv
     [ "$OCOUNT_FLAG" == "1" ] && ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
