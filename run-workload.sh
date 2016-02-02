@@ -58,8 +58,8 @@ stop_monitors() {
 
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
-    #debug_message "Stopping perf measurement on $SLAVE"
-    #./stop_perf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.perf.report
+    PERF_FN=$RUN_ID.$SLAVE.perf.report
+    [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $RUNDIR/data/raw/$PERF_FN
   done
 }
 
@@ -129,8 +129,8 @@ do
     fi
     #./start_operf.sh $SLAVE
     #[ $? -ne 0 ] && debug_message "Problem starting operf on host \"$SLAVE\""
-    #./start_perf.sh $SLAVE
-    #[ $? -ne 0 ] && debug_message "Problem starting perf on host \"$SLAVE\""
+    [ "$PERF_FLAG" == "1" ] && ./start_perf.sh $SLAVE
+    [ $? -ne 0 ] && debug_message "Problem starting perf on host \"$SLAVE\""
 done
 
 echo "#### PID MONITOR ####: Running this workload:"

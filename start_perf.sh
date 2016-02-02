@@ -2,10 +2,11 @@
 
 [ "$#" -ne "1" ] && echo Usage: $0 HOSTNAME && exit 1
 
+HOST=$1
 echo Checking to see if perf is running on $HOST
-CMD="ps -efa | grep perf | grep -v grep | grep -v $0 | grep -v vim | wc -l"
+CMD="ps -efa | grep 'perf record' | grep -v grep | grep -v $0 | grep -v vim | wc -l"
 RC=$(ssh $HOST $CMD)
-if [ $RC -ne 0 ]
+if [ "$RC" -ne 0 ]
 then
   echo perf appears to be running on $HOST.
   echo Please stop perf. Exiting...
