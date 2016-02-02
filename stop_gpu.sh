@@ -11,6 +11,6 @@ if [ "$#" -eq "3" ]
 then
   echo Copying nvidia-smi data from $HOST:$FN to $OUT_DIR
   scp -r $HOST:$FN $OUT_DIR/.
-  [ "$?" -eq 0 ] && ssh $HOST "rm $FN"
+  [ "$?" -eq 0 ] && ssh $HOST "rm -f $FN"
 fi
   

@@ -13,6 +13,6 @@ if [ "$#" -eq "3" ]
 then
   echo Copying dstat data from $HOST:$DSTAT_FN to $OUT_DIR
   scp -r $HOST:$DSTAT_FN $OUT_DIR/.
-  [ "$?" -eq 0 ] && ssh $HOST "rm $DSTAT_FN"
+  [ "$?" -eq 0 ] && ssh $HOST "rm -f $DSTAT_FN"
 fi
   

@@ -30,6 +30,7 @@ debug_message(){
 }
 
 stop_all() {
+  cd $CWD
   # function to kill PIDs of workload and process monitors
   kill -9 $TIME_PID 2> /dev/null  &# Kill main process if ctrl-c
   PIDS=$(pgrep -f "$WORKLOAD_CMD")
