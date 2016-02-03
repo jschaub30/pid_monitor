@@ -91,9 +91,6 @@
             console.log(data);
             gpu.show();
             var title_str = "GPU Utilization [ % ]";
-            if(id === "id_gpu_mem"){
-                title_str = "GPU Memory Utilization [ % ]";
-            }
             var chart = new Dygraph(
                 document.getElementById(id),
                 data, {
@@ -215,7 +212,7 @@
             csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
             csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
             load_membw_csv();
-            load_gpu_gpu_csv();
+            load_gpu_csv();
             load_gpu_mem_csv();
             $('#id_progress').hide();
         },
@@ -253,8 +250,8 @@
                 }
             });
         },
-        load_gpu_gpu_csv = function() {
-            var url = data_dir + '/' + run_id + '.' + hostname + '.gpu.gpu.csv';
+        load_gpu_csv = function() {
+            var url = data_dir + '/' + run_id + '.' + hostname + '.gpu.csv';
             console.log(url);
             //Read csv data
             $.ajax({
@@ -262,7 +259,7 @@
                 url: url,
                 dataType: "text",
                 success: function(data) {
-                    gpu_chart("id_gpu_gpu", data);
+                    gpu_chart("id_gpu", data);
                 },
                 error: function(request, status, error) {
                     // console.log(status);
@@ -271,24 +268,7 @@
                 }
             });
         },
-        load_gpu_mem_csv = function() {
-            var url = data_dir + '/' + run_id + '.' + hostname + '.gpu.mem.csv';
-            console.log(url);
-            //Read csv data
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "text",
-                success: function(data) {
-                    gpu_chart("id_gpu_mem", data);
-                },
-                error: function(request, status, error) {
-                    // console.log(status);
-                    // console.log(error);
-                    console.log('GPU data not found');
-                }
-            });
-        },        create_host_button = function(index, id) {
+        create_host_button = function(index, id) {
             var button_id = "cluster_button" + String(index),
                 button = $('<button></button>', {
                     id: button_id,
@@ -455,8 +435,7 @@
             create_all_buttons(data.slaves, data.run_ids);
             load_dstat_csv();
             load_membw_csv();
-            load_gpu_gpu_csv();
-            load_gpu_mem_csv();
+            load_gpu_csv();
         },
         read_config = function() {
             // Read config data, update page, then
