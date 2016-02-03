@@ -3,7 +3,7 @@
 export WORKLOAD_NAME=EXAMPLE-SWEEP
 export DESCRIPTION="Example sweep using dd command"
 export WORKLOAD_DIR="."
-export ESTIMATED_RUN_TIME_MIN=1
+export MEAS_DELAY_SEC=1
 export X_LABEL="Block size [ KB ]"
 export VERBOSE=0  # Turn off most messages
 

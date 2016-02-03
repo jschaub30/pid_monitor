@@ -6,8 +6,8 @@
 [ -z "$WORKLOAD_NAME" ]  && WORKLOAD_NAME=dd  # No spaces!
 [ -z "$WORKLOAD_CMD" ]  && WORKLOAD_CMD="dd if=/dev/zero of=/tmp/tmpfile bs=1048576 count=1024"
 [ -z "$WORKLOAD_DIR" ]  && WORKLOAD_DIR='.'
-[ -z "$ESTIMATED_RUN_TIME_MIN" ]  && ESTIMATED_RUN_TIME_MIN=1
-[ "$ESTIMATED_RUN_TIME_MIN" -lt "1" ]  && ESTIMATED_RUN_TIME_MIN=1
+[ -z "$MEAS_DELAY_SEC" ]  && MEAS_DELAY_SEC=1
+[ "$MEAS_DELAY_SEC" -lt "1" ]  && MEAS_DELAY_SEC=1
 [ -z "$RUNDIR" ]  && export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && export RUN_ID="RUN=1.1"
 [ -z "$SLAVES" ] && export SLAVES=$(hostname)
@@ -75,8 +75,6 @@ else
     cp tmp.json $RUNDIR/html/config.json
 fi
 
-DELAY_SEC=$ESTIMATED_RUN_TIME_MIN  # For 20min total run time, record data every 20 seconds
-
 cp *sh $RUNDIR/scripts
 cp *R $RUNDIR/scripts
 cp *py $RUNDIR/scripts
@@ -105,12 +103,12 @@ do
     debug_message "Starting monitors on $SLAVE"
     # Start dstat monitor
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
-    ./start_dstat.sh $SLAVE $DSTAT_FN $DELAY_SEC
+    ./start_dstat.sh $SLAVE $DSTAT_FN $MEAS_DELAY_SEC
     [ $? -ne 0 ] && fatal_message "Problem starting dstat on host \"$SLAVE\""
     if [ "$OCOUNT_FLAG" == "1" ]
     then
         OCOUNT_FN=$RUN_ID.$SLAVE.ocount
-        ./start_ocount.sh $SLAVE $OCOUNT_FN $DELAY_SEC $OCOUNT_EVENTS $OCOUNT_PID
+        ./start_ocount.sh $SLAVE $OCOUNT_FN $MEAS_DELAY_SEC $OCOUNT_EVENTS $OCOUNT_PID
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting ocount on host \"$SLAVE\""
@@ -120,7 +118,7 @@ do
     if [ "$GPU_FLAG" == "1" ]
     then
         GPU_FN=$RUN_ID.$SLAVE.gpu
-        ./start_gpu.sh $SLAVE $GPU_FN $DELAY_SEC
+        ./start_gpu.sh $SLAVE $GPU_FN $MEAS_DELAY_SEC
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""

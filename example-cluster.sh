@@ -3,7 +3,7 @@
 export WORKLOAD_NAME=EXAMPLE-CLUSTER
 export DESCRIPTION="Example workload on 2 node cluster using dd command"
 export X_LABEL="Block size [ KB ]"
-export ESTIMATED_RUN_TIME_MIN=1
+export MEAS_DELAY_SEC=1
 export VERBOSE=0 # Turn off most messages
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 
