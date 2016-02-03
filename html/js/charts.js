@@ -88,13 +88,12 @@
             return chart;
         },
         gpu_chart = function(id, data) {
-            console.log(data);
-            gpu.show();
+            //console.log(data);
             var title_str = "GPU Utilization [ % ]";
             var chart = new Dygraph(
                 document.getElementById(id),
                 data, {
-                    // labels: labels,
+                    //labels: ['Elapsed time [ sec ]', 'GPU', 'Memory'],
                     //http://colorbrewer2.org/  <- qualitative, 6 classes
                     colors: ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'],
                     xlabel: "Elapsed time [ sec ]",
@@ -210,10 +209,9 @@
 
             csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
             csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
-            csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
+            //csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
             load_membw_csv();
             load_gpu_csv();
-            load_gpu_mem_csv();
             $('#id_progress').hide();
         },
         load_dstat_csv = function() {

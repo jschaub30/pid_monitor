@@ -63,15 +63,14 @@
 		</div>
 		<div>
 			<section>
-				<div class="one chart" id="id_membw"></div>
-				<div class="one chart" id="id_gpu"></div>
+				<div class="one chart" id="id_sys"></div>
 				<div class="two chart" id="id_proc"></div>
 			</section>
 		</div>
 		<div>
 			<section>
-				<div class="one chart" id="id_sys"></div>
-				<div class="two chart" id="id_pag"></div>
+				<div class="one chart" id="id_membw"></div>
+				<div class="one chart" id="id_gpu"></div>
 			</section>
 		</div>
 	</div> <!-- content -->
@@ -82,7 +81,6 @@
 	 </div>
 
 	<script>
-		var gpu = $("#id_gpu").hide();
 		$("#summary_table").load('summary.html', function(response, status) {
 			if (status === "success") {
 				// $("#summary_title").html('<h2>Time summary</h2>');
