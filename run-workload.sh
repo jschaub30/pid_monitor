@@ -61,6 +61,31 @@ stop_monitors() {
     PERF_FN=$RUN_ID.$SLAVE.perf.report
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $RUNDIR/data/raw/$PERF_FN
   done
+  ###############################################################################
+  # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
+  rm -rf html/data  # For historical reasons
+  cp -R html $RUNDIR/.
+  cp html/all_files.html $RUNDIR/data/raw
+  # Create symlink to allows python SimpleHTTPServer to serve files
+  $(cd $RUNDIR/html; ln -sf ../data)
+
+  # Process data from all runs into HTML tables
+  ./create_summary_table.py $RUNDIR/html/config.json > $RUNDIR/html/summary.html
+
+  # Create tarball of raw data
+  cd $RUNDIR/data
+  tar cfz all_raw_data.tar.gz raw
+  cd $CWD
+
+  echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
+  chmod u+x pid_webserver.sh
+  IP=$(hostname -I | cut -d' ' -f1)
+  echo
+  echo "#### PID MONITOR ####: All data saved to $RUNDIR"
+  echo "#### PID MONITOR ####: View the html output using the following command:"
+  echo "#### PID MONITOR ####: $ ./pid_webserver.sh"
+  echo "#### PID MONITOR ####: Then navigate to http://${IP}:12121"
+  echo
 }
 
 trap 'stop_all' SIGTERM SIGINT # Kill process monitors if killed early
@@ -175,32 +200,6 @@ wait $TIME_PID
 cd $CWD
 
 ###############################################################################
-# STEP 5: STOP_DSTAT
+# STEP 5: STOP MONITORS
 stop_monitors
-sleep 1
 
-###############################################################################
-# STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
-rm -rf html/data  # For historical reasons
-cp -R html $RUNDIR/.
-cp html/all_files.html $RUNDIR/data/raw
-# Create symlink to allows python SimpleHTTPServer to serve files
-$(cd $RUNDIR/html; ln -sf ../data)
-
-# Process data from all runs into HTML tables
-./create_summary_table.py $RUNDIR/html/config.json > $RUNDIR/html/summary.html
-
-# Create tarball of raw data
-cd $RUNDIR/data
-tar cfz all_raw_data.tar.gz raw
-cd $CWD
-
-echo "cd $RUNDIR/html; python -m SimpleHTTPServer 12121" > pid_webserver.sh
-chmod u+x pid_webserver.sh
-IP=$(hostname -I | cut -d' ' -f1)
-echo
-echo "#### PID MONITOR ####: All data saved to $RUNDIR"
-echo "#### PID MONITOR ####: View the html output using the following command:"
-echo "#### PID MONITOR ####: $ ./pid_webserver.sh"
-echo "#### PID MONITOR ####: Then navigate to http://${IP}:12121"
-echo
