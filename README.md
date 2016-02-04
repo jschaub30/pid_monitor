@@ -4,6 +4,7 @@ Linux tool that launches a workload, records process and system data using dstat
 #Requires
 - [dstat](http://dag.wiee.rs/home-made/dstat/)
 - [python](https://www.python.org/)
+- Some monitors use [R scripts](https://www.r-project.org/) to parse output data
 
 Written in bash, python, html and javascript.  
 
@@ -12,7 +13,8 @@ Also uses:
 - [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing (included).
 - GNU-time /usr/bin/time
 
-Start by viewing:
+Setup:
+- Configure password-less ssh on your machine
 - [example.sh](https://github.com/jschaub30/pid_monitor/blob/master/example.sh) Simple write to disk example
 - [example-sweep.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Sweeping block size while writing to disk
 - [example-cluster.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Shows how to monitor workload on 2 machines at once
