@@ -99,6 +99,7 @@
                     xlabel: "Elapsed time [ sec ]",
                     // ylabel: ylabel,
                     strokeWidth: 2,
+                    connectSeparatedPoints: true,
                     legend: 'always',
                     labelsDivWidth: 500,
                     title: title_str
