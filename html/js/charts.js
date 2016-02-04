@@ -225,6 +225,7 @@
                 type: "GET",
                 url: url,
                 dataType: "text",
+                cache: false,
                 success: create_dstat_charts,
                 error: function(request, status, error) {
                     console.log(status);
@@ -239,6 +240,7 @@
             $.ajax({
                 type: "GET",
                 url: url,
+                cache: false,
                 dataType: "text",
                 success: membw_chart,
                 error: function(request, status, error) {
@@ -255,8 +257,10 @@
             $.ajax({
                 type: "GET",
                 url: url,
+                cache: false,
                 dataType: "text",
                 success: function(data) {
+                    //location.reload();
                     gpu_chart("id_gpu", data);
                 },
                 error: function(request, status, error) {
@@ -395,6 +399,7 @@
             //Read summary CSV data and create summary chart
             $.ajax({
                 type: "GET",
+                cache: false,
                 url: "summary.csv",
                 dataType: "text",
                 success: function(data) {
@@ -440,6 +445,7 @@
             // create buttons and dstat charts
             $.ajax({
                 type: "GET",
+                cache: false,
                 url: "config.json",
                 dataType: "json",
                 success: function(data) {
