@@ -44,22 +44,33 @@ stop_all() {
 stop_monitors() {
   for SLAVE in $SLAVES
   do
+    # Stop all monitors first, then parse them
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
+    OCOUNT_FN=$RUN_ID.$SLAVE.ocount
+    GPU_FN=$RUN_ID.$SLAVE.gpu
+    PERF_FN=$RUN_ID.$SLAVE.perf.report
+    AMESTER_FN=$RUN_ID.$SLAVE.amester
     debug_message "Stopping dstat measurement on $SLAVE"
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
-    [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
+    [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
+    [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $RUNDIR/data/raw/$PERF_FN
+    [ "$AMESTER_FLAG" == "1" ] && ./stop_amester.sh $SLAVE $AMESTER_FN $RUNDIR/data/raw/.
+ 
     # Now parse monitor output files
-    [ "$OCOUNT_FLAG" == "1" ] && ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
-        $RUNDIR/data/raw/$OCOUNT_FN.csv
-    [ "$OCOUNT_FLAG" == "1" ] && ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
-        $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
+    # dstat data is parsed directly in webpage by javascript
+    if [ "$OCOUNT_FLAG" == "1" ]
+    then
+        ./parse_ocount.py $RUNDIR/data/raw/$OCOUNT_FN > \
+            $RUNDIR/data/raw/$OCOUNT_FN.csv
+        ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
+            $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
+    fi
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN
+    #[ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$GPU_FN
 
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
-    PERF_FN=$RUN_ID.$SLAVE.perf.report
-    [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $RUNDIR/data/raw/$PERF_FN
   done
   ###############################################################################
   # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
@@ -147,6 +158,16 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
+          exit 1
+        fi
+    fi
+    if [ "$AMESTER_FLAG" == "1" ]
+    then
+        AMESTER_FN=$RUN_ID.$SLAVE.amester
+        ./start_amester.sh $SLAVE $AMESTER_FN $MEAS_DELAY_SEC
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting amester on host \"$SLAVE\""
           exit 1
         fi
     fi
