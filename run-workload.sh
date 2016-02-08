@@ -79,7 +79,7 @@ stop_monitors() {
             $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
     fi
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN
-    [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$GPU_FN
+    [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$AMESTER_FN
 
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data
