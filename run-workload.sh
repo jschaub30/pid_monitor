@@ -12,6 +12,18 @@
 [ -z "$RUN_ID" ]  && export RUN_ID="RUN=1.1"
 [ -z "$SLAVES" ] && export SLAVES=$(hostname)
 [ -z "$VERBOSE" ] && export VERBOSE=0  # Set to 1 to turn on debug messages
+if [ "$P8_MEMBW_FLAG" == "1" ]
+then
+    OCOUNT_FLAG=1
+    OCOUNT_EVENTS=$(cat counters.p8.mem.in | cut -d' ' -f1 | \
+        perl -pe "s/\n/,/g" | sed s/,$//    )
+fi
+if [ "$HASWELL_MEMBW_FLAG" == "1" ]
+then
+    OCOUNT_FLAG=1
+    OCOUNT_EVENTS=$(cat counters.haswell.mem.in | cut -d' ' -f1 | \
+        perl -pe "s/\n/,/g" | sed s/,$//    )
+fi
 
 WORKLOAD_NAME=$(echo $WORKLOAD_NAME | tr " " "_")  # Remove spaces
 RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
@@ -67,7 +79,7 @@ stop_monitors() {
             $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
     fi
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN
-    #[ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$GPU_FN
+    [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$GPU_FN
 
     #debug_message "Stopping operf measurement on $SLAVE"
     #./stop_operf.sh $SLAVE $RUNDIR/data/raw/$RUN_ID.$SLAVE.oprofile_data

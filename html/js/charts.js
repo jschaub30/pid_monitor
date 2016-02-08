@@ -7,6 +7,11 @@
         header_lines,
         data_dir,
         cumsum_flag = false,
+        config,
+        monitor_idx = 1,
+        //http://colorbrewer2.org/
+        chart_colors = ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 
+                        'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'], 
         parse_summary_line = function(line) {
             return {
                 x: line.run_id,
@@ -51,14 +56,12 @@
             return arr;
         },
         csv_chart = function(data, id, title, labels, ylabel) {
-            //console.log('csv_chart');
             //console.log(data);
             var chart = new Dygraph(
                 document.getElementById(id),
                 data, {
                     labels: labels,
-                    //http://colorbrewer2.org/  <- qualitative, 6 classes
-                    colors: ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'],
+                    colors: chart_colors,
                     xlabel: "Elapsed time [ sec ]",
                     ylabel: ylabel,
                     strokeWidth: 2,
@@ -69,39 +72,19 @@
             );
             return chart;
         },
-        membw_chart = function(data) {
+        csv_chart2 = function(data, monitor_idx, title) {
             //console.log(data);
             var chart = new Dygraph(
-                document.getElementById("id_membw"),
+                document.getElementById("id_monitor" + monitor_idx.toString()),
                 data, {
                     // labels: labels,
-                    //http://colorbrewer2.org/  <- qualitative, 6 classes
-                    colors: ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'],
+                    colors: chart_colors,
                     xlabel: "Elapsed time [ sec ]",
                     // ylabel: ylabel,
                     strokeWidth: 2,
                     legend: 'always',
                     labelsDivWidth: 500,
-                    title: "Cache/Memory Bandwidth [ GB/s ]"
-                }
-            );
-            return chart;
-        },
-        gpu_chart = function(id, data) {
-            //console.log(data);
-            var title_str = "GPU Utilization [ % ]";
-            var chart = new Dygraph(
-                document.getElementById(id),
-                data, {
-                    //labels: ['Elapsed time [ sec ]', 'GPU', 'Memory'],
-                    //http://colorbrewer2.org/  <- qualitative, 6 classes
-                    colors: ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'],
-                    xlabel: "Elapsed time [ sec ]",
-                    // ylabel: ylabel,
-                    strokeWidth: 2,
-                    legend: 'always',
-                    labelsDivWidth: 500,
-                    title: title_str
+                    title: title
                 }
             );
             return chart;
@@ -193,25 +176,31 @@
                 }
             );
 
-            csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", "idle", "wait", "hiq", "siq"], "Usage [ % ]");
-            csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", "cache", "free"], "Usage [ GB ]");
+            csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", 
+                      "idle", "wait", "hiq", "siq"], "Usage [ % ]");
+            csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", 
+                      "cache", "free"], "Usage [ GB ]");
             if (cumsum_flag) {
-                csv_chart(io_sum_data, "id_io", "&#x222b; IO", ["time", "read", "write"], "Usage [ MB ]");
+                csv_chart(io_sum_data, "id_io", "&#x222b; IO", ["time", "read", 
+                          "write"], "Usage [ MB ]");
             } else {
-                csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], "Usage [ MB/s ]");
+                csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], 
+                          "Usage [ MB/s ]");
             }
 
             if (cumsum_flag) {
-                csv_chart(net_sum_data, "id_net", "&#x222b; Network", ["time", "recv", "send"], "Usage [ MB ]");
+                csv_chart(net_sum_data, "id_net", "&#x222b; Network", 
+                          ["time", "recv", "send"], "Usage [ MB ]");
             } else {
-                csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], "Usage [ MB/s ]");
+                csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], 
+                          "Usage [ MB/s ]");
             }
 
-            csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
-            csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
+            csv_chart(sys_data, "id_sys", "System", 
+                      ["time", "interrupts", "context switches"], "");
+            csv_chart(proc_data, "id_proc", "Processes", 
+                      ["time", "run", "blk", "new"], "");
             //csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
-            load_membw_csv();
-            load_gpu_csv();
             $('#id_progress').hide();
         },
         load_dstat_csv = function() {
@@ -232,37 +221,19 @@
                 }
             });
         },
-        load_membw_csv = function() {
-            var url = data_dir + '/' + run_id + '.' + hostname + '.ocount.memory_bw.csv';
+        load_csv = function(extension, monitor_idx, title) {
+            var url = data_dir + '/' + run_id + '.' + hostname + extension;
             // console.log(url);
-            //Read csv data
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "text",
-                success: membw_chart,
-                error: function(request, status, error) {
-                    // console.log(status);
-                    // console.log(error);
-                    console.log('Ocount data not found');
-                }
-            });
-        },
-        load_gpu_csv = function() {
-            var url = data_dir + '/' + run_id + '.' + hostname + '.gpu.csv';
-            console.log(url);
-            //Read csv data
             $.ajax({
                 type: "GET",
                 url: url,
                 dataType: "text",
                 success: function(data) {
-                    gpu_chart("id_gpu", data);
+                    csv_chart2(data, monitor_idx, title)
                 },
                 error: function(request, status, error) {
-                    // console.log(status);
-                    // console.log(error);
-                    console.log('GPU data not found');
+                    console.log(status);
+                    console.log(error);
                 }
             });
         },
@@ -282,7 +253,7 @@
                 $this.siblings('button').removeClass('active');
                 hostname = id;
                 setTimeout(function() {
-                    load_dstat_csv();
+                    load_all_data();
                 }, 500);
             });
         },
@@ -308,7 +279,7 @@
                 $this.siblings('button').removeClass('active');
                 run_id = id;
                 setTimeout(function() {
-                    load_dstat_csv();
+                    load_all_data();
                 }, 500);
             });
         },
@@ -324,7 +295,8 @@
                 $this.toggleClass('active');
                 cumsum_flag = !cumsum_flag;
                 setTimeout(function() {
-                    load_dstat_csv();
+                    load_all_data();
+                    load_monitor_data();
                 }, 500);
             });
         },
@@ -411,29 +383,42 @@
                 }
             });
         },
-        update_page = function(data, showTest) {
+        load_all_data = function(){
+            if(config.monitors.indexOf("dstat") > -1){
+                load_dstat_csv();
+            }
+            monitor_idx = 1;
+            if(config.monitors.indexOf("membw") > -1){
+                load_csv('.ocount.memory_bw.csv', monitor_idx, 
+                         'Cache/Memory Bandwidth [ GB/s ]');
+                monitor_idx += 1;
+            }
+            if(config.monitors.indexOf("gpu") > -1){
+                load_csv('.gpu.csv', monitor_idx, 'GPU Utilization [ % ]');
+                monitor_idx += 1;
+            }
+            if(config.monitors.indexOf("amester") > -1){
+                load_csv('.amester.csv', monitor_idx, 
+                         'AMESTER memory bandwidth [ GB/s ]');
+                monitor_idx += 1;
+            }
+        },
+        update_page = function(config, showTest) {
             // console.log(data);
-            if (showTest) {
-                var msg = 'Problem with config.json file.<br>';
-                msg += 'Loading test data.';
-                $('#id_error').html(msg);
-            }
-            xlabel = data.xlabel;
+            xlabel = config.xlabel;
             data_dir = '../data/raw';
-            if (data.hasOwnProperty('data_dir')) {
-                data_dir = data.data_dir;
+            if (config.hasOwnProperty('config_dir')) {
+                config_dir = config.config_dir;
             }
 
-            $('#id_workload').text(data.description);
-            $('#id_title').text(data.workload);
-            $('#id_date').text(data.date);
-            hostname = data.slaves[0];
-            run_id = data.run_ids[0];
+            $('#id_workload').text(config.description);
+            $('#id_title').text(config.workload);
+            $('#id_date').text(config.date);
+            hostname = config.slaves[0];
+            run_id = config.run_ids[0];
 
-            create_all_buttons(data.slaves, data.run_ids);
-            load_dstat_csv();
-            load_membw_csv();
-            load_gpu_csv();
+            create_all_buttons(config.slaves, config.run_ids);
+            load_all_data();
         },
         read_config = function() {
             // Read config data, update page, then
@@ -443,26 +428,16 @@
                 url: "config.json",
                 dataType: "json",
                 success: function(data) {
-                    update_page(data);
+                    config = data;
+                    update_page(config);
                 },
                 error: function(request, status, error) {
-                    //if problem with config.json, try config.test.json
-                    $.ajax({
-                        type: "GET",
-                        url: "config.test.json",
-                        dataType: "json",
-                        success: function(data) {
-                            update_page(data, true);
-                        },
-                        error: function(request, status, error) {
-                            console.log(error);
-                        }
-                    });
+                    console.log(error);
                 }
             });
         };
 
-    load_summary();
+    load_summary();  // Create the summary chart
     read_config();
 
 })();
