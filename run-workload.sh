@@ -149,6 +149,17 @@ done
 for SLAVE in $SLAVES
 do
     debug_message "Starting monitors on $SLAVE"
+    # Start amester first, since it takes a long time to start up
+    if [ "$AMESTER_FLAG" == "1" ]
+    then
+        AMESTER_FN=$RUN_ID.$SLAVE.amester
+        ./start_amester.sh $SLAVE $AMESTER_FN $MEAS_DELAY_SEC
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting amester on host \"$SLAVE\""
+          exit 1
+        fi
+    fi
     # Start dstat monitor
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $MEAS_DELAY_SEC
@@ -170,16 +181,6 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
-          exit 1
-        fi
-    fi
-    if [ "$AMESTER_FLAG" == "1" ]
-    then
-        AMESTER_FN=$RUN_ID.$SLAVE.amester
-        ./start_amester.sh $SLAVE $AMESTER_FN $MEAS_DELAY_SEC
-        if [ $? -ne 0 ] 
-        then
-          fatal_message "Problem starting amester on host \"$SLAVE\""
           exit 1
         fi
     fi

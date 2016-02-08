@@ -35,7 +35,7 @@ CMD="mkdir -p /tmp/pid_monitor/; \
            rm -f $FN; \
            bash -c \"$AM_CMD &\""
 #echo $CMD
-sleep 15  # Give amester a chance to establish communication and start up
+sleep 30  # Give amester a chance to establish communication and start up
 $(ssh ubuntu@$AM_HOST $CMD) 2>/dev/null &
 
 
