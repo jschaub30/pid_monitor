@@ -33,7 +33,6 @@ RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
 # Define functions
 fatal_message(){
   echo "#### PID MONITOR - FATAL ####: $@"
-  stop_monitors
   exit 1
 }
 debug_message(){
