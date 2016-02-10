@@ -33,6 +33,7 @@ RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
 # Define functions
 fatal_message(){
   echo "#### PID MONITOR - FATAL ####: $@"
+  stop_monitors
   exit 1
 }
 debug_message(){
@@ -159,7 +160,6 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting amester on host \"$SLAVE\""
-          exit 1
         fi
     fi
     # Start dstat monitor
@@ -173,7 +173,6 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting ocount on host \"$SLAVE\""
-          exit 1
         fi
     fi
     if [ "$GPU_FLAG" == "1" ]
@@ -183,7 +182,6 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
-          exit 1
         fi
     fi
     #./start_operf.sh $SLAVE
