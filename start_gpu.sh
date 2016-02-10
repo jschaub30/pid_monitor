@@ -15,9 +15,8 @@ CMD="ps -efa | grep nvidia-smi | grep -v grep | grep -v $0 | grep -v vim | wc -l
 RC=$(ssh $HOST $CMD)
 if [ $RC -ne 0 ]
 then
-  echo nvidia-smi appears to be running on $HOST.
-  echo Please stop nvidia-smi. Exiting...
-  exit 1
+  echo WARNING: nvidia-smi appears to be running on $HOST.
+  echo Continuing...
 fi
 echo Starting nvidia-smi monitoring on $HOST
 
