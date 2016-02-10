@@ -4,7 +4,7 @@
 
 HOST=$1
 OUT_DIR=$3
-ssh $HOST "sudo killall -SIGINT nvidia-smi"
+ssh $HOST "killall -SIGINT nvidia-smi"
 sleep 1
 if [ "$#" -eq "3" ]
 then
