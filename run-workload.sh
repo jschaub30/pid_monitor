@@ -88,7 +88,6 @@ stop_monitors() {
   # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
   rm -rf html/data  # For historical reasons
   cp -R html $RUNDIR/.
-  cp html/all_files.html $RUNDIR/data/raw
   # Create symlink to allows python SimpleHTTPServer to serve files
   $(cd $RUNDIR/html; ln -sf ../data)
 
@@ -126,6 +125,7 @@ fi
 cp *sh $RUNDIR/scripts
 cp *R $RUNDIR/scripts
 cp *py $RUNDIR/scripts
+cp html/all_files.html $RUNDIR/data/raw
 
 ###############################################################################
 # STEP 1: CREATE OUTPUT FILENAMES
