@@ -24,6 +24,7 @@ then
     OCOUNT_EVENTS=$(cat counters.haswell.mem.in | cut -d' ' -f1 | \
         perl -pe "s/\n/,/g" | sed s/,$//    )
 fi
+[ "$GPU_DETAIL_FLAG" == "1" ] && GPU_FLAG=1 
 
 WORKLOAD_NAME=$(echo $WORKLOAD_NAME | tr " " "_")  # Remove spaces
 RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
@@ -59,7 +60,7 @@ stop_monitors() {
     # Stop all monitors first, then parse them
     DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
     OCOUNT_FN=$RUN_ID.$SLAVE.ocount
-    GPU_FN=$RUN_ID.$SLAVE.gpu
+    [ "$GPU_FLAG" == "1" ] && GPU_FN=$RUN_ID.$SLAVE.gpu
     PERF_FN=$RUN_ID.$SLAVE.perf.report
     AMESTER_FN=$RUN_ID.$SLAVE.amester
     debug_message "Stopping dstat measurement on $SLAVE"
@@ -79,6 +80,7 @@ stop_monitors() {
             $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
     fi
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN
+    [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $RUNDIR/data/raw/$GPU_FN
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$AMESTER_FN
 
     #debug_message "Stopping operf measurement on $SLAVE"
