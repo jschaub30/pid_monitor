@@ -83,6 +83,7 @@
                     // ylabel: ylabel,
                     strokeWidth: 2,
                     legend: 'always',
+                    connectSeparatedPoints: true,
                     labelsDivWidth: 500,
                     title: title
                 }
@@ -394,7 +395,13 @@
                 monitor_idx += 1;
             }
             if(config.monitors.indexOf("gpu") > -1){
-                load_csv('.gpu.csv', monitor_idx, 'GPU Utilization [ % ]');
+                load_csv('.gpu.csv', monitor_idx, 'Average GPU Utilization [ % ]');
+                monitor_idx += 1;
+            }
+            if(config.monitors.indexOf("gpu_detail") > -1){
+                load_csv('.gpu.gpu.csv', monitor_idx, 'Detail GPU Utilization [ % ]');
+                monitor_idx += 1;
+                load_csv('.gpu.mem.csv', monitor_idx, 'Detail GPU Memory Utilization [ % ]');
                 monitor_idx += 1;
             }
             if(config.monitors.indexOf("amester") > -1){
