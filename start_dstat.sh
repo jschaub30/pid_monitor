@@ -15,7 +15,7 @@ if [ $RC -ne 0 ]
 then
   echo dstat appears to be running on $HOST.
   echo Please stop dstat. Exiting...
-  exit 1
+ # exit 1
 fi
 
 DSTAT_CMD="mkdir -p /tmp/pid_monitor/; \

@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 
-#library(reshape2)
+library(reshape2)
 args = commandArgs(trailingOnly=TRUE)
 input_fn <- args[1]
 d <- read.csv(input_fn, stringsAsFactors=FALSE)
