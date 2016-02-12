@@ -397,6 +397,8 @@
             if(config.monitors.indexOf("gpu") > -1){
                 load_csv('.gpu.csv', monitor_idx, 'Average GPU Utilization [ % ]');
                 monitor_idx += 1;
+                load_csv('.gpu.pwr.csv', monitor_idx, 'Average GPU Power [ W ]');
+                monitor_idx += 1;
             }
             if(config.monitors.indexOf("gpu_detail") > -1){
                 load_csv('.gpu.gpu.csv', monitor_idx, 'Detail GPU Utilization [ % ]');
