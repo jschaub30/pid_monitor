@@ -3,6 +3,8 @@
 WORKLOAD_NAME=DATA
 [[ "$#" -ne 0 ]] && WORKLOAD_NAME=$1
 CWD=$(pwd)
+mkdir -p $CWD/rundir/$WORKLOAD_NAME
+chmod o+w $CWD/rundir/$WORKLOAD_NAME  # Other users can write to directory
 RUNDIR=$CWD/rundir/$WORKLOAD_NAME/$(date +"%Y%m%d-%H%M%S")
 RAWDIR=$RUNDIR/data/raw
 FINALDIR=$RUNDIR/data/final
