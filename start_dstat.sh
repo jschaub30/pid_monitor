@@ -19,7 +19,7 @@ then
 fi
 
 DSTAT_CMD="mkdir -p /tmp/pid_monitor/; \
-           chmod 777 /tmp/pid_monitor; \
+           chmod -f 777 /tmp/pid_monitor; \
            rm -f $DSTAT_FN; \
            sleep 0.1; \
            dstat --time -v --net --output $DSTAT_FN $DELAY_SEC"

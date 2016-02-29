@@ -26,7 +26,7 @@ echo Starting ocount monitoring on $HOST
 #echo Events are $EVENT_LIST
 
 OCOUNT_CMD="mkdir -p /tmp/pid_monitor/; \
-           chmod 777 /tmp/pid_monitor; \
+           chmod -f 777 /tmp/pid_monitor; \
            rm -f $OCOUNT_FN; \
            sleep 0.1; \
            sudo bash -c \"ulimit -n 100000;ocount -b -i $((DELAY_SEC*1000)) --events ${EVENT_LIST} --system-wide  >> $OCOUNT_FN 2>&1 < /dev/null &\""

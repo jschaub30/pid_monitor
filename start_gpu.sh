@@ -23,7 +23,7 @@ echo Starting nvidia-smi monitoring on $HOST
 GPU_CMD="nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,utilization.memory,power.draw \
     --format=csv --filename=$FN --loop=$DELAY_SEC"
 CMD="mkdir -p /tmp/pid_monitor/; \
-           chmod 777 /tmp/pid_monitor; \
+           chmod -f 777 /tmp/pid_monitor; \
            rm -f $FN; \
            sleep 0.1; \
            bash -c \"$GPU_CMD &\""
