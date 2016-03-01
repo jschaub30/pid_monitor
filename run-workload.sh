@@ -25,6 +25,7 @@ then
         perl -pe "s/\n/,/g" | sed s/,$//    )
 fi
 [ "$GPU_DETAIL_FLAG" == "1" ] && GPU_FLAG=1 
+[ -z "$NUM_GPU" ] && NUM_GPU=100 # Parse all GPUs attached to system
 
 WORKLOAD_NAME=$(echo $WORKLOAD_NAME | tr " " "_")  # Remove spaces
 RUN_ID=$(echo $RUN_ID | tr " " "_")  # Remove spaces
@@ -79,7 +80,7 @@ stop_monitors() {
         ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
             $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
     fi
-    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN 100
+    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN $NUM_GPU
     [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $RUNDIR/data/raw/$GPU_FN
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$AMESTER_FN
 
