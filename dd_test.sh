@@ -1,7 +1,7 @@
 #!/bin/bash
-# Simple workload to write 1GB file
+# Simple workload to write a file to disk
 
-BS=1024k  # default block size
+BS=1024k    # default block size
 
 [ "$#" -ne "0" ] && BS=$1
 I=0
@@ -17,4 +17,4 @@ do
 done
 
 echo Writing to $OUT_FN
-dd if=/dev/zero of=$OUT_FN bs=$BS count=1024 oflag=direct
+dd if=/dev/zero of=$OUT_FN bs=$BS count=4096 oflag=direct

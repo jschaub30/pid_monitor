@@ -3,16 +3,29 @@
 [ "$#" -lt "1" ] && echo Usage: $0 HOSTNAME DSTAT_FN OUT_DIR && exit 1
 
 HOST=$1
-#ssh $HOST "killall -SIGINT dstat"
+
+if [ "$HOST" == "$(hostname -s)" ] || [ "$HOST" == "$(hostname -s)" ]
+then
+  DSTAT_FN=$2
+  unset SSH_FLAG
+else
+  # Will collect data over ssh.  Store in /tmp directory
+  DSTAT_FN=/tmp/pid_monitor/$(basename $2)
+  SSH_FLAG=1
+fi
+
 CMD="kill $(ps -ef | grep $USER | grep -E 'python.*dstat' | grep -v grep | awk -F ' ' '{print $2}' | tr '\n' ' ')"
-ssh $HOST "$CMD"
-sleep 1
+
+[ $SSH_FLAG ] && ssh $HOST "$CMD"
+[ ! $SSH_FLAG ] && $CMD
+
 if [ "$#" -eq "3" ]
 then
-  DSTAT_FN=/tmp/pid_monitor/$(basename $2)
   OUT_DIR=$3
-  echo Copying dstat data from $HOST:$DSTAT_FN to $OUT_DIR
-  scp -r $HOST:$DSTAT_FN $OUT_DIR/.
-  [ "$?" -eq 0 ] && ssh $HOST "rm -f $DSTAT_FN"
+  if [ $SSH_FLAG ]
+  then
+    echo Copying dstat data from $HOST:$DSTAT_FN to $OUT_DIR
+    scp -r $HOST:$DSTAT_FN $OUT_DIR/.
+  fi
 fi
   

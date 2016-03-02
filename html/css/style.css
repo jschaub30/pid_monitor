@@ -61,7 +61,7 @@ a:not(:hover) {
   color: #1f628d;
   font-size: 12px;
   background: #ffffff;
-  padding: 2px 5px 2px 5px;
+  margin: 8px 5px 8px 5px;
   border: solid #1f628d 1px;
   text-decoration: none;
   max-width: 160px;
@@ -117,13 +117,12 @@ div#id_error {
 }
 
 .footer {
-		background-color:rgba(220, 220, 220, 1);
+    background-color:rgba(220, 220, 220, 1);
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: 40px;
-		z-index:8888;
+    z-index:8888;
 }
 
 section {

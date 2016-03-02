@@ -59,7 +59,7 @@ stop_monitors() {
   for SLAVE in $SLAVES
   do
     # Stop all monitors first, then parse them
-    DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
+    DSTAT_FN=${RUNDIR}/data/raw/${RUN_ID}.${SLAVE}.dstat.csv
     OCOUNT_FN=$RUN_ID.$SLAVE.ocount
     [ "$GPU_FLAG" == "1" ] && GPU_FN=$RUN_ID.$SLAVE.gpu
     PERF_FN=$RUN_ID.$SLAVE.perf.report
@@ -165,7 +165,7 @@ do
         fi
     fi
     # Start dstat monitor
-    DSTAT_FN=$RUN_ID.$SLAVE.dstat.csv
+    DSTAT_FN=${RUNDIR}/data/raw/${RUN_ID}.${SLAVE}.dstat.csv
     ./start_dstat.sh $SLAVE $DSTAT_FN $MEAS_DELAY_SEC
     [ $? -ne 0 ] && fatal_message "Problem starting dstat on host \"$SLAVE\""
     if [ "$OCOUNT_FLAG" == "1" ]
