@@ -126,9 +126,11 @@ else
 fi
 
 cp *sh $RUNDIR/scripts
+cp -r tidy $RUNDIR/scripts/.
 cp *R $RUNDIR/scripts
 cp *py $RUNDIR/scripts
 cp html/all_files.html $RUNDIR/data/raw
+env > $RUNDIR/data/raw/$RUN_ID.env
 
 ###############################################################################
 # STEP 1: CREATE OUTPUT FILENAMES

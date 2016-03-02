@@ -2,13 +2,8 @@
 
 export WORKLOAD_NAME=EXAMPLE
 export DESCRIPTION="Example workload using dd command"
-export WORKLOAD_DIR="."
-export WORKLOAD_CMD="./dd_test.sh"
-export MEAS_DELAY_SEC=1
-export VERBOSE=0 # Turn off most messages
-export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
+export WORKLOAD_DIR="."             # The workload working directory
+export WORKLOAD_CMD="./dd_test.sh"  # The workload to run
+export MEAS_DELAY_SEC=1  # Delay between each measurement
 
 ./run-workload.sh
-# Optionally create new HTML table here
-# e.g. for spark workloads:
-#  ./create_spark_table.py $RUNDIR/html/config.json > $RUNDIR/html/workload.html
