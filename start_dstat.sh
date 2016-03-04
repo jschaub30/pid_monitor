@@ -7,7 +7,7 @@ HOST=$1
 DELAY_SEC=$3
 [ "$DELAY_SEC" -lt "1" ] && echo Setting DELAY_SEC to 1 instead of $DELAY_SEC && DELAY_SEC=1
 
-if [ "$HOST" == "$(hostname -s)" ] || [ "$HOST" == "$(hostname -s)" ]
+if [ "$HOST" == "$(hostname)" ] || [ "$HOST" == "$(hostname -s)" ]
 then
   # Run locally on this machine.  Store in path given
   DSTAT_FN=$2

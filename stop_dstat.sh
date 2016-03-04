@@ -4,7 +4,7 @@
 
 HOST=$1
 
-if [ "$HOST" == "$(hostname -s)" ] || [ "$HOST" == "$(hostname -s)" ]
+if [ "$HOST" == "$(hostname)" ] || [ "$HOST" == "$(hostname -s)" ]
 then
   DSTAT_FN=$2
   kill $(ps -ef | grep $USER | grep -E 'python.*dstat' | grep -v grep | awk -F ' ' '{print $2}' | tr '\n' ' ')
