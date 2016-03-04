@@ -61,13 +61,15 @@ stop_monitors() {
     # Stop all monitors first, then parse them
     DSTAT_FN=${RUNDIR}/data/raw/${RUN_ID}.${SLAVE}.dstat.csv
     OCOUNT_FN=$RUN_ID.$SLAVE.ocount
-    [ "$GPU_FLAG" == "1" ] && GPU_FN=$RUN_ID.$SLAVE.gpu
+    NMON_FN=$RUN_ID.$SLAVE.nmon
+    GPU_FN=$RUN_ID.$SLAVE.gpu
     PERF_FN=$RUN_ID.$SLAVE.perf.report
     AMESTER_FN=$RUN_ID.$SLAVE.amester
     debug_message "Stopping dstat measurement on $SLAVE"
     ./stop_dstat.sh $SLAVE $DSTAT_FN $RUNDIR/data/raw/.
     [ "$OCOUNT_FLAG" == "1" ] && ./stop_ocount.sh $SLAVE $OCOUNT_FN $RUNDIR/data/raw/.
     [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
+    [ "$NMON_FLAG" == "1" ] && ./stop_nmon.sh $SLAVE $NMON_FN $RUNDIR/data/raw/.
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $RUNDIR/data/raw/$PERF_FN
     [ "$AMESTER_FLAG" == "1" ] && ./stop_amester.sh $SLAVE $AMESTER_FN $RUNDIR/data/raw/.
  
@@ -184,6 +186,15 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
+        fi
+    fi
+    if [ "$NMON_FLAG" == "1" ]
+    then
+        NMON_FN=$RUN_ID.$SLAVE.nmon
+        ./start_nmon.sh $SLAVE $NMON_FN $MEAS_DELAY_SEC
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting nmon on host \"$SLAVE\""
         fi
     fi
     #./start_operf.sh $SLAVE
