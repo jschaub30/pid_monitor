@@ -20,6 +20,7 @@ then
   RC=$(ps -efa | grep dstat | grep -v grep | grep -v $0 | grep -v vim | wc -l)
   [ $RC -ne 0 ] && echo WARNING: dstat appears to be running on $HOST.
   
+  rm -f $DSTAT_FN
   # Start dstat
   dstat --time -v --net --output $DSTAT_FN $DELAY_SEC 1>/dev/null &
   RC=$?
@@ -40,7 +41,6 @@ else
   DSTAT_CMD="mkdir -p /tmp/pid_monitor/; \
 	   chmod -f 777 /tmp/pid_monitor; \
 	   rm -f $DSTAT_FN; \
-	   sleep 0.1; \
 	   dstat --time -v --net --output $DSTAT_FN $DELAY_SEC"
   $(ssh $HOST $DSTAT_CMD) 2>/dev/null &
   RC=$?
