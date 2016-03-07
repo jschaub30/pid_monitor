@@ -162,3 +162,11 @@ div.two {
 #id_data_dir {
 	margin-right: 2em;
 }
+
+#snap {
+	/*width: 48%;*/
+    margin: 5px;
+    padding: 5px;
+    background: #CCCCCC;
+}
+
