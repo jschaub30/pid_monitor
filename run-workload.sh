@@ -82,7 +82,7 @@ stop_monitors() {
         ./memory_bw.R $RUNDIR/data/raw/$OCOUNT_FN.csv > \
             $RUNDIR/data/raw/$OCOUNT_FN.memory_bw.csv
     fi
-    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN $NUM_GPU
+    [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $RUNDIR/data/raw/$GPU_FN
     [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $RUNDIR/data/raw/$GPU_FN
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $RUNDIR/data/raw/$AMESTER_FN
 

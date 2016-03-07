@@ -6,7 +6,16 @@ input_fn <- args[1]
 d <- read.csv(input_fn, stringsAsFactors=FALSE)
 
 t <- as.POSIXct(d$timestamp)
-d1 <- data.frame(time.sec=floor(as.numeric(t-t[1])), index=d$index)
+# Make timestamps for all GPUs match that of GPU0
+t0 = 0
+for(I in seq(length(t))){
+    if(d$index[I]==d$index[1]){
+        t0 = t[I]
+    } else {
+        t[I] = t0
+    }
+}
+d1 <- data.frame(time.sec=t, index=d$index)
 d1$GPU <- as.numeric(sub("%","",d$utilization.gpu....))
 d1$MEMORY <- as.numeric(sub("%","",d$utilization.memory....))
 d2 <- dcast(d1, time.sec ~ index, value.var="GPU")
