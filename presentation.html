@@ -34,6 +34,15 @@
         background: #e7e8e2;
         border-radius: 5px;
       }
+      .jcode {
+        margin-top: 2em;
+        font-family: 'Courier New';
+        font-size: 1.5em;
+        background: #BBBBBB;
+        border-radius: 5px;
+        text-align: right;
+        width: 80%;
+      }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       .remark-code-line-highlighted     { background-color: #373832; }
       .pull-left {
@@ -70,7 +79,7 @@
       position: absolute;
       top:  220px;
       right: 300px;
-      width: 360px;
+      width: 400px;
       border-radius: 5px;
       background: #AAAAAA;
       padding: 0px 10px 0px 0px;
@@ -78,6 +87,9 @@
       border-width: 2px;
       border-style: solid;
       border-color: #000000;
+    }
+    .indent{
+        margin-left: 20px;
     }
     .node1{
       top:  190px;
@@ -93,9 +105,9 @@
     .dotdotdot{
       font-size: 1.5em;
       position: absolute;
-      top:  400px;
+      top:  480px;
       right: 220px;
-       z-index: 5;
+      z-index: 5;
    }
 
    .rectangle p {
@@ -119,21 +131,43 @@ class: center, middle, inverse
 
 # Automated, data-rich workload profiling
 
+## https://github.com/jschaub30/pid_monitor
+
+---
+
+# Email example
+
+---
+
+# Sort demo
+
 ---
 layout: false
 
-# Agenda
+# Useful command line tools
+- top, htop
+- nmon
+- dstat -v --net
 
-1. Types of workload profiling
-2. Concept behind pid_monitor tool
-3. Extensions
+---
+name: before you start
 
+# Collect all your data
+- in one location
+- organized by project
+- then timestamp
+
+.jcode[host:\data\sort\20160308-090000<br>
+20160309-101234<br>
+...<br>
+host:\data\spark\20160310-121500<br>
+...
+]
 ---
 
 name: basic
 
 .rectangle[
-<br>
 1. Record system state
 2. Start monitors
 3. Run workload
@@ -142,32 +176,58 @@ name: basic
 ]
 ---
 
-name: basic
+name: sweep
 
-.rectangle[.nodelabel[Node1]
-<br>
-1. Record system state
+.rectangle[
+for N in ...<br>
+do
+.indent[1. Record system state
 2. Start monitors
 3. Run workload
 4. Collect and parse data
 5. Summarize results
 ]
-.rectangle.node1[.nodelabel[Node2]
-<br>
-1. Record system 
+done
+]
+---
+
+name: sweep-node
+
+.rectangle[.nodelabel[Node1]
+for N in ...<br>
+do
+.indent[1. Record system state
 2. Start monitors
 3. Run workload
-4. Collect and parse
-5. Summarize 
+4. Collect and parse data
+5. Summarize results
+]
+done
+]
+.rectangle.node1[.nodelabel[Node2]
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 ]
 .dotdotdot[...]
 .rectangle.nodeN[.nodelabel[NodeN]
 <br>
-1. Record system 
-2. Start monitors
-3. Run workload
-4. Collect and parse
-5. Summarize 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 ]
 
 ---
