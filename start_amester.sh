@@ -1,19 +1,18 @@
 #!/bin/bash
+# This script starts the amester program
+# AM_HOST is the host where the amester program is installed
+# BMC_IP is the address of the BMC/service processor
+# export BMC_USER and BMC_PASS if different than the default
 
-[ "$#" -ne "3" ] && echo "Usage: $0 HOSTNAME FN DELAY_MS" && exit 1
+[ "$#" -ne "5" ] && echo "Usage: $0 HOSTNAME FN DELAY_MS AMESTER_IP BMC_IP" && exit 64
 
-ARGS=( $@ )
-len=${#ARGS[@]}
-HOST=${ARGS[0]}
-
-DELAY_MS=$((${ARGS[2]}*1000))
-[ $HOST == "pcloud1" ] && AM_HOST="xcloud1" && FSP_IP=9.3.158.193
-[ $HOST == "pcloud2" ] && AM_HOST="xcloud1" && FSP_IP=9.3.158.195
-[ $HOST == "pcloud3" ] && AM_HOST="xcloud1" && FSP_IP=9.3.158.197
-[ $HOST == "pcloud4" ] && AM_HOST="xcloud1" && FSP_IP=9.3.158.199
-[ -z "$AM_HOST" ] && echo Unknown host && exit 1
-
-FN=/tmp/pid_monitor/$(basename ${ARGS[1]})
+HOST=$1
+FN=/tmp/pid_monitor/$(basename $2)
+DELAY_MS=$(($3*1000))
+AM_HOST=$4
+BMC_IP=$5
+[ -z "$BMC_USER" ] && BMC_USER=ADMIN
+[ -z "$BMC_PASS" ] && BMC_PASS=admin
 
 [ "$DELAY_MS" -lt "1000" ] && echo Setting DELAY_MS to 1000 instead of $DELAY_MS && DELAY_MS=1000
 
@@ -29,13 +28,12 @@ then
 fi
 echo Starting amester monitoring on $HOST
 
-AM_CMD="amester --nogui /home/ubuntu/amester/watchsensors.tcl $FSP_IP ADMIN admin $FN $DELAY_MS"
+AM_CMD="amester --nogui /home/ubuntu/amester/watchsensors.tcl $BMC_IP $BMC_USER $BMC_PASS $FN $DELAY_MS"
 CMD="mkdir -p /tmp/pid_monitor/; \
            chmod -f 777 /tmp/pid_monitor; \
            rm -f $FN; \
            bash -c \"$AM_CMD &\""
 #echo $CMD
-sleep 42  # Give amester a chance to establish communication and start up
 $(ssh ubuntu@$AM_HOST $CMD) 2>/dev/null &
-
+sleep 15  # Give amester a chance to establish communication and start up
 

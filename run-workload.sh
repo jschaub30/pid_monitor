@@ -160,7 +160,9 @@ do
     if [ "$AMESTER_FLAG" == "1" ]
     then
         AMESTER_FN=$RUN_ID.$SLAVE.amester
-        ./start_amester.sh $SLAVE $AMESTER_FN $MEAS_DELAY_SEC
+        [ -z "$AMESTER_IP" ] && fatal_message "Need to export AMESTER_IP and BMC_IP when using AMESTER_FLAG"
+        [ -z "$BMC_IP" ] && fatal_message "Need to export AMESTER_IP and BMC_IP when using AMESTER_FLAG"
+        ./start_amester.sh $SLAVE $AMESTER_FN $MEAS_DELAY_SEC $AMESTER_IP $BMC_IP $AMESTER_USER $AMESTER_PASS
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting amester on host \"$SLAVE\""
