@@ -29,10 +29,10 @@ cd $WD
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 export WORKLOAD_DIR="$WD/stream"             # The workload working directory
 
-export RUN_ID="SIZE=96M"
+export RUN_ID="SIZE_96M"
 export WORKLOAD_CMD=./stream.96M
 ./run-workload.sh
 
-export RUN_ID="SIZE=768M"
+export RUN_ID="SIZE_768M"
 export WORKLOAD_CMD=./stream.768M
 ./run-workload.sh

@@ -6,7 +6,7 @@ export WORKLOAD_DIR="/data/spark"   # The spark home directory
 export MEAS_DELAY_SEC=1  # Delay between each measurement
 
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)  # needed by create_spark_table.py below
-export RUN_ID="SAMPLES=300"
+export RUN_ID="SAMPLES_300"
 export WORKLOAD_CMD="./bin/run-example SparkPi 300"  # The workload to run
 ./run-workload.sh
 

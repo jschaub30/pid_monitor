@@ -19,7 +19,7 @@ Start here:
 
 This repository also makes use of:
 - [Dygraphs](http://dygraphs.com/) for javascript charts (included).
-- [c3.js](http://c3js.com/) for javascript charts (included).
+- [c3.js](http://c3js.org/) for javascript charts (included).
 - [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing (included).
 - GNU-time /usr/bin/time
 

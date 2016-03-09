@@ -18,7 +18,7 @@ export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 
 for BLOCK_SIZE_KB in 128 256 512
 do
-  export RUN_ID="BSIZE_KB=$BLOCK_SIZE_KB" # A unique label to identify this measurement
+  export RUN_ID="BSIZE_KB_$BLOCK_SIZE_KB" # A unique label to identify this measurement
   export WORKLOAD_CMD="./dd_test.sh ${BLOCK_SIZE_KB}k"
   ./run-workload.sh
 done

@@ -207,7 +207,7 @@
         load_dstat_csv = function() {
             // Read dstat data based on current value of 'run_id'
             // and 'hostname'
-            var url = data_dir + '/' + run_id + '.' + hostname + '.dstat.csv';
+            var url = data_dir + '/' + run_id + '_' + hostname + '_dstat.csv';
             $("#id_data_dir").attr("href", data_dir + "/all_files.html");
             // console.log(url);
             //Read csv data
@@ -223,7 +223,7 @@
             });
         },
         load_csv = function(extension, monitor_idx, title) {
-            var url = data_dir + '/' + run_id + '.' + hostname + extension;
+            var url = data_dir + '/' + run_id + '_' + hostname + extension;
             // console.log(url);
             $.ajax({
                 type: "GET",
@@ -390,24 +390,24 @@
             }
             monitor_idx = 1;
             if(config.monitors.indexOf("membw") > -1){
-                load_csv('.ocount.memory_bw.csv', monitor_idx, 
+                load_csv('_ocount.memory_bw.csv', monitor_idx, 
                          'Cache/Memory Bandwidth [ GB/s ]');
                 monitor_idx += 1;
             }
             if(config.monitors.indexOf("gpu") > -1){
-                load_csv('.gpu.csv', monitor_idx, 'Average GPU Utilization [ % ]');
+                load_csv('_gpu.csv', monitor_idx, 'Average GPU Utilization [ % ]');
                 monitor_idx += 1;
-                load_csv('.gpu.pwr.csv', monitor_idx, 'Average GPU Power [ W ]');
+                load_csv('_gpu.pwr.csv', monitor_idx, 'Average GPU Power [ W ]');
                 monitor_idx += 1;
             }
             if(config.monitors.indexOf("gpu_detail") > -1){
-                load_csv('.gpu.gpu.csv', monitor_idx, 'Detail GPU Utilization [ % ]');
+                load_csv('_gpu.gpu.csv', monitor_idx, 'Detail GPU Utilization [ % ]');
                 monitor_idx += 1;
-                load_csv('.gpu.mem.csv', monitor_idx, 'Detail GPU Memory Utilization [ % ]');
+                load_csv('_gpu.mem.csv', monitor_idx, 'Detail GPU Memory Utilization [ % ]');
                 monitor_idx += 1;
             }
             if(config.monitors.indexOf("amester") > -1){
-                load_csv('.amester.csv', monitor_idx, 
+                load_csv('_amester.csv', monitor_idx, 
                          'AMESTER memory bandwidth [ GB/s ]');
                 monitor_idx += 1;
             }

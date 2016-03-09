@@ -6,9 +6,9 @@
 [[ -z "$X_LABEL" ]] && X_LABEL="X label"
 [[ -z "$DESCRIPTION" ]] && DESCRIPTION="DESCRIPTION"
 [[ -z "$DATA_DIR" ]] && DATA_DIR="../data/raw"
-[[ -z "$STDOUT_EXT" ]] && STDOUT_EXT=".workload.stdout"
-[[ -z "$STDERR_EXT" ]] && STDERR_EXT=".workload.stderr"
-[[ -z "$TIME_EXT" ]] && TIME_EXT=".time.stdout"
+[[ -z "$STDOUT_EXT" ]] && STDOUT_EXT="_workload_stdout.txt"
+[[ -z "$STDERR_EXT" ]] && STDERR_EXT="_workload_stderr.txt"
+[[ -z "$TIME_EXT" ]] && TIME_EXT="_time_stdout.txt"
 [[ -z "$SLAVES" ]] && SLAVES=$(hostname)
 [ "$GPU_DETAIL_FLAG" == "1" ] && GPU_FLAG=1
 
