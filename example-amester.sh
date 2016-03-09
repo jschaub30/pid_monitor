@@ -5,8 +5,8 @@
 # - use the watchsensors.tcl script downloaded here (IBM internal only)
 #     http://arlab093.austin.ibm.com/blog/?p=3332
 
-export WORKLOAD_NAME=EXAMPLE
-export DESCRIPTION="Example workload using dd command"
+export WORKLOAD_NAME=EXAMPLE-AMESTER
+export DESCRIPTION="Using amester and stream to measure memory bandwidth"
 export MEAS_DELAY_SEC=1  # Delay between each measurement
 export AMESTER_FLAG=1
 export AMESTER_IP=  # The IP of the machine where amester is installed
@@ -20,9 +20,19 @@ WD=$(pwd)
 mkdir -p stream
 cd stream
 [ ! -e stream_5-10_posix_memalign.c ] && wget http://www.cs.virginia.edu/stream/FTP/Code/Versions/stream_5-10_posix_memalign.c
-[ ! -e "stream.32M" ] && gcc -O2 -fopenmp -DNTIMES=60000 -DSTREAM_ARRAY_SIZE=$((4*1024*1024)) -O stream_5-10_posix_memalign.c -o stream.32M
+[ ! -e "stream.96M" ] && gcc -O2 -fopenmp -DNTIMES=40000 -DSTREAM_ARRAY_SIZE=$((4*1024*1024)) \
+                         -O stream_5-10_posix_memalign.c -o stream.96M
+[ ! -e "stream.768M" ] && gcc -O2 -fopenmp -DNTIMES=2000 -DSTREAM_ARRAY_SIZE=$((32*1024*1024)) \
+                         -O stream_5-10_posix_memalign.c -o stream.768M
 cd $WD
 
+export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 export WORKLOAD_DIR="$WD/stream"             # The workload working directory
-export WORKLOAD_CMD=./stream.32M
+
+export RUN_ID="SIZE=96M"
+export WORKLOAD_CMD=./stream.96M
+./run-workload.sh
+
+export RUN_ID="SIZE=768M"
+export WORKLOAD_CMD=./stream.768M
 ./run-workload.sh
