@@ -48,10 +48,13 @@ stop_all() {
   # function to kill PIDs of workload and process monitors
   kill -9 $TIME_PID 2> /dev/null  &# Kill main process if ctrl-c
   PIDS=$(pgrep -f "$WORKLOAD_CMD")
-  echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
-  kill $PIDS 2>/dev/null &
+  if [ "$PIDS" != "" ]
+  then
+    echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
+    kill -9 $PIDS 2>/dev/null &
+    sleep 1
+  fi
   stop_monitors&
-  sleep 1
   exit
 }
 
@@ -71,7 +74,7 @@ stop_monitors() {
     [ "$GPU_FLAG" == "1" ] && ./stop_gpu.sh $SLAVE $GPU_FN $RUNDIR/data/raw/.
     [ "$NMON_FLAG" == "1" ] && ./stop_nmon.sh $SLAVE $NMON_FN $RUNDIR/data/raw/.
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $RUNDIR/data/raw/$PERF_FN
-    [ "$AMESTER_FLAG" == "1" ] && ./stop_amester.sh $SLAVE $AMESTER_FN $RUNDIR/data/raw/.
+    [ "$AMESTER_FLAG" == "1" ] && ./stop_amester.sh $AMESTER_IP $AMESTER_FN $RUNDIR/data/raw/.
  
     # Now parse monitor output files
     # dstat data is parsed directly in webpage by javascript
@@ -160,7 +163,9 @@ do
     if [ "$AMESTER_FLAG" == "1" ]
     then
         AMESTER_FN=$RUN_ID.$SLAVE.amester
-        ./start_amester.sh $SLAVE $AMESTER_FN $MEAS_DELAY_SEC
+        [ -z "$AMESTER_IP" ] && fatal_message "Need to export AMESTER_IP and BMC_IP when using AMESTER_FLAG"
+        [ -z "$BMC_IP" ] && fatal_message "Need to export AMESTER_IP and BMC_IP when using AMESTER_FLAG"
+        ./start_amester.sh $AMESTER_IP $AMESTER_FN $MEAS_DELAY_SEC $BMC_IP $AMESTER_USER $AMESTER_PASS
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting amester on host \"$SLAVE\""
@@ -231,10 +236,7 @@ TIME_PATH=/usr/bin/time
 $TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
 if [ "$?" -ne "0" ]
 then
-    echo /usr/bin/time not working.  Trying gtime...
-    TIME_PATH=gtime  # For OSX
-    $TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
-    [ "$?" -ne "0" ] && echo gnu-time not found.  Exiting ... && exit 1
+    echo gnu-time not found.  Exiting ... && exit 1
 fi
 
 $TIME_PATH --verbose --output=$TIME_FN bash -c \
