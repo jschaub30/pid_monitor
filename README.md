@@ -1,7 +1,8 @@
 # pid_monitor
-Linux tool that launches a workload, records system data using dstat, and automatically generates an html page with interactive javascript charts.
+Profile your workload and share the results in data-rich, interactive charts
 
 #Requires
+- Linux
 - [dstat](http://dag.wiee.rs/home-made/dstat/)
 - [python](https://www.python.org/)
 - (Optional) Some of the advanced monitors (like GPU) use [R scripts](https://www.r-project.org/) to parse output data
@@ -11,8 +12,10 @@ Start here:
 - [example-sweep.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Sweeping block size while writing to disk
 - [example-cluster.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Run workload on 2 machines at once
 - [example-spark.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-spark.sh) Run the SparkPi example on your spark cluster
-- [example-gpu.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-gpu.sh) Record GPU profiles on systems with nvidia GPUs
 - [example-amester.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-amester.sh) Collect measurements on Power8 systems using the AMESTER tool
+- TODO [example-gpu.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-gpu.sh) Record GPU profiles on systems with nvidia GPUs
+- TODO [example-perf.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-oprofile.sh) Record perf data
+- TODO [example-oprofile.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-oprofile.sh) Record oprofile data
 
 This repository also makes use of:
 - [Dygraphs](http://dygraphs.com/) for javascript charts (included).

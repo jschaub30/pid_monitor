@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Awesome Presentation</title>
+    <title>Jeremy's pid_monitor</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
       @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
@@ -136,50 +136,34 @@ class: center, middle, inverse
 
 ---
 
-# Email example
+# Email examples
 
 ---
 
-# Sort demo
+# Blog examples
+
+---
+
+# Sort command line demo
 
 ---
 layout: false
 
-# Useful command line tools
+# Useful system profiling tools
 .large[- top
 - htop
 - nmon
 - dstat -v --net
 ]
 ---
-name: practices1
-
-# Good practices #1
-
-##Collect all your data
-.medium[- in one location
-- organized by project
-- then organized by timestamp
-]
-
-.jcode[\data\sort\20160308-090000<br>
-20160309-101234<br>
-...<br>
-\data\spark\20160310-121500<br>
-...
-]
+layout: true
+class: center, middle, inverse
 ---
-name: practices2
 
-# Good practices #2
-
-.medium[
-- Record state of the system(s)
-- Store all measurement and analysis scripts
-- 
-]
+# Sort pid_monitor demo
 
 ---
+layout: false
 
 name: basic
 
@@ -192,7 +176,16 @@ name: basic
 5. Collect and parse data
 6. Summarize results
 ]
+
 ---
+layout: true
+class: center, middle, inverse
+---
+
+# Sort sweep demo
+
+---
+layout: false
 
 name: sweep
 
@@ -210,8 +203,16 @@ do
 ]
 done
 ]
+
+---
+layout: true
+class: center, middle, inverse
 ---
 
+# Multi-node demo
+
+---
+layout: false
 name: sweep-node
 
 # Multiple nodes
@@ -253,6 +254,44 @@ done
 <br>
 <br>
 ]
+
+---
+name: practices1
+
+# Good practices #1
+
+##Collect all your data
+.medium[- in one location
+- organized by project
+- then organized by timestamp
+]
+
+.jcode[\rundir\sort\20160308-090000<br>
+20160309-101234<br>
+...<br>
+\rundir\spark\20160310-121500<br>
+...
+]
+---
+name: practices2
+
+# Good practices #2
+
+.medium[
+- Maximize data density
+- Store all measurement and analysis scripts
+]
+---
+name: practices3
+
+# Good practices #3
+
+.medium[
+- Record state of the system(s)
+- Store all measurement and analysis scripts
+- 
+]
+
 
 ---
 
