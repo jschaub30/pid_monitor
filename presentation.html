@@ -25,6 +25,7 @@
       }
       li p { line-height: 1.25em; }
       .red { color: #fa0000; }
+      .medium { font-size: 1.4em; }
       .large { font-size: 2em; }
       a, a > code {
         color: rgb(249, 38, 114);
@@ -77,7 +78,7 @@
     .rectangle{
       font-size: 1.5em;
       position: absolute;
-      top:  220px;
+      top:  270px;
       right: 300px;
       width: 400px;
       border-radius: 5px;
@@ -92,20 +93,20 @@
         margin-left: 20px;
     }
     .node1{
-      top:  190px;
+      top:  240px;
       right: 260px;
       z-index: 2;
     }
     .nodeN{
         position: absolute;
-       top:  120px;
+       top:  170px;
        right: 180px;
        z-index: 1;
     }
     .dotdotdot{
       font-size: 1.5em;
       position: absolute;
-      top:  480px;
+      top:  530px;
       right: 220px;
       z-index: 5;
    }
@@ -145,47 +146,67 @@ class: center, middle, inverse
 layout: false
 
 # Useful command line tools
-- top, htop
+.large[- top
+- htop
 - nmon
 - dstat -v --net
-
+]
 ---
-name: before you start
+name: practices1
 
-# Collect all your data
-- in one location
+# Good practices #1
+
+##Collect all your data
+.medium[- in one location
 - organized by project
-- then timestamp
+- then organized by timestamp
+]
 
-.jcode[host:\data\sort\20160308-090000<br>
+.jcode[\data\sort\20160308-090000<br>
 20160309-101234<br>
 ...<br>
-host:\data\spark\20160310-121500<br>
+\data\spark\20160310-121500<br>
 ...
 ]
+---
+name: practices2
+
+# Good practices #2
+
+.medium[
+- Record state of the system(s)
+- Store all measurement and analysis scripts
+- 
+]
+
 ---
 
 name: basic
 
+# Basic measurement
 .rectangle[
 1. Record system state
 2. Start monitors
 3. Run workload
-4. Collect and parse data
-5. Summarize results
+4. Stop monitors
+5. Collect and parse data
+6. Summarize results
 ]
 ---
 
 name: sweep
 
+# Sweeping a parameter
 .rectangle[
 for N in ...<br>
 do
-.indent[1. Record system state
+.indent[
+1. Record system state
 2. Start monitors
 3. Run workload
-4. Collect and parse data
-5. Summarize results
+4. Stop monitors
+5. Collect and parse data
+6. Summarize results
 ]
 done
 ]
@@ -193,14 +214,17 @@ done
 
 name: sweep-node
 
+# Multiple nodes
 .rectangle[.nodelabel[Node1]
 for N in ...<br>
 do
-.indent[1. Record system state
+.indent[
+1. Record system state
 2. Start monitors
 3. Run workload
-4. Collect and parse data
-5. Summarize results
+4. Stop monitors
+5. Collect and parse data
+6. Summarize results
 ]
 done
 ]
