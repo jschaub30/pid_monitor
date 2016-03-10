@@ -6,7 +6,6 @@
 
 export WORKLOAD_NAME=EXAMPLE-CLUSTER
 export DESCRIPTION="Example workload on 2 node cluster using dd command"
-export X_LABEL="Block size [ KB ]"
 export MEAS_DELAY_SEC=1
 export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 
