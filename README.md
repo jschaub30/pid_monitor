@@ -23,11 +23,6 @@ This repository also makes use of:
 - [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing (included).
 - GNU-time /usr/bin/time
 
-When run, these examples will create the following directories:
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/scripts    # Measurement and analysis scripts
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
-
 Try it out:
 ```
 git clone https://github.com/jschaub30/pid_monitor
@@ -37,4 +32,16 @@ cp example.sh your_workload.sh
 ./your_workload.sh
 ./pid_webserver.sh
 [ (Optional) copy the run directory to your web server ]
+```
+When run, these examples will create the following directories:
+ - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
+ - ./rundir/[WORKLOAD-NAME]/[DATETIME]/scripts    # Measurement and analysis scripts
+ - ./rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
+
+To permanently share all the measurements on your server, you need to enable a web server.
+On Ubuntu, this is as simple as
+```
+sudo apt-get install apache2
+cd /var/www/html
+sudo ln -sf [location of rundir in pid_monitor directory]
 ```
