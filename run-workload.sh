@@ -80,8 +80,6 @@ stop_monitors() {
     [ "$NMON_FLAG" == "1" ] && ./stop_monitor.sh nmon $SLAVE $NMON_FN
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $PERF_FN
     [ "$AMESTER_FLAG" == "1" ] && ./stop_monitor.sh amester $AMESTER_IP $AMESTER_FN
-    echo AMESTER_FLAG is $AMESTER_FLAG
-    echo "./stop_monitor.sh amester $AMESTER_IP $AMESTER_FN"
  
     # Now parse monitor output files
     # dstat data is parsed directly in webpage by javascript
