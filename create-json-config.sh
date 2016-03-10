@@ -3,7 +3,7 @@
 
 [[ -z "$RUNDIR" ]] && echo $0: !!!!!!!!!! Warning!  RUNDIR not set
 [[ -z "$WORKLOAD_NAME" ]] && WORKLOAD_NAME="WORKLOAD"
-[[ -z "$X_LABEL" ]] && X_LABEL="X label"
+[[ -z "$X_LABEL" ]] && X_LABEL="RUN ID"
 [[ -z "$DESCRIPTION" ]] && DESCRIPTION="DESCRIPTION"
 [[ -z "$DATA_DIR" ]] && DATA_DIR="../data/raw"
 [[ -z "$STDOUT_EXT" ]] && STDOUT_EXT="_workload_stdout.txt"
