@@ -185,7 +185,7 @@ do
     fi
     if [ "$GPU_FLAG" == "1" ]
     then
-        ./start_gpu.sh $SLAVE $GPU_FN $MEAS_DELAY_SEC
+        ./start_monitor.sh gpu $SLAVE $GPU_FN $MEAS_DELAY_SEC
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
