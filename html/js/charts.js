@@ -143,21 +143,23 @@
                     return parse_dstat_line(x, index, 1, "usr", "sys", "idl", "wai", "hiq", "siq");
                 }
             );
+            var factor_g = 1/1024/1024/1024,
+                factor_m = 1/1024/1024;
             mem_data = csv_data.map(
                 function(x, index) {
-                    return parse_dstat_line(x, index, 1e-9, "used", "buff", "cach", "free");
+                    return parse_dstat_line(x, index, factor_g, "used", "buff", "cach", "free");
                 }
             );
             io_data = csv_data.map(
                 function(x, index) {
-                    return parse_dstat_line(x, index, 1e-6, "read", "writ");
+                    return parse_dstat_line(x, index, factor_g, "read", "writ");
                 }
             );
             var io_sum_data = calc_cumsum(io_data);
 
             net_data = csv_data.map(
                 function(x, index) {
-                    return parse_dstat_line(x, index, 1e-6, "recv", "send");
+                    return parse_dstat_line(x, index, factor_g, "recv", "send");
                 }
             );
             var net_sum_data = calc_cumsum(net_data);
@@ -183,18 +185,18 @@
                       "cache", "free"], "Usage [ GB ]");
             if (cumsum_flag) {
                 csv_chart(io_sum_data, "id_io", "&#x222b; IO", ["time", "read", 
-                          "write"], "Usage [ MB ]");
+                          "write"], "Usage [ GB ]");
             } else {
                 csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], 
-                          "Usage [ MB/s ]");
+                          "Usage [ GB/s ]");
             }
 
             if (cumsum_flag) {
                 csv_chart(net_sum_data, "id_net", "&#x222b; Network", 
-                          ["time", "recv", "send"], "Usage [ MB ]");
+                          ["time", "recv", "send"], "Usage [ GB ]");
             } else {
                 csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], 
-                          "Usage [ MB/s ]");
+                          "Usage [ GB/s ]");
             }
 
             csv_chart(sys_data, "id_sys", "System", 
