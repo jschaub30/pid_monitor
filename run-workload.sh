@@ -69,6 +69,7 @@ define_filenames() {
 }
 
 stop_monitors() {
+  sleep 2
   for SLAVE in $SLAVES
   do
     # Stop all monitors first, then parse them
