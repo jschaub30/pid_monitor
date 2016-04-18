@@ -22,7 +22,7 @@ else
   if [ "$#" -eq "3" ]
   then
     TARGET_FN=$3
-    REMOTE_FN=/tmp/pid_monitor/$(basename $3)
+    REMOTE_FN=/tmp/${USER}/pid_monitor/$(basename $3)
     echo Copying $MONITOR data from $HOST:$REMOTE_FN to $TARGET_FN
     scp -r $HOST:$REMOTE_FN $TARGET_FN
     [ "$?" -eq 0 ] && ssh $HOST "$PREFIX rm $REMOTE_FN"

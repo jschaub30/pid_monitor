@@ -7,7 +7,7 @@
 [ "$#" -ne "4" ] && echo "Usage: $0 AMESTER_IP FN DELAY_SEC BMC_IP" && exit 64
 
 AMESTER_IP=$1
-FN=/tmp/pid_monitor/$(basename $2)
+FN=/tmp/${USER}/pid_monitor/$(basename $2)
 DELAY_MS=$(($3*1000))
 BMC_IP=$4
 [ -z "$BMC_USER" ] && BMC_USER=ADMIN
@@ -28,8 +28,7 @@ fi
 echo Starting amester monitoring on $AMESTER_IP
 
 AM_CMD="amester --nogui /home/ubuntu/amester/watchsensors.tcl $BMC_IP $BMC_USER $BMC_PASS $FN $DELAY_MS"
-CMD="mkdir -p /tmp/pid_monitor/; \
-           chmod -f 777 /tmp/pid_monitor; \
+CMD="mkdir -p /tmp/${USER}/pid_monitor/; \
            rm -f $FN; \
            bash -c \"$AM_CMD &\""
 #echo $CMD

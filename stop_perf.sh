@@ -3,7 +3,7 @@
 [ "$#" -lt "1" ] && echo Usage: $0 HOSTNAME [TARGET_FN] && exit 1
 
 HOST=$1
-REMOTE_DIR=/tmp/pid_monitor/perf
+REMOTE_DIR=/tmp/${USER}/pid_monitor/perf
 TARGET_FN=$2
 KILL_CMD="sudo killall -SIGINT perf;
           sudo rm -f $REMOTE_DIR/perf.report;

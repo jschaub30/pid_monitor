@@ -5,15 +5,14 @@ BS=1024k    # default block size
 
 [ "$#" -ne "0" ] && BS=$1
 I=0
-mkdir -p /tmp/pid_monitor
-chmod -f a+w /tmp/pid_monitor # allow other users to write to this directory
+mkdir -p /tmp/${USER}/pid_monitor
 
-OUT_FN=/tmp/pid_monitor/tmpfile.0
+OUT_FN=/tmp/${USER}/pid_monitor/tmpfile.0
 # Make sure that OUT_FN is unique
 while [ -e $OUT_FN ]
 do
     I=$((I+1))
-    OUT_FN=/tmp/tmpfile.$I
+    OUT_FN=/tmp/${USER}/pid_monitor/tmpfile.$I
 done
 
 echo Writing to $OUT_FN

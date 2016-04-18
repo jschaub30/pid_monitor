@@ -5,7 +5,7 @@
 ARGS=( $@ )
 len=${#ARGS[@]}
 HOST=${ARGS[0]}
-OCOUNT_FN=/tmp/pid_monitor/$(basename ${ARGS[1]})
+OCOUNT_FN=/tmp/${USER}/pid_monitor/$(basename ${ARGS[1]})
 DELAY_SEC=${ARGS[2]}
 EVENT_LIST=${ARGS[3]}
 PID=${ARGS[4]}
@@ -25,8 +25,7 @@ fi
 echo Starting ocount monitoring on $HOST
 #echo Events are $EVENT_LIST
 
-OCOUNT_CMD="mkdir -p /tmp/pid_monitor/; \
-           chmod -f 777 /tmp/pid_monitor; \
+OCOUNT_CMD="mkdir -p /tmp/${USER}/pid_monitor/; \
            rm -f $OCOUNT_FN; \
            sleep 0.1; \
            sudo bash -c \"ulimit -n 100000;ocount -b -i $((DELAY_SEC*1000)) --events ${EVENT_LIST} --system-wide  >> $OCOUNT_FN 2>&1 < /dev/null &\""

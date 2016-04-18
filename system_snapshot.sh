@@ -10,7 +10,7 @@ else
   SSH_FLAG=1
 fi
 
-TMPDIR=/tmp/pid_monitor/$(date +"%Y%m%d-%H%M%S")
+TMPDIR=/tmp/${USER}/pid_monitor/$(date +"%Y%m%d-%H%M%S")
 
 echo Collecting system snapshot on $HOST
 
