@@ -151,6 +151,10 @@ div.two {
 	flex: 1;
 }
 
+div.content {
+    margin-bottom: 50px;
+}
+
 .c3-axis-y-label {
 	font-size: 12px;
 }
