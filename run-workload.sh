@@ -154,9 +154,10 @@ for SLAVE in $SLAVES
 do
     debug_message "Collecting system snapshot on $SLAVE"
     # Gather system summary
-    ./system_snapshot.sh $SLAVE
-    mv ${SLAVE}.html $RUNDIR/html/.
+    bash -c "./system_snapshot.sh $SLAVE && mv ${SLAVE}.html $RUNDIR/html/." &
+    sleep 0.1
 done
+wait
 
 for SLAVE in $SLAVES
 do
