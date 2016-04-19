@@ -10,15 +10,15 @@ else
   SSH_FLAG=1
 fi
 
-TMPDIR=/tmp/${USER}/pid_monitor/$(date +"%Y%m%d-%H%M%S")
+TMPDIR=/tmp/${USER}/pid_monitor/
 
 echo Collecting system snapshot on $HOST
 
 CMD="mkdir -p $TMPDIR; \
-    chmod -fR 777 $TMPDIR; \
     cd $TMPDIR; \
-    git clone https://github.com/jschaub30/linux_summary $HOST; \
-    cd $HOST; \
+    [ ! -e linux_summary ] && git clone https://github.com/jschaub30/linux_summary && FLAG=1; \
+    cd linux_summary; \
+    \${FLAG+\`git pull;echo pulling\`}; \
     ./linux_summary.sh;"
 
 if [ $SSH_FLAG ]
