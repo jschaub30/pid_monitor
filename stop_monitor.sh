@@ -14,7 +14,7 @@ then
   # run locally
   PIDS=$(pgrep $MONITOR)
   PIDS=$(echo $PIDS | perl -pe "s/$$//")  # $$ is the PID of this script
-  $PREFIX kill $PIDS  # killall didn't work here
+  $PREFIX kill $PIDS 2>/dev/null # killall didn't work here
 else
   # use ssh.  Retrieve file from /tmp directory
   #ssh $HOST "$PREFIX killall -SIGINT $MONITOR"
