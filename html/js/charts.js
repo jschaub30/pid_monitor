@@ -430,6 +430,7 @@
 
             create_all_buttons(config.slaves, config.run_ids);
             load_all_data();
+            load_cpu_detail();
         },
         read_config = function() {
             // Read config data, update page, then
@@ -446,7 +447,29 @@
                     console.log(error);
                 }
             });
-        };
+        },
+    load_cpu_detail = function() {
+      $.ajax({
+          type: "GET",
+          url: data_dir + '/' + run_id + '_' + hostname + '_cpu_detail.csv.js',
+          dataType: "json",
+          success: function(data) {
+              var ctx = document.getElementById("id_cpu_detail").getContext("2d");
+            var sampleChart = new Chart(ctx).HeatMap(data, {
+              responsive: true,
+              rounded: false,
+              paddingScale: 0.0,
+              showLabels: false,
+              showScale: false,
+              tooltipTemplate: "t: <%= xLabel %> | cpu: <%= yLabel %> | value: <%= value %>",              colorInterpolation: 'gradient',
+              colors: ['grey', 'red']
+            });
+          },
+          error: function(request, status, error) {
+              console.log(error);
+          }
+      });
+    };
 
     load_summary();  // Create the summary chart
     read_config();
