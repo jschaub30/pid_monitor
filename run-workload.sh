@@ -52,15 +52,14 @@ stop_all() {
   then
     echo "#### PID MONITOR ####: Stopping these processes: $PIDS"
     kill -9 $PIDS 2>/dev/null &
-    sleep 1
+    sleep 0.1
   fi
-  stop_monitors&
-  exit
 }
 
 define_filenames() {
   RAWDIR=${RUNDIR}/data/raw
   DSTAT_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_dstat.csv
+  CPU_DETAIL_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_cpu_detail.csv
   OCOUNT_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_ocount
   NMON_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_nmon
   GPU_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_gpu
@@ -81,6 +80,7 @@ stop_monitors() {
     [ "$NMON_FLAG" == "1" ] && ./stop_monitor.sh nmon $SLAVE $NMON_FN
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $PERF_FN
     [ "$AMESTER_FLAG" == "1" ] && ./stop_monitor.sh amester $AMESTER_IP $AMESTER_FN
+    [ "$CPU_DETAIL_FLAG" == "1" ] && ./stop_monitor.sh cpu_detail $SLAVE $CPU_DETAIL_FN
  
     # Now parse monitor output files
     # dstat data is parsed directly in webpage by javascript
@@ -89,13 +89,14 @@ stop_monitors() {
         ./parse_ocount.py $OCOUNT_FN > $OCOUNT_FN.csv
         ./memory_bw.R $OCOUNT_FN.csv > $OCOUNT_FN.memory_bw.csv
     fi
+    [ "$CPU_DETAIL_FLAG" == "1" ] && ./parse_cpu_detail.py $CPU_DETAIL_FN > ${CPU_DETAIL_FN}.js
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $GPU_FN
     [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $GPU_FN
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $AMESTER_FN
 
   done
   ###############################################################################
-  # STEP 6: ANALYZE DATA AND CREATE HTML CHARTS
+  # STEP 5: ANALYZE DATA AND CREATE HTML CHARTS
   rm -rf html/data  # For historical reasons
   cp -R html $RUNDIR/.
   # Create symlink to allows python SimpleHTTPServer to serve files
@@ -118,6 +119,7 @@ stop_monitors() {
   echo "#### PID MONITOR ####: $ ./pid_webserver.sh"
   echo "#### PID MONITOR ####: Then navigate to http://${IP}:12121"
   echo
+  exit
 }
 
 trap 'stop_all' SIGTERM SIGINT # Kill process monitors if killed early
@@ -142,7 +144,6 @@ env > $RUNDIR/data/raw/${RUN_ID}_env.txt
 ###############################################################################
 # STEP 1: CREATE OUTPUT FILENAMES
 TIME_FN=$RUNDIR/data/raw/${RUN_ID}_time_stdout.txt
-CONFIG_FN=$RUNDIR/data/raw/${RUN_ID}_config_txt.txt
 WORKLOAD_STDOUT=$RUNDIR/data/raw/${RUN_ID}_workload_stdout.txt
 WORKLOAD_STDERR=$RUNDIR/data/raw/${RUN_ID}_workload_stderr.txt
 
@@ -176,6 +177,14 @@ do
     fi
     # Start dstat monitor
     ./start_monitor.sh dstat $SLAVE $DSTAT_FN $MEAS_DELAY_SEC
+    if [ "$CPU_DETAIL_FLAG" == "1" ]
+    then
+        ./start_monitor.sh cpu_detail $SLAVE $CPU_DETAIL_FN $MEAS_DELAY_SEC
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting cpu_detail on host \"$SLAVE\""
+        fi
+    fi
     [ $? -ne 0 ] && fatal_message "Problem starting dstat on host \"$SLAVE\""
     if [ "$OCOUNT_FLAG" == "1" ]
     then
@@ -212,20 +221,7 @@ debug_message "Putting results in $RUNDIR"
 debug_message "RUN_ID=\"$RUN_ID\""
 
 ###############################################################################
-# STEP 3: COPY CONFIG FILES TO CONFIG FILE IN RAW DIRECTORY
-CONFIG=$CONFIG,timestamp,$(date +"%Y-%m-%d_%H:%M:%S")
-CONFIG=$CONFIG,run_id,$RUN_ID
-CONFIG=$CONFIG,kernel,$(uname -r)
-CONFIG=$CONFIG,hostname,$(hostname -s)
-CONFIG=$CONFIG,workload_name,$WORKLOAD_NAME
-CONFIG=$CONFIG,dstat_command,$DSTAT_CMD
-CONFIG=$CONFIG,workload_command,$WORKLOAD_CMD
-CONFIG=$CONFIG,workload_dir,$WORKLOAD_DIR
-CONFIG=$CONFIG,  # Add trailiing comma
-echo $CONFIG > $CONFIG_FN
-
-###############################################################################
-# STEP 4: RUN WORKLOAD
+# STEP 3: RUN WORKLOAD
 debug_message "Working directory: $WORKLOAD_DIR"
 cd $WORKLOAD_DIR
 # check for /usr/bin/time
@@ -246,6 +242,6 @@ wait $TIME_PID
 cd $CWD
 
 ###############################################################################
-# STEP 5: STOP MONITORS
+# STEP 4: STOP MONITORS
 stop_monitors
 

@@ -20,6 +20,15 @@ fi
 [ "$MONITOR" == "nmon" ] && \
   RUN_CMD="nmon -f -c 10000 -F $TARGET_FN -s $DELAY_SEC"
 
+if [ "$MONITOR" == "cpu_detail" ]
+then
+    NUM_CPU=$(cat /proc/cpuinfo | grep processor | wc -l)
+    CPU_LIST=$(seq 0 $NUM_CPU | perl -pe "s/\n/,/" | perl -pe "s/,$//")
+    RUN_CMD="dstat --time --cpu -C $CPU_LIST --output $TARGET_FN $DELAY_SEC"
+    # redefine MONITOR for test below
+    MONITOR="dstat"
+fi
+
 if [ "$MONITOR" == "gpu" ]
 then
   MONITOR="nvidia-smi"

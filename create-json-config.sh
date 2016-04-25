@@ -20,6 +20,7 @@ echo \"hostname\":\"$(hostname -s)\", >> $CONFIG_FN
 echo \"data_dir\":\"$DATA_DIR\", >> $CONFIG_FN
 echo \"description\":\"$DESCRIPTION\", >> $CONFIG_FN
 echo \"monitors\":[\"dstat\" >> $CONFIG_FN
+[ "$CPU_DETAIL_FLAG" == "1" ] && echo ,\"cpu_detail\" >> $CONFIG_FN
 [ "$GPU_FLAG" == "1" ] && echo ,\"gpu\" >> $CONFIG_FN
 [ "$GPU_DETAIL_FLAG" == "1" ] && echo ,\"gpu_detail\" >> $CONFIG_FN
 [ "$P8_MEMBW_FLAG" == "1" ] && echo ,\"membw\" >> $CONFIG_FN

@@ -4,6 +4,7 @@
 	<link href="css/c3.min.css" rel="stylesheet">
   <script src="js/d3.min.js" charset="utf-8"></script>
   <script src="js/c3.min.js"></script>
+  <script src='js/Chart.HeatMap.S.min.js'></script>
   <!-- Load jQuery -->
   <script src="js/jquery.min.js"></script>
   <script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
@@ -34,7 +35,7 @@
 			</p>
 			<p class="wait" id="id_progress">
 				<img src="ajax-loader.gif"></img>
-				Please wait for data to load</p>
+                Please wait for data to load</p>
 			<section>
 				<div class="one chart">
 					<span id="summary_table"></span>
@@ -47,7 +48,14 @@
 			<div id="workload_table"></div>
 		</div>
 
-		</p>
+		<div>
+				<section>
+                <div class="one chart">
+                    <div class="dygraph-label dygraph-title">CPU Detail</div>
+                    <canvas class="one chart" id="id_cpu_detail"></canvas></div>
+					<div class="two chart" id="id_"></div>
+				</section>
+		</div>
 		<div>
 				<section>
 					<div class="one chart" id="id_cpu"></div>
@@ -100,8 +108,7 @@
 		$("#id_header").load('header.html');
 	</script>
 
-  <script src='js/charts.js' type='text/javascript'>
-	</script>
+  <script src='js/charts.js' type='text/javascript'></script>
 
 </body>
 
