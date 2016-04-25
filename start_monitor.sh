@@ -20,7 +20,7 @@ fi
 [ "$MONITOR" == "nmon" ] && \
   RUN_CMD="nmon -f -c 10000 -F $TARGET_FN -s $DELAY_SEC"
 
-if [ "$MONITOR" == "dstat_cpu" ]
+if [ "$MONITOR" == "cpu_detail" ]
 then
     NUM_CPU=$(cat /proc/cpuinfo | grep processor | wc -l)
     CPU_LIST=$(seq 0 $NUM_CPU | perl -pe "s/\n/,/" | perl -pe "s/,$//")

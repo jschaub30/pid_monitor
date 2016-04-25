@@ -59,7 +59,7 @@ stop_all() {
 define_filenames() {
   RAWDIR=${RUNDIR}/data/raw
   DSTAT_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_dstat.csv
-  DSTAT_CPU_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_dstat_cpu.csv
+  CPU_DETAIL_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_cpu_detail.csv
   OCOUNT_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_ocount
   NMON_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_nmon
   GPU_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_gpu
@@ -80,7 +80,7 @@ stop_monitors() {
     [ "$NMON_FLAG" == "1" ] && ./stop_monitor.sh nmon $SLAVE $NMON_FN
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $PERF_FN
     [ "$AMESTER_FLAG" == "1" ] && ./stop_monitor.sh amester $AMESTER_IP $AMESTER_FN
-    [ "$DSTAT_CPU_FLAG" == "1" ] && ./stop_monitor.sh dstat_cpu $SLAVE $DSTAT_CPU_FN
+    [ "$CPU_DETAIL_FLAG" == "1" ] && ./stop_monitor.sh cpu_detail $SLAVE $CPU_DETAIL_FN
  
     # Now parse monitor output files
     # dstat data is parsed directly in webpage by javascript
@@ -89,7 +89,7 @@ stop_monitors() {
         ./parse_ocount.py $OCOUNT_FN > $OCOUNT_FN.csv
         ./memory_bw.R $OCOUNT_FN.csv > $OCOUNT_FN.memory_bw.csv
     fi
-    [ "$DSTAT_CPU_FLAG" == "1" ] && ./parse_dstat_cpu.py $DSTAT_CPU_FN > ${DSTAT_CPU_FN}.js
+    [ "$CPU_DETAIL_FLAG" == "1" ] && ./parse_cpu_detail.py $CPU_DETAIL_FN > ${CPU_DETAIL_FN}.js
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $GPU_FN
     [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $GPU_FN
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $AMESTER_FN
@@ -177,12 +177,12 @@ do
     fi
     # Start dstat monitor
     ./start_monitor.sh dstat $SLAVE $DSTAT_FN $MEAS_DELAY_SEC
-    if [ "$DSTAT_CPU_FLAG" == "1" ]
+    if [ "$CPU_DETAIL_FLAG" == "1" ]
     then
-        ./start_monitor.sh dstat_cpu $SLAVE $DSTAT_CPU_FN $MEAS_DELAY_SEC
+        ./start_monitor.sh cpu_detail $SLAVE $CPU_DETAIL_FN $MEAS_DELAY_SEC
         if [ $? -ne 0 ] 
         then
-          fatal_message "Problem starting dstat_cpu on host \"$SLAVE\""
+          fatal_message "Problem starting cpu_detail on host \"$SLAVE\""
         fi
     fi
     [ $? -ne 0 ] && fatal_message "Problem starting dstat on host \"$SLAVE\""
