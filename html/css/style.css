@@ -149,13 +149,13 @@ div.one-left {
 }
 .heatmap-y1 {
     position: absolute;
-    top: 20px;
+    bottom: 0px;
     right: 2px;
 }
 
 .heatmap-y0 {
     position: absolute;
-    bottom: 0px;
+    top: 20px;
     right: 2px;
 }
 .heatmap {
