@@ -75,7 +75,7 @@
         },
         csv_chart2 = function(data, monitor_idx, title) {
             var id_str = "id_monitor" + monitor_idx.toString();
-            $(id_str).show();
+            $("#" + id_str).show();
             //console.log(data);
             var chart = new Dygraph(
                 document.getElementById(id_str),
