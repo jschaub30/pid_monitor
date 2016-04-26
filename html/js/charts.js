@@ -414,6 +414,9 @@
                     'AMESTER memory bandwidth [ GB/s ]');
                 monitor_idx += 1;
             }
+            if (config.monitors.indexOf("cpu_detail") > -1) {
+                load_cpu_detail();
+            }
         },
         load_cpu_detail = function() {
             $.ajax({
@@ -428,7 +431,7 @@
                         paddingScale: 0.0,
                         showLabels: false,
                         showScale: false,
-                        tooltipTemplate: "t: <%= xLabel %> | cpu: <%= yLabel %> | value: <%= value %>",
+                        tooltipTemplate: "t: <%= xLabel %> | cpu: <%= yLabel %> | value: <%= value %>%",
                         colorInterpolation: 'gradient',
                         colors: ['grey', 'red']
                     });
@@ -456,7 +459,6 @@
 
             create_all_buttons(config.slaves, config.run_ids);
             load_all_data();
-            load_cpu_detail();
         },
         read_config = function() {
             // Read config data, update page, then
