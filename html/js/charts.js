@@ -74,9 +74,11 @@
             return chart;
         },
         csv_chart2 = function(data, monitor_idx, title) {
+            var id_str = "id_monitor" + monitor_idx.toString();
+            $(id_str).show();
             //console.log(data);
             var chart = new Dygraph(
-                document.getElementById("id_monitor" + monitor_idx.toString()),
+                document.getElementById(id_str),
                 data, {
                     // labels: labels,
                     colors: chart_colors,
@@ -414,6 +416,9 @@
                     'AMESTER memory bandwidth [ GB/s ]');
                 monitor_idx += 1;
             }
+            if (config.monitors.indexOf("cpu_detail") > -1) {
+                load_cpu_detail();
+            }
         },
         load_cpu_detail = function() {
             $.ajax({
@@ -421,19 +426,23 @@
                 url: data_dir + '/' + run_id + '_' + hostname + '_cpu_detail.csv.js',
                 dataType: "json",
                 success: function(data) {
+                    $("#id_cpu_heatmap").show();
                     var ctx = document.getElementById("id_cpu_detail").getContext("2d");
                     var sampleChart = new Chart(ctx).HeatMap(data, {
                         responsive: true,
+                        maintainAspectRatio: false,
                         rounded: false,
                         paddingScale: 0.0,
                         showLabels: false,
                         showScale: false,
-                        tooltipTemplate: "t: <%= xLabel %> | cpu: <%= yLabel %> | value: <%= value %>",
+                        tooltipTemplate: "t: <%= xLabel %> | cpu: <%= yLabel %> | value: <%= value %>%",
                         colorInterpolation: 'gradient',
-                        colors: ['grey', 'red']
+                        colors: ['rgb(220,220,220)', 'red']
                     });
-                    $('#id_cpu_x0').text(data.labels[0] + 's')
-                    $('#id_cpu_x1').text(data.labels[data.labels.length - 1] + 's')
+                    $('#id_cpu_y0').text('cpu' + data.datasets[0].label);
+                    $('#id_cpu_y1').text('cpu' + data.datasets[data.datasets.length - 1].label);
+                    $('#id_cpu_x1').text(data.labels[data.labels.length - 1] + 's');
+                    $('#id_cpu_x0').text(data.labels[0] + 's');
                 },
                 error: function(request, status, error) {
                     console.log(error);
@@ -456,7 +465,6 @@
 
             create_all_buttons(config.slaves, config.run_ids);
             load_all_data();
-            load_cpu_detail();
         },
         read_config = function() {
             // Read config data, update page, then

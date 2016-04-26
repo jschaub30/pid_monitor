@@ -129,26 +129,42 @@ section {
 	width: 98%;
 	margin: auto;
 	padding: 10px;
-	display: -ms-flexbox;
-	display: -webkit-flex;
-	display: flex;
 }
 
 div.one {
-	/*width: 48%;*/
-	min-height: 400px;
+	width: 48%;
+	min-height: 380px;
 	float: left;
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
 }
 
 div.two {
-	/*margin-left: 52%;*/
-	min-height: 400px;
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
+	margin-left: 52%;
+	min-height: 380px;
+}
+div.one-left {
+	width: 3%;
+	min-height: 380px;
+	float: left;
+  position: relative;
+}
+.heatmap-y1 {
+    position: absolute;
+    top: 20px;
+    right: 2px;
+}
+
+.heatmap-y0 {
+    position: absolute;
+    bottom: 0px;
+    right: 2px;
+}
+.heatmap {
+  height: 350px;
+}
+div.one-middle {
+	width: 45%;
+	min-height: 380px;
+	float: left;
 }
 
 div.content {
@@ -196,4 +212,7 @@ div.content {
   font-size: 12px;
   font-weight: bold;
   z-index: 10;
+}
+.heatmap-y {
+  width: 30px;
 }
