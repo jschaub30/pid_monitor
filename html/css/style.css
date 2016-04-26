@@ -174,3 +174,26 @@ div.content {
     background: #CCCCCC;
 }
 
+.heatmap-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 10;
+}
+.heatmap-x0 {
+  float: left;
+}
+.heatmap-label {
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+}
+.heatmap-x1 {
+  float: right;
+}
+.heatmap-ylabel {
+  width: 50px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+}
