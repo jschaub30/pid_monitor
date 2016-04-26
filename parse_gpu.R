@@ -14,7 +14,9 @@ for(GPU in unique(d$index)){
 }
 
 IDX <- sort(IDX)
-d <- d[IDX,]
+if(!is.null(IDX)){
+  d <- d[IDX,]
+}
 t <- as.POSIXct(d$timestamp)
 t <- floor(as.numeric(t - t[1]))
 # Make timestamps for all GPUs match that of GPU0
