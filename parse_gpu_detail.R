@@ -15,7 +15,7 @@ for(I in seq(length(t))){
         t[I] = t0
     }
 }
-d1 <- data.frame(time.sec=t, index=d$index)
+d1 <- data.frame(time.sec=(t-t[1]), index=d$index)
 d1$GPU <- as.numeric(sub("%","",d$utilization.gpu....))
 d1$MEMORY <- as.numeric(sub("%","",d$utilization.memory....))
 d2 <- dcast(d1, time.sec ~ index, value.var="GPU")

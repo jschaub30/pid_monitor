@@ -1,7 +1,7 @@
 # pid_monitor
 Profile your workload and share the results in data-rich, interactive charts
 
-Version 1.0
+Version 1.01
 
 #Requires
 - Linux
