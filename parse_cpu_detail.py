@@ -40,10 +40,10 @@ def main(dstat_fn):
             #js_string += '[%d,%d,%0.1f],' % (int(td), cpu, val)
     js_string = '{\n  "labels": [' + ','.join(['"%.0f' % i + '"' for i in td_array]) + '],\n'
     js_string += '  "datasets": [\n'
-    for cpu in range(num_cpu):
+    for cpu in range(num_cpu - 1, -1, -1):
         js_string += '  {\n    "label": "%d",\n' % cpu
         js_string += '    "data": [' + ','.join([str(i) for i in val_array[cpu]]) + ']\n  }'
-        if cpu == (num_cpu - 1):
+        if cpu == 0:
             js_string += ']\n}'
         else:
             js_string += ' ,'
