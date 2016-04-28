@@ -147,6 +147,16 @@ div.one-left {
 	float: left;
   position: relative;
 }
+div.interrupt-main {
+  margin-left: 25%;
+	min-height: 500px;
+}
+div.interrupt-left {
+	width: 20%;
+	min-height: 500px;
+	float: left;
+  position: relative;
+}
 .heatmap-y1 {
     position: absolute;
     bottom: 0px;
@@ -160,6 +170,9 @@ div.one-left {
 }
 .heatmap {
   height: 350px;
+}
+.heatmap-big {
+  height: 500px;
 }
 div.one-middle {
 	width: 45%;

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<!-- Load jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<script src='js/Chart.HeatMap.S.min.js'></script>
+
+	<title id="id_title">Interrupts</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+</head>
+
+<body>
+
+	<div class="content">
+		<a href="index.html">
+			Back to main page
+		</a>
+		<div>
+
+		<section id="id_int_heatmap">
+			<div class="interrupt-left">
+				<span class="heatmap-label heatmap-y0" id="id_int_y0">y0</span>
+				<span class="heatmap-label heatmap-y1" id="id_int_y1">y1</span>
+				y2
+			</div>
+			<div class="interrupt-main">
+				<div class="heatmap-title">Interrupt Heatmap</div>
+				<div class="heatmap-big"><canvas id="id_int_detail"></canvas></div>
+				<span class="heatmap-label heatmap-x0" id="id_int_x0">x0</span>
+				<span class="heatmap-label heatmap-x1" id="id_int_x1">x1</span>
+			</div>
+			<div class="two chart" id="id_"></div>
+		</section>
+	</div>
+	<!-- content -->
+	<div class="footer">
+		<div id="cluster_buttons">Nodes: </div>
+		<div id="run_id_buttons">Run ID: </div>
+		<div id="sum_buttons"></div>
+	</div>
+
+
+	<script src='js/interrupts.js' type='text/javascript'></script>
+
+</body>
+
+</html>
