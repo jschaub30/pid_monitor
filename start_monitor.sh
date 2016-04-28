@@ -23,7 +23,7 @@ fi
 if [ "$MONITOR" == "cpu_detail" ]
 then
     NUM_CPU=$(cat /proc/cpuinfo | grep processor | wc -l)
-    CPU_LIST=$(seq 0 $NUM_CPU | perl -pe "s/\n/,/" | perl -pe "s/,$//")
+    CPU_LIST=$(seq $((NUM_CPU-1)) -1 0 | perl -pe "s/\n/,/" | perl -pe "s/,$//")
     RUN_CMD="dstat --time --cpu -C $CPU_LIST --output $TARGET_FN $DELAY_SEC"
     # redefine MONITOR for test below
     MONITOR="dstat"
