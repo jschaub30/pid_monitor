@@ -65,6 +65,7 @@ define_filenames() {
   GPU_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_gpu
   PERF_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_perf_report
   AMESTER_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_amester
+  INTERRUPTS_FN=${RAWDIR}/${RUN_ID}_${SLAVE}_interrupts
 }
 
 stop_monitors() {
@@ -81,6 +82,7 @@ stop_monitors() {
     [ "$PERF_FLAG" == "1" ] && ./stop_perf.sh $SLAVE $PERF_FN
     [ "$AMESTER_FLAG" == "1" ] && ./stop_monitor.sh amester $AMESTER_IP $AMESTER_FN
     [ "$CPU_DETAIL_FLAG" == "1" ] && ./stop_monitor.sh cpu_detail $SLAVE $CPU_DETAIL_FN
+    [ "$INTERRUPTS_FLAG" == "1" ] && ./stop_monitor.sh interrupts $SLAVE $INTERRUPTS_FN
  
     # Now parse monitor output files
     # dstat data is parsed directly in webpage by javascript
@@ -93,6 +95,10 @@ stop_monitors() {
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $GPU_FN
     [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $GPU_FN
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $AMESTER_FN
+    [ "$INTERRUPTS_FLAG" == "1" ] && ./processIRQbyCPU.py $INTERRUPTS_FN \
+        -interval $MEAS_DELAY_SEC -threshold 10 > ${INTERRUPTS_FN}_cpu.json
+    [ "$INTERRUPTS_FLAG" == "1" ] && ./processIRQbyQUEUE.py $INTERRUPTS_FN \
+        -interval $MEAS_DELAY_SEC -threshold 10 > ${INTERRUPTS_FN}_queue.json
 
   done
   ###############################################################################
@@ -200,6 +206,14 @@ do
         if [ $? -ne 0 ] 
         then
           fatal_message "Problem starting nvidia-smi on host \"$SLAVE\""
+        fi
+    fi
+    if [ "$INTERRUPTS_FLAG" == "1" ]
+    then
+        ./start_monitor.sh interrupts $SLAVE $INTERRUPTS_FN $MEAS_DELAY_SEC
+        if [ $? -ne 0 ] 
+        then
+          fatal_message "Problem starting record_interrupts.sh on host \"$SLAVE\""
         fi
     fi
     if [ "$NMON_FLAG" == "1" ]

@@ -49,11 +49,11 @@ def main(argList):
 	
 	try:
 		if threshold == 0:
-			ob =  str(json.dumps(createJSON(sampleRatesCPU), sort_keys = False, indent = 1))
+			ob =  str(json.dumps(createJSON(sampleRatesCPU, interval), sort_keys = False, indent = 1))
 #			ob.replace('OrderedDict','').replace('(','{').replace(')','}')
 			print ob
 		else:
-			ob =  str(json.dumps(createJSON(thresholdFilter(sampleRatesCPU, threshold)), sort_keys = False, indent = 1))
+			ob =  str(json.dumps(createJSON(thresholdFilter(sampleRatesCPU, threshold), interval), sort_keys = False, indent = 1))
 			print ob
 	except:
 		print 'processIRObyCPU Exception JSON: can not generate json string.'
@@ -68,9 +68,9 @@ def thresholdFilter(x, threshold):
 	return filtered.items()
 	
 
-def createJSON(x):
+def createJSON(x, interval):
 	obj2ser = collections.OrderedDict()
-	obj2ser['labels'] = range(len(x[0][1]))
+	obj2ser['labels'] = [interval*i for i in range(len(x[0][1]))]
 	r = []
 	for i in sorted(x, reverse = True, key=lambda z: int(z[0].strip('CPU'))):
 		t = collections.OrderedDict()

@@ -49,11 +49,11 @@ def main(argList):
 
 	try:	
 		if threshold == 0:
-			ob =  str(json.dumps(createJSON(sampleRatesQueue), sort_keys = False, indent = 1))
+			ob =  str(json.dumps(createJSON(sampleRatesQueue, interval), sort_keys = False, indent = 1))
 #			ob.replace('OrderedDict','').replace('(','{').replace(')','}')
 			print ob
 		else:
-			ob =  str(json.dumps(createJSON(thresholdFilter(sampleRatesQueue, threshold)), sort_keys = False, indent = 1))
+			ob =  str(json.dumps(createJSON(thresholdFilter(sampleRatesQueue, threshold), interval), sort_keys = False, indent = 1))
 			print ob
 	except:
 		print 'processIRObyQUEUE Exception JSON: can not generate json string.'
@@ -66,9 +66,9 @@ def thresholdFilter(x, threshold):
 			filtered[i[0]] = i[1]
 	return filtered.items()
 
-def createJSON(x):
+def createJSON(x, interval):
 	obj2ser = collections.OrderedDict()
-	obj2ser['labels'] = range(len(x[0][1]))
+	obj2ser['labels'] = [ interval*i for i in range(len(x[0][1]))]
 	r = []
 	for i in sorted(x, reverse = True):
 		t = collections.OrderedDict()
