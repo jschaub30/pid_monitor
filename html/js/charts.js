@@ -408,6 +408,10 @@
                 load_csv('_gpu.mem.csv', monitor_idx, 'Detail GPU Memory Utilization [ % ]');
                 monitor_idx += 1;
             }
+            if(config.monitors.indexOf("gpu_bandwidth") > -1){
+                load_csv('_gpu_bandwidth.csv', monitor_idx, 'GPU Bandwidth [ GB/sec ]');
+                monitor_idx += 1;
+            }
             if(config.monitors.indexOf("amester") > -1){
                 load_csv('_amester.csv', monitor_idx, 
                          'AMESTER memory bandwidth [ GB/s ]');

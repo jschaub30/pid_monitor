@@ -4,7 +4,7 @@ library(reshape2)
 args = commandArgs(trailingOnly=TRUE)
 input_fn <- args[1]
 d <- read.csv(input_fn, stringsAsFactors=FALSE)
-
+d <- d[!is.na(d$index),]  # remove partial rows
 t <- as.POSIXct(d$timestamp)
 # Make timestamps for all GPUs match that of GPU0
 t0 = 0
