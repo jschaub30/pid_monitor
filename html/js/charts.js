@@ -419,6 +419,10 @@
             if (config.monitors.indexOf("cpu_detail") > -1) {
                 load_cpu_detail();
             }
+            if (config.monitors.indexOf("interrupts_detail") > -1) {
+                load_interrupts_detail(monitor_idx);
+                monitor_idx += 1;
+            }
         },
         load_cpu_detail = function() {
             $.ajax({
@@ -443,6 +447,39 @@
                     $('#id_cpu_y1').text('cpu' + data.datasets[data.datasets.length - 1].label);
                     $('#id_cpu_x1').text(data.labels[data.labels.length - 1] + 's');
                     $('#id_cpu_x0').text(data.labels[0] + 's');
+                },
+                error: function(request, status, error) {
+                    console.log(error);
+                }
+            });
+        },
+        load_interrupts_detail = function(monitor_idx) {
+            var id_str = "id_monitor" + monitor_idx.toString();
+            $("#" + id_str).show();
+            id_str = "id_canvas" + monitor_idx.toString();
+            $("#" + id_str).show();
+            $.ajax({
+                type: "GET",
+                url: data_dir + '/' + run_id + '_' + hostname + '_interrupts_cpu.json',
+                dataType: "json",
+                success: function(data) {
+                    $("#id_int_heatmap").show();
+                    var ctx = document.getElementById("id_int_detail").getContext("2d");
+                    var sampleChart = new Chart(ctx).HeatMap(data, {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        rounded: false,
+                        paddingScale: 0.0,
+                        showLabels: false,
+                        showScale: false,
+                        tooltipTemplate: "t: <%= xLabel %> | <%= yLabel %> | value: <%= value %>",
+                        colorInterpolation: 'gradient',
+                        colors: ['rgb(220,220,220)', 'red']
+                    });
+                    $('#id_int_y0').text(data.datasets[0].label);
+                    // $('#id_int_y1').text(data.datasets[data.datasets.length - 1].label);
+                    $('#id_int_x1').text(data.labels[data.labels.length - 1] + 's');
+                    $('#id_int_x0').text(data.labels[0] + 's');
                 },
                 error: function(request, status, error) {
                     console.log(error);

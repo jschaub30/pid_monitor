@@ -49,7 +49,7 @@
 			<div id="workload_table"></div>
 		</div>
 
-		<section id="id_cpu_heatmap">
+		<section id="id_heatmap1">
 			<div class="one-left">
 				<span class="heatmap-label heatmap-y0" id="id_cpu_y0">y0</span>
 				<span class="heatmap-label heatmap-y1" id="id_cpu_y1">y1</span>
@@ -82,6 +82,20 @@
 			<div class="one chart" id="id_monitor3"></div>
 			<div class="two chart" id="id_monitor4"></div>
 		</section>
+        <section id="id_int_heatmap">
+            <div class="interrupt-left">
+                <span class="heatmap-label heatmap-y0" id="id_int_y0">y0</span>
+                <span class="heatmap-label heatmap-y1" id="id_int_y1">y1</span>
+                y2
+            </div>
+            <div class="interrupt-main">
+                <div class="heatmap-title">Interrupt Heatmap</div>
+                <div class="heatmap-big"><canvas id="id_int_detail"></canvas></div>
+                <span class="heatmap-label heatmap-x0" id="id_int_x0">x0</span>
+                <span class="heatmap-label heatmap-x1" id="id_int_x1">x1</span>
+            </div>
+            <div class="two chart" id="id_"></div>
+        </section>
 	</div>
 	<!-- content -->
 	<div class="footer">
@@ -107,6 +121,7 @@
 		$("#id_monitor3").hide();
 		$("#id_monitor4").hide();
 		$("#id_cpu_heatmap").hide();
+		$("#id_int_heatmap").hide();
 		$("#id_header").load('header.html');
 	</script>
 
