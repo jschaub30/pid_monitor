@@ -23,7 +23,7 @@ def main(input_fn):
     start = False
     for line in lines:
         if start and len(line) > 10:
-            HtoD, DtoH, DtoD = "NaN","NaN","NaN"
+            HtoD, DtoH, DtoD = "","",""
             write_flag = False
             fields = line.split(',')
             startTime = fields[0]
