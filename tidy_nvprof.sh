@@ -8,7 +8,9 @@ HOST=$3
 # Step 1: Find the largest nvprof file for this run ID
 FN=$(ls -S ${INPUT_DIR}/${RUN_ID}*${HOST}*nvprof | head -n 1)
 NEW_FN=${INPUT_DIR}/${RUN_ID}_${HOST}_nvprof
-mv $FN $NEW_FN
+cp $FN $NEW_FN
+
+[ $? -ne 0 ] && echo ERROR: nvprof not found && exit 1
 
 # Step 2: Convert to CSV
 CSV_FN=$(echo $NEW_FN | perl -pe "s/nvprof/gpu_bandwidth.csv/")
