@@ -10,7 +10,7 @@
 [ "$MEAS_DELAY_SEC" -lt "1" ]  && MEAS_DELAY_SEC=1
 [ -z "$RUNDIR" ]  && export RUNDIR=$(./setup-run.sh $WORKLOAD_NAME)
 [ -z "$RUN_ID" ]  && export RUN_ID="RUN_1"
-[ -z "$SLAVES" ] && export SLAVES=$(hostname)
+[ -z "$SLAVES" ] && export SLAVES=$(hostname -s)
 [ -z "$VERBOSE" ] && export VERBOSE=0  # Set to 1 to turn on debug messages
 if [ "$P8_MEMBW_FLAG" == "1" ]
 then
