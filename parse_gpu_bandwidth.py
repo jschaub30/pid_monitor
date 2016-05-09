@@ -46,8 +46,10 @@ def main(input_fn):
             idx = fields.index('Throughput')
 
     # Now write output csv files
-    out_fn = input_fn.replace('.gpu_bandwidth.csv', 
-            '.gpu_bandwidth.timeseries.csv')
+    out_fn = input_fn.replace('gpu_bandwidth.csv', 
+            'gpu_bandwidth.timeseries.csv')
+    if (out_fn == input_fn)
+        out_fn = out_fn + '1'
     # write data to data/final directory
     #out_fn = out_fn.replace('data/raw', 'data/final')
     with open(out_fn, 'w') as fid:
