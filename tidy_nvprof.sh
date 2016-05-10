@@ -17,5 +17,11 @@ CSV_FN=$(echo $NEW_FN | perl -pe "s/nvprof/gpu_bandwidth.csv/")
 nvprof --csv --print-gpu-trace --import-profile $NEW_FN 2> $CSV_FN
 
 # Step 2: Pull out HtoD, DtoH and DtoD bandwidth data
-./parse_gpu_bandwidth.py $CSV_FN
-
+I=0
+for FN in ${INPUT_DIR}/*gpu_bandwidth.csv
+do
+    ./parse_gpu_bandwidth.py $FN &
+    I=$((I+1))
+    [ $((I % 4)) -eq 0 ] && wait
+done
+wait
