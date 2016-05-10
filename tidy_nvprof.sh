@@ -14,7 +14,7 @@ cp $FN $NEW_FN
 
 # Step 2: Convert to CSV
 I=0
-for FN in ${INPUT_DIR}/*nvprof
+for FN in ${INPUT_DIR}/${RUN_ID}*${HOST}*nvprof
 do
     CSV_FN=$(echo $FN | perl -pe "s/nvprof/gpu_bandwidth.csv/")
     /usr/local/cuda-7.5/bin/nvprof --csv --print-gpu-trace --import-profile $FN 2> $CSV_FN &
