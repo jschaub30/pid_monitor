@@ -26,7 +26,7 @@ wait
 
 # Step 2: Pull out HtoD, DtoH and DtoD bandwidth data
 I=0
-for FN in ${INPUT_DIR}/*gpu_bandwidth.csv
+for FN in ${INPUT_DIR}/${RUN_ID}*${HOST}*gpu_bandwidth.csv
 do
     ./parse_gpu_bandwidth.py $FN &
     I=$((I+1))
