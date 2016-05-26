@@ -90,7 +90,7 @@ stop_monitors() {
     fi
     [ "$GPU_FLAG" == "1" ] && ./parse_gpu.R $GPU_FN
     [ "$GPU_DETAIL_FLAG" == "1" ] && ./parse_gpu_detail.R $GPU_FN
-    [ "$GPU_BANDWIDTH_FLAG" == "1" ] && ./tidy_nvprof.sh $RUNDIR/data/raw $RUN_ID
+    [ "$GPU_BANDWIDTH_FLAG" == "1" ] && ./tidy_nvprof.sh $RUNDIR/data/raw "$RUN_ID"
     [ "$AMESTER_FLAG" == "1" ] && ./parse_amester.R $AMESTER_FN
 
   done
