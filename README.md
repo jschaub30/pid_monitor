@@ -27,7 +27,7 @@ This repository also makes use of:
 
 Try it out:
 ```
-sudo apt-get install -y dstat
+sudo apt-get install -y dstat time
 git clone https://github.com/jschaub30/pid_monitor
 cd pid_monitor/
 cp example.sh your_workload.sh
