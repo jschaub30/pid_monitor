@@ -15,7 +15,7 @@ Start here:
 - [example-cluster.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-sweep.sh) Run workload on 2 machines at once
 - [example-spark.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-spark.sh) Run the SparkPi example on your spark cluster
 - [example-amester.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-amester.sh) Collect measurements on Power8 systems using the AMESTER tool
-- TODO [example-gpu.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-gpu.sh) Record GPU profiles on systems with nvidia GPUs
+- [example-gpu.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-gpu.sh) Record GPU profiles on systems with nvidia GPUs
 - TODO [example-perf.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-oprofile.sh) Record perf data
 - TODO [example-oprofile.sh](https://github.com/jschaub30/pid_monitor/blob/master/example-oprofile.sh) Record oprofile data
 
@@ -25,7 +25,8 @@ This repository also makes use of:
 - [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing (included).
 - GNU-time /usr/bin/time
 
-Try it out:
+Try it out
+----------
 ```
 sudo apt-get install -y dstat time
 git clone https://github.com/jschaub30/pid_monitor
@@ -36,6 +37,24 @@ cp example.sh your_workload.sh
 ./pid_webserver.sh
 [ (Optional) copy the run directory to your web server ]
 ```
+
+## Optional: for GPU profiling, install R and packages 
+```
+sudo apt-get install r-base  # ubuntu
+sudo yum install R-devel     # redhat
+```
+
+Launch R
+```
+sudo R
+```
+In the r-shell, run the following commands
+```
+install.packages('ggplot2')
+install.packages('reshape2')
+install.packages('dplyr')
+```
+
 When run, these examples will create the following directories:
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
  - ./rundir/[WORKLOAD-NAME]/[DATETIME]/scripts    # Measurement and analysis scripts
