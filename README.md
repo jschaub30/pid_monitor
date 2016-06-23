@@ -25,8 +25,7 @@ This repository also makes use of:
 - [jquery-csv](https://code.google.com/p/jquery-csv/) for csv parsing (included).
 - GNU-time /usr/bin/time
 
-Try it out
-----------
+#Try it out
 ```
 sudo apt-get install -y dstat time
 git clone https://github.com/jschaub30/pid_monitor
