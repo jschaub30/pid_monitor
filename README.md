@@ -37,6 +37,19 @@ cp example.sh your_workload.sh
 [ (Optional) copy the run directory to your web server ]
 ```
 
+When run, these examples will create the following directories:
+ - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
+ - ./rundir/[WORKLOAD-NAME]/[DATETIME]/scripts    # Measurement and analysis scripts
+ - ./rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
+
+To permanently share all the measurements on your server, you need to enable a web server.
+On Ubuntu, this is as simple as
+```
+sudo apt-get install apache2
+cd /var/www/html
+sudo ln -sf [location of rundir in pid_monitor directory]
+```
+
 ## Optional: for GPU profiling, install R and packages 
 ```
 sudo apt-get install r-base  # ubuntu
@@ -52,17 +65,4 @@ In the r-shell, run the following commands
 install.packages('ggplot2')
 install.packages('reshape2')
 install.packages('dplyr')
-```
-
-When run, these examples will create the following directories:
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/data/raw   # All config and raw data files end up here
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/scripts    # Measurement and analysis scripts
- - ./rundir/[WORKLOAD-NAME]/[DATETIME]/html       # For interactive charts
-
-To permanently share all the measurements on your server, you need to enable a web server.
-On Ubuntu, this is as simple as
-```
-sudo apt-get install apache2
-cd /var/www/html
-sudo ln -sf [location of rundir in pid_monitor directory]
 ```
