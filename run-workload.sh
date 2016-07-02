@@ -227,7 +227,8 @@ echo $CONFIG > $CONFIG_FN
 ###############################################################################
 # STEP 4: RUN WORKLOAD
 debug_message "Working directory: $WORKLOAD_DIR"
-cd $WORKLOAD_DIR
+cd "$WORKLOAD_DIR"
+[ $? -ne 0 ] && echo ERROR Problem changing to WORKLOAD_DIR && exit 1
 # check for /usr/bin/time
 TIME_PATH=/usr/bin/time
 $TIME_PATH --verbose ls  2>/dev/null 1>/dev/null
