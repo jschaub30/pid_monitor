@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
 <head>
 	<link href="css/c3.min.css" rel="stylesheet">
-  <script src="js/d3.min.js" charset="utf-8"></script>
-  <script src="js/c3.min.js"></script>
-  <!-- Load jQuery -->
-  <script src="js/jquery.min.js"></script>
-  <script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
-  <script type="text/javascript" src="js/dygraph-combined.js"></script>
+	<script src="js/d3.min.js" charset="utf-8"></script>
+	<script src="js/c3.min.js"></script>
+	<script src='js/Chart.HeatMap.S.min.js'></script>
+	<!-- Load jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.csv-0.71.js" type="text/javascript"></script>
+	<script type="text/javascript" src="js/dygraph-combined.js"></script>
 
-  <title id="id_title">PID monitor</title>
+	<title id="id_title">PID monitor</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 
 </head>
@@ -47,49 +49,60 @@
 			<div id="workload_table"></div>
 		</div>
 
-		</p>
-		<div>
-				<section>
-					<div class="one chart" id="id_cpu"></div>
-					<div class="two chart" id="id_io"></div>
-				</section>
-		</div>
-		<div>
-			<section>
-				<div class="one chart" id="id_mem"></div>
-				<div class="two chart" id="id_net"></div>
-			</section>
-		</div>
-		<div>
-			<section>
-				<div class="one chart" id="id_sys"></div>
-				<div class="two chart" id="id_proc"></div>
-			</section>
-		</div>
-		<div>
-			<section>
-				<div class="one chart" id="id_monitor1"></div>
-				<div class="two chart" id="id_monitor2"></div>
-			</section>
-		</div>
-		<div>
-			<section>
-				<div class="one chart" id="id_monitor3"></div>
-				<div class="two chart" id="id_monitor4"></div>
-			</section>
-		</div>
-		<div>
-			<section>
-				<div class="one chart" id="id_monitor5"></div>
-				<div class="two chart" id="id_monitor6"></div>
-			</section>
-		</div>
-	</div> <!-- content -->
-	 <div class="footer">
-		 <div id="cluster_buttons">Nodes: </div>
-		 <div id="run_id_buttons">Run ID: </div>
-		 <div id="sum_buttons"></div>
-	 </div>
+		<section id="id_heatmap1">
+			<div class="one-left">
+				<span class="heatmap-label heatmap-y0" id="id_cpu_y0">y0</span>
+				<span class="heatmap-label heatmap-y1" id="id_cpu_y1">y1</span>
+			</div>
+			<div class="one-middle">
+				<div class="heatmap-title">CPU Heatmap</div>
+				<div class="heatmap"><canvas id="id_cpu_detail"></canvas></div>
+				<span class="heatmap-label heatmap-x0" id="id_cpu_x0">x0</span>
+				<span class="heatmap-label heatmap-x1" id="id_cpu_x1">x1</span>
+			</div>
+			<div class="two chart" id="id_"></div>
+		</section>
+		<section>
+			<div class="one chart" id="id_cpu"></div>
+			<div class="two chart" id="id_io"></div>
+		</section>
+		<section>
+			<div class="one chart" id="id_mem"></div>
+			<div class="two chart" id="id_net"></div>
+		</section>
+		<section>
+			<div class="one chart" id="id_sys"></div>
+			<div class="two chart" id="id_proc"></div>
+		</section>
+		<section>
+			<div class="one chart" id="id_monitor1"></div>
+			<div class="two chart" id="id_monitor2"></div>
+		</section>
+		<section>
+			<div class="one chart" id="id_monitor3"></div>
+			<div class="two chart" id="id_monitor4"></div>
+		</section>
+        <section id="id_int_heatmap">
+            <div class="interrupt-left">
+                <span class="heatmap-label heatmap-y0" id="id_int_y0">y0</span>
+                <span class="heatmap-label heatmap-y1" id="id_int_y1">y1</span>
+                y2
+            </div>
+            <div class="interrupt-main">
+                <div class="heatmap-title">Interrupt Heatmap</div>
+                <div class="heatmap-big"><canvas id="id_int_detail"></canvas></div>
+                <span class="heatmap-label heatmap-x0" id="id_int_x0">x0</span>
+                <span class="heatmap-label heatmap-x1" id="id_int_x1">x1</span>
+            </div>
+            <div class="two chart" id="id_"></div>
+        </section>
+	</div>
+	<!-- content -->
+	<div class="footer">
+		<div id="cluster_buttons">Nodes: </div>
+		<div id="run_id_buttons">Run ID: </div>
+		<div id="sum_buttons"></div>
+	</div>
 
 	<script>
 		$("#summary_table").load('summary.html', function(response, status) {
@@ -103,11 +116,16 @@
 			}
 		});
 		$("#workload_table").load('workload.html');
+		$("#id_monitor1").hide();
+		$("#id_monitor2").hide();
+		$("#id_monitor3").hide();
+		$("#id_monitor4").hide();
+		$("#id_cpu_heatmap").hide();
+		$("#id_int_heatmap").hide();
 		$("#id_header").load('header.html');
 	</script>
 
-  <script src='js/charts.js' type='text/javascript'>
-	</script>
+	<script src='js/charts.js' type='text/javascript'></script>
 
 </body>
 

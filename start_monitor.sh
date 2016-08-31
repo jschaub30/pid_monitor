@@ -9,8 +9,10 @@ DELAY_SEC=$4
 
 if [ "$HOST" == "$(hostname)" ] || [ "$HOST" == "$(hostname -s)" ]
 then
+  LOCAL_MODE=1
   TARGET_FN=$3
 else
+  LOCAL_MODE=0
   TARGET_FN=/tmp/${USER}/pid_monitor/$(basename $3)
 fi
 
@@ -20,6 +22,27 @@ fi
 [ "$MONITOR" == "nmon" ] && \
   RUN_CMD="nmon -f -c 10000 -F $TARGET_FN -s $DELAY_SEC"
 
+if [ "$MONITOR" == "cpu_detail" ]
+then
+    NUM_CPU=$(cat /proc/cpuinfo | grep processor | wc -l)
+    CPU_LIST=$(seq 0 $((NUM_CPU-1))  | perl -pe "s/\n/,/" | perl -pe "s/,$//")
+    RUN_CMD="dstat --time --cpu -C $CPU_LIST --output $TARGET_FN $DELAY_SEC"
+    # redefine MONITOR for test below
+    MONITOR="dstat"
+fi
+
+if [ "$MONITOR" == "interrupts" ]
+then
+    if [ $LOCAL_MODE -eq 1 ]
+    then
+        RUN_CMD="$(dirname $0)/record_interrupts.sh $TARGET_FN $DELAY_SEC"
+    else
+      scp $(dirname $0)/record_interrupts.sh $HOST:/tmp/. > /dev/null
+      RUN_CMD="/tmp/record_interrupts.sh $TARGET_FN $DELAY_SEC"
+    fi
+    SKIP_CHECK=1
+fi
+
 if [ "$MONITOR" == "gpu" ]
 then
   MONITOR="nvidia-smi"
@@ -28,13 +51,16 @@ then
     --format=csv --filename=$TARGET_FN --loop=$DELAY_SEC"
 fi
 
-if [ "$HOST" == "$(hostname)" ] || [ "$HOST" == "$(hostname -s)" ]
+if [ $LOCAL_MODE -eq 1 ]
 then
   # Run locally on this machine.  Store in path given
 
   # Check if $MONITOR is installed
-  which $MONITOR >/dev/null
-  [ "$?" -ne 0 ] && echo ERROR: $MONITOR is not installed on $HOST. Exiting... && exit 64
+  if [ -z $SKIP_CHECK ] 
+  then
+      which $MONITOR >/dev/null
+      [ "$?" -ne 0 ] && echo ERROR: $MONITOR is not installed on $HOST. Exiting... && exit 64
+  fi 
   
   # Checking to see if $MONITOR is already running
   RC=$(ps -efa | grep $MONITOR | grep -v grep | grep -v $0 | grep -v vim | wc -l)
@@ -47,9 +73,12 @@ then
 
 else
   # Will collect data over ssh.  Store in /tmp directory
-  # Check if monitor is installed
-  ssh $HOST "which $MONITOR" > /dev/null
-  [ "$?" -ne 0 ] && echo ERROR: $MONITOR is not installed on $HOST. Exiting... && exit 64
+  if [ -z $SKIP_CHECK ] 
+  then
+      # Check if monitor is installed
+      ssh $HOST "which $MONITOR" > /dev/null
+      [ "$?" -ne 0 ] && echo ERROR: $MONITOR is not installed on $HOST. Exiting... && exit 64
+  fi 
   
   # Checking to see if monitor is already running
   RC=$(ssh $HOST "ps -efa | grep $MONITOR | grep -v grep | grep -v vim | wc -l")

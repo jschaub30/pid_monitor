@@ -10,8 +10,9 @@
         config,
         monitor_idx = 1,
         //http://colorbrewer2.org/
-        chart_colors = ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)', 
-                        'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'], 
+        chart_colors = ['rgb(228,26,28)', 'rgb(55,126,184)', 'rgb(77,175,74)',
+            'rgb(152,78,163)', 'rgb(255,127,0)', 'rgb(141,211,199)'
+        ],
         parse_summary_line = function(line) {
             return {
                 x: line.run_id,
@@ -73,9 +74,11 @@
             return chart;
         },
         csv_chart2 = function(data, monitor_idx, title) {
+            var id_str = "id_monitor" + monitor_idx.toString();
+            $("#" + id_str).show();
             //console.log(data);
             var chart = new Dygraph(
-                document.getElementById("id_monitor" + monitor_idx.toString()),
+                document.getElementById(id_str),
                 data, {
                     // labels: labels,
                     colors: chart_colors,
@@ -97,9 +100,9 @@
                 new_array.push(data[i].slice(0));
             }
             for (i = 1; i < new_array.length; i++) {
-                dt = new_array[i][0] - new_array[i-1][0];
+                dt = new_array[i][0] - new_array[i - 1][0];
                 for (var j = 1; j < new_array[0].length; j++) {
-                  new_array[i][j] = new_array[i-1][j] + dt*new_array[i][j];
+                    new_array[i][j] = new_array[i - 1][j] + dt * new_array[i][j];
                 }
             }
             return new_array;
@@ -143,8 +146,8 @@
                     return parse_dstat_line(x, index, 1, "usr", "sys", "idl", "wai", "hiq", "siq");
                 }
             );
-            var factor_g = 1/1024/1024/1024,
-                factor_m = 1/1024/1024;
+            var factor_g = 1 / 1024 / 1024 / 1024,
+                factor_m = 1 / 1024 / 1024;
             mem_data = csv_data.map(
                 function(x, index) {
                     return parse_dstat_line(x, index, factor_g, "used", "buff", "cach", "free");
@@ -179,30 +182,30 @@
                 }
             );
 
-            csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system", 
-                      "idle", "wait", "hiq", "siq"], "Usage [ % ]");
-            csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff", 
-                      "cache", "free"], "Usage [ GB ]");
+            csv_chart(cpu_data, "id_cpu", "CPU", ["time", "user", "system",
+                "idle", "wait", "hiq", "siq"
+            ], "Usage [ % ]");
+            csv_chart(mem_data, "id_mem", "Memory", ["time", "used", "buff",
+                "cache", "free"
+            ], "Usage [ GB ]");
             if (cumsum_flag) {
-                csv_chart(io_sum_data, "id_io", "&#x222b; IO", ["time", "read", 
-                          "write"], "Usage [ GB ]");
+                csv_chart(io_sum_data, "id_io", "&#x222b; IO", ["time", "read",
+                    "write"
+                ], "Usage [ GB ]");
             } else {
-                csv_chart(io_data, "id_io", "IO", ["time", "read", "write"], 
-                          "Usage [ GB/s ]");
+                csv_chart(io_data, "id_io", "IO", ["time", "read", "write"],
+                    "Usage [ GB/s ]");
             }
 
             if (cumsum_flag) {
-                csv_chart(net_sum_data, "id_net", "&#x222b; Network", 
-                          ["time", "recv", "send"], "Usage [ GB ]");
+                csv_chart(net_sum_data, "id_net", "&#x222b; Network", ["time", "recv", "send"], "Usage [ GB ]");
             } else {
-                csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"], 
-                          "Usage [ GB/s ]");
+                csv_chart(net_data, "id_net", "Network", ["time", "recv", "send"],
+                    "Usage [ GB/s ]");
             }
 
-            csv_chart(sys_data, "id_sys", "System", 
-                      ["time", "interrupts", "context switches"], "");
-            csv_chart(proc_data, "id_proc", "Processes", 
-                      ["time", "run", "blk", "new"], "");
+            csv_chart(sys_data, "id_sys", "System", ["time", "interrupts", "context switches"], "");
+            csv_chart(proc_data, "id_proc", "Processes", ["time", "run", "blk", "new"], "");
             //csv_chart(pag_data, "id_pag", "Paging", ["time", "in", "out"], "");
             $('#id_progress').hide();
         },
@@ -262,9 +265,9 @@
         },
         create_snapshot_link = function(hostname) {
             var link = $('<a></a>', {
-                    href: hostname + '.html',
-                    text: hostname
-                }).appendTo('#id_snapshot').addClass('snapshot');
+                href: hostname + '.html',
+                text: hostname
+            }).appendTo('#id_snapshot').addClass('snapshot');
         },
         create_run_button = function(index, id) {
             var button_id = "button" + String(index),
@@ -321,7 +324,7 @@
             c3.generate({
                 bindto: id,
                 // size: {
-                    // height: 600
+                // height: 600
                 // },
                 data: {
                     json: data,
@@ -386,23 +389,23 @@
                 }
             });
         },
-        load_all_data = function(){
-            if(config.monitors.indexOf("dstat") > -1){
+        load_all_data = function() {
+            if (config.monitors.indexOf("dstat") > -1) {
                 load_dstat_csv();
             }
             monitor_idx = 1;
-            if(config.monitors.indexOf("membw") > -1){
-                load_csv('_ocount.memory_bw.csv', monitor_idx, 
-                         'Cache/Memory Bandwidth [ GB/s ]');
+            if (config.monitors.indexOf("membw") > -1) {
+                load_csv('_ocount.memory_bw.csv', monitor_idx,
+                    'Cache/Memory Bandwidth [ GB/s ]');
                 monitor_idx += 1;
             }
-            if(config.monitors.indexOf("gpu") > -1){
+            if (config.monitors.indexOf("gpu") > -1) {
                 load_csv('_gpu.csv', monitor_idx, 'Average GPU Utilization [ % ]');
                 monitor_idx += 1;
                 load_csv('_gpu.pwr.csv', monitor_idx, 'Average GPU Power [ W ]');
                 monitor_idx += 1;
             }
-            if(config.monitors.indexOf("gpu_detail") > -1){
+            if (config.monitors.indexOf("gpu_detail") > -1) {
                 load_csv('_gpu.gpu.csv', monitor_idx, 'Detail GPU Utilization [ % ]');
                 monitor_idx += 1;
                 load_csv('_gpu.mem.csv', monitor_idx, 'Detail GPU Memory Utilization [ % ]');
@@ -417,6 +420,75 @@
                          'AMESTER memory bandwidth [ GB/s ]');
                 monitor_idx += 1;
             }
+            if (config.monitors.indexOf("cpu_detail") > -1) {
+                load_cpu_detail();
+            }
+            if (config.monitors.indexOf("interrupts_detail") > -1) {
+                load_interrupts_detail(monitor_idx);
+                monitor_idx += 1;
+            }
+        },
+        load_cpu_detail = function() {
+            $.ajax({
+                type: "GET",
+                url: data_dir + '/' + run_id + '_' + hostname + '_cpu_detail.csv.js',
+                dataType: "json",
+                success: function(data) {
+                    $("#id_cpu_heatmap").show();
+                    var ctx = document.getElementById("id_cpu_detail").getContext("2d");
+                    var sampleChart = new Chart(ctx).HeatMap(data, {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        rounded: false,
+                        paddingScale: 0.0,
+                        showLabels: false,
+                        showScale: false,
+                        tooltipTemplate: "t: <%= xLabel %> | cpu: <%= yLabel %> | value: <%= value %>%",
+                        colorInterpolation: 'gradient',
+                        colors: ['rgb(220,220,220)', 'red']
+                    });
+                    $('#id_cpu_y0').text('cpu' + data.datasets[0].label);
+                    $('#id_cpu_y1').text('cpu' + data.datasets[data.datasets.length - 1].label);
+                    $('#id_cpu_x1').text(data.labels[data.labels.length - 1] + 's');
+                    $('#id_cpu_x0').text(data.labels[0] + 's');
+                },
+                error: function(request, status, error) {
+                    console.log(error);
+                }
+            });
+        },
+        load_interrupts_detail = function(monitor_idx) {
+            var id_str = "id_monitor" + monitor_idx.toString();
+            $("#" + id_str).show();
+            id_str = "id_canvas" + monitor_idx.toString();
+            $("#" + id_str).show();
+            $.ajax({
+                type: "GET",
+                url: data_dir + '/' + run_id + '_' + hostname + '_interrupts_cpu.json',
+                dataType: "json",
+                success: function(data) {
+                    $("#id_int_heatmap").show();
+                    var ctx = document.getElementById("id_int_detail").getContext("2d");
+                    var sampleChart = new Chart(ctx).HeatMap(data, {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        rounded: false,
+                        paddingScale: 0.0,
+                        showLabels: false,
+                        showScale: false,
+                        tooltipTemplate: "t: <%= xLabel %> | <%= yLabel %> | value: <%= value %>",
+                        colorInterpolation: 'gradient',
+                        colors: ['rgb(220,220,220)', 'red']
+                    });
+                    $('#id_int_y0').text(data.datasets[0].label);
+                    // $('#id_int_y1').text(data.datasets[data.datasets.length - 1].label);
+                    $('#id_int_x1').text(data.labels[data.labels.length - 1] + 's');
+                    $('#id_int_x0').text(data.labels[0] + 's');
+                },
+                error: function(request, status, error) {
+                    console.log(error);
+                }
+            });
         },
         update_page = function(config, showTest) {
             // console.log(data);
@@ -452,7 +524,7 @@
             });
         };
 
-    load_summary();  // Create the summary chart
+    load_summary(); // Create the summary chart
     read_config();
 
 })();
